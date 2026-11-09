@@ -273,3 +273,24 @@ export const gastosExemplo: [number, string, string, string, string, string, (nu
   [96, "2026-10-24", "Pedágio", "van1", "l1", ""],
   [80, "2026-10-24", "Alimentação", "van1", "l1", ""],
 ];
+
+// Histórico de recebimentos de junho a outubro (para o Financeiro ter meses anteriores)
+{
+  const tem = new Set(cobrancasExemplo.map((c) => `${c.pid}_${c.tipo}_${c.venc}`));
+  const add = (c: CobrancaExemplo) => { const k = `${c.pid}_${c.tipo}_${c.venc}`; if (!tem.has(k)) { tem.add(k); cobrancasExemplo.push(c); } };
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const mensais: [string, number, string][] = [["p7", 320, "05"], ["p9", 320, "05"], ["p11", 250, "05"], ["p12", 250, "05"], ["p13", 250, "01"], ["p15", 250, "05"]];
+  const semanais: [string, number][] = [["p6", 90], ["p8", 90], ["p10", 90], ["p14", 65]];
+  const porViagem = ["p1", "p2", "p3", "p4", "p5", "p16", "p17", "p18", "p19", "p20", "p21", "p22"];
+  for (let m = 6; m <= 10; m++) {
+    const mes = `2026-${String(m).padStart(2, "0")}`;
+    mensais.forEach(([pid, valor, dia], i) => add({ pid, tipo: "mes", venc: `${mes}-${dia}`, valor, pago: [valor, `${mes}-${dia}`, i % 2 ? "dinheiro" : "pix"] }));
+    const sextas: string[] = [];
+    for (let d = new Date(2026, m - 1, 1); d.getMonth() === m - 1; d.setDate(d.getDate() + 1)) {
+      const s = iso(d);
+      if (d.getDay() === 1 && s < "2026-10-26") semanais.forEach(([pid, valor]) => add({ pid, tipo: "semana", venc: s, valor, pago: [valor, s, "pix"] }));
+      if (d.getDay() === 5) sextas.push(s);
+    }
+    [sextas[0], sextas[2]].filter(Boolean).forEach((s, j) => porViagem.forEach((pid, i) => add({ pid, tipo: "viagem", venc: s!, valor: 150, pago: [150, s!, (i + j) % 2 ? "dinheiro" : "pix"] })));
+  }
+}
