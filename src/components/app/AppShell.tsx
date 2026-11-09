@@ -19,7 +19,7 @@ export function AppShell({ items }: { items: NavItem[] }) {
             <li key={it.to} className="flex-1">
               <Link
                 to={it.to}
-                activeOptions={{ exact: it.exact }}
+                activeOptions={{ exact: it.exact ?? false }}
                 className="flex min-h-[68px] flex-col items-center justify-center gap-1 text-xs font-semibold text-muted-foreground"
                 activeProps={{ className: "text-primary [&_svg]:text-accent-strong" }}
               >
