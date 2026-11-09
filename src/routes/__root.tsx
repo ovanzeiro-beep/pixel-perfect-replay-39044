@@ -9,8 +9,10 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { registrarServiceWorker } from "../lib/pwa";
+import { capturarInstalacao, registrarServiceWorker } from "../lib/pwa";
 import { iniciarPersistencia } from "../data/store";
+import { AtualizacaoApp } from "../components/app/AtualizacaoApp";
+import { SemConexao } from "../components/app/SemConexao";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -132,6 +134,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
+    capturarInstalacao();
     registrarServiceWorker();
     return iniciarPersistencia();
   }, []);
@@ -140,6 +143,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] mx-auto max-w-md space-y-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="pointer-events-auto space-y-2">
+          <AtualizacaoApp />
+          <SemConexao />
+        </div>
+      </div>
     </QueryClientProvider>
   );
 }

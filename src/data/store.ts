@@ -32,7 +32,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-export type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[] };
+export type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[]; alertasDispensados: Record<string, string> };
 
 export function criarEstadoExemplo(): Estado {
   const base: Estado = {
@@ -47,7 +47,7 @@ export function criarEstadoExemplo(): Estado {
       ...p, endereco: p.endereco.split(",")[0]!, ...(detalhesPassageiros[p.id] ?? detalheVazio), linhaIds: linhaId ? [linhaId] : [], ativo: true,
       emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
     })),
-    ajustes: {}, cobrancas: [], recibos: [], chavePix: "",
+    ajustes: {}, cobrancas: [], recibos: [], chavePix: "", alertasDispensados: {},
     gastos: [
       ...gastosMes.map((g) => ({ id: g.id, valor: g.valor, data: g.data, categoria: (g.descricao === "Diesel" ? "Diesel" : g.descricao === "Pedágio" ? "Pedágio" : "Manutenção") as Categoria,
         vanId: g.vanId, linhaId: g.descricao === "Pedágio" ? "l1" : "", descricao: g.descricao === "Diesel" || g.descricao === "Pedágio" ? "" : g.descricao, litros: null, km: null, mensal: false })),
@@ -121,7 +121,7 @@ export function iniciarPersistencia(): () => void {
   persistenciaAtiva = true;
   const lido = ler(armazem, ehEstado);
   // Dados salvos antes da Etapa 2 traziam "passageiroAtualId"; agora quem é o passageiro vem da sessão.
-  const salvo = lido ? (({ passageiroAtualId: _antigo, ...resto }) => resto as Estado)(lido as Estado & { passageiroAtualId?: string }) : null;
+  const salvo = lido ? (({ passageiroAtualId: _antigo, ...resto }) => ({ ...resto, alertasDispensados: resto.alertasDispensados ?? {} }) as Estado)(lido as Estado & { passageiroAtualId?: string }) : null;
   if (salvo) set(comAberto({ ...salvo, cobrancas: gerarPeriodicas(salvo.cobrancas, salvo.passageiros, isoDe(new Date())) }));
   marcarProntos();
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -263,6 +263,10 @@ export function desfazerRecibo(numero: number) {
 export function cancelarCob(id: string, motivo: string) {
   set(comAberto({ ...estado, cobrancas: cancelarCobranca(estado.cobrancas, id, motivo) }));
 }
+export function dispensarAlerta(id: string, assinatura: string) {
+  set({ ...estado, alertasDispensados: { ...estado.alertasDispensados, [id]: assinatura } });
+}
+export function restaurarAlertas() { set({ ...estado, alertasDispensados: {} }); }
 export function salvarChavePix(chave: string) { set({ ...estado, chavePix: chave.trim() }); }
 
 export function salvarGasto(g: Omit<Gasto, "id"> & { id?: string | undefined }) {

@@ -276,3 +276,17 @@ export function semPassageiro(aj: Ajuste, pid: string): Ajuste {
   }
   return { ...novo, ida: novaIda };
 }
+
+const somaMinutos = (hhmm: string, min: number) => {
+  if (!hhmm.includes(":")) return hhmm;
+  const [h, m] = hhmm.split(":").map(Number);
+  const total = (h! * 60 + m! + min) % (24 * 60);
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+};
+export const MINUTOS_ENTRE_PARADAS = 20;
+
+/** Horário aproximado na parada do passageiro: a saída mais 20 minutos por cidade até a dele no trajeto. */
+export function horarioNaParada(saida: string, cidadeDoPassageiro: string, trajeto: string[]): string {
+  const pos = trajeto.findIndex((c) => c.toLowerCase().startsWith(cidadeDoPassageiro.toLowerCase()));
+  return pos <= 0 ? saida : somaMinutos(saida, pos * MINUTOS_ENTRE_PARADAS);
+}

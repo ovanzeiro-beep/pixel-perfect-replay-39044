@@ -77,3 +77,20 @@ describe("volta e entrega", () => {
     expect(totalCobrado({ ...ida, volta: { ...novaVolta(0), extras: [{ pid: "x", cobrou: 25 }] } })).toBe(55);
   });
 });
+
+import { horarioNaParada } from "./viagens";
+describe("horário na parada do passageiro", () => {
+  const trajeto = ["Jacarezinho", "Cambará", "Andirá", "Bandeirantes", "Londrina"];
+  it("primeira cidade sai no horário; cada cidade a mais soma 20 minutos", () => {
+    expect(horarioNaParada("17:30", "Jacarezinho", trajeto)).toBe("17:30");
+    expect(horarioNaParada("17:30", "Cambará", trajeto)).toBe("17:50");
+    expect(horarioNaParada("17:30", "Bandeirantes", trajeto)).toBe("18:30");
+  });
+  it("cidade fora do trajeto usa a saída; passa da meia-noite sem quebrar", () => {
+    expect(horarioNaParada("17:30", "Marte", trajeto)).toBe("17:30");
+    expect(horarioNaParada("23:50", "Andirá", trajeto)).toBe("00:30");
+  });
+  it("aceita bairro/cidade com complemento no trajeto", () => {
+    expect(horarioNaParada("06:40", "Jacarezinho", ["Jacarezinho (Centro)", "Vila São Pedro"])).toBe("06:40");
+  });
+});

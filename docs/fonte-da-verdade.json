@@ -774,7 +774,7 @@
     {
       "id": 6,
       "titulo": "Alertas e prazos",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Avisos dentro do app: CNH vencendo, cobranças em atraso, prazo de confirmação da viagem.",
       "checks": [
         {
@@ -783,57 +783,315 @@
           "arquivo": "src/data/alertas.ts"
         },
         {
-          "d": "Testes dos alertas",
+          "d": "Alerta de CNH vencendo/vencida",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"cnh\""
+        },
+        {
+          "d": "Alerta de pagamentos atrasados",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"cobranca\""
+        },
+        {
+          "d": "Alerta de prazo de confirmação",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"confirmacao\""
+        },
+        {
+          "d": "Prazo de confirmação calculado (véspera, 20h)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "PRAZO = \\{ diasAntes: 1, hora: 20 \\}"
+        },
+        {
+          "d": "Dispensar volta se a situação mudar (assinatura)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "export const filtrarDispensados"
+        },
+        {
+          "d": "Prazo não é mais texto fixo no exemplo",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "prazoConfirmacao"
+        },
+        {
+          "d": "Dispensados ficam salvos",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function dispensarAlerta"
+        },
+        {
+          "d": "Hook dos alertas (atualiza a cada minuto)",
           "tipo": "arquivo",
-          "arquivo": "src/data/alertas.test.ts"
+          "arquivo": "src/data/useAlertas.ts"
+        },
+        {
+          "d": "Cartões de alerta na tela",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/Alertas.tsx"
         },
         {
           "d": "Início do vanzeiro mostra alertas",
           "tipo": "contem",
           "arquivo": "src/routes/vanzeiro.index.tsx",
-          "regex": "alertas"
+          "regex": "<Alertas />"
+        },
+        {
+          "d": "Selo de alertas no menu Início",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "badge: atencao"
+        },
+        {
+          "d": "Menu mostra o selo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AppShell.tsx",
+          "regex": "badge"
+        },
+        {
+          "d": "Ficha da viagem usa o prazo calculado",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Passageiro vê o prazo para responder",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Testes dos alertas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/alertas.test.ts"
+        },
+        {
+          "d": "Teste: prazo muda no minuto certo (20h)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "encerra exatamente às 20h"
+        },
+        {
+          "d": "Teste: dispensar volta quando a situação muda",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "dispensar esconde, e volta se a situação mudar"
+        },
+        {
+          "d": "Teste: demonstração mostra alertas",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "alertas com os dados de exemplo"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
         },
         {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },
     {
       "id": 7,
       "titulo": "Área do passageiro completa",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Passageiro confirma, vê parada/horário, débitos e recibos; aceite de convite sem atalhos falsos.",
       "checks": [
         {
-          "d": "Teste do fluxo do passageiro",
+          "d": "Lista de recibos do passageiro",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ListaRecibos.tsx"
+        },
+        {
+          "d": "Recibos visíveis ao passageiro (só os dele)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "recibos\\.filter\\(\\(r\\) => r\\.pid === p\\.id\\)"
+        },
+        {
+          "d": "Recibo: compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ListaRecibos.tsx",
+          "regex": "compartilharTexto"
+        },
+        {
+          "d": "Recibo: copiar",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ListaRecibos.tsx",
+          "regex": "Recibo copiado"
+        },
+        {
+          "d": "Avisos do passageiro (regras)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "export function gerarAvisosPassageiro"
+        },
+        {
+          "d": "Avisos do passageiro (tela)",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/AvisosPassageiro.tsx"
+        },
+        {
+          "d": "Avisos no início do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Avisos em pagamentos",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Avisos em minhas viagens",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Minhas viagens mostra o prazo",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Minhas viagens mostra o horário na parada",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "Na sua parada"
+        },
+        {
+          "d": "Horário na parada em função própria e testada",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "export function horarioNaParada"
+        },
+        {
+          "d": "Link de convite real",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/convite.ts"
+        },
+        {
+          "d": "Link de convite falso removido",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "ovanzeiro\\.app|linkConviteExemplo"
+        },
+        {
+          "d": "Rota do convite (/convite/:id)",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/convite.$passageiroId.tsx"
+        },
+        {
+          "d": "Convite só vale se enviado e ativo",
+          "tipo": "contem",
+          "arquivo": "src/lib/convite.ts",
+          "regex": "export function conviteValido"
+        },
+        {
+          "d": "Tela de convite sem aviso técnico de banco",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.convite.tsx",
+          "regex": "Sem banco de dados"
+        },
+        {
+          "d": "Aceite simulado do vanzeiro só no modo demo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "modoDemo && aberto\\.convite"
+        },
+        {
+          "d": "Teste do fluxo do passageiro (telas reais)",
           "tipo": "arquivo",
           "arquivo": "src/test/passageiro-fluxo.test.tsx"
         },
         {
-          "d": "Recibos visíveis ao passageiro",
+          "d": "Teste: recibos só do próprio passageiro",
           "tipo": "contem",
-          "arquivo": "src/routes/passageiro.pagamentos.tsx",
-          "regex": "[Rr]ecibo"
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "nunca de outro passageiro"
+        },
+        {
+          "d": "Teste: convite pelo link até entrar",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "convite enviado: abre a tela do convite"
+        },
+        {
+          "d": "Teste: responder 'Vou' grava na viagem",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "responder 'Vou' grava"
+        },
+        {
+          "d": "Teste: passageiro não entra na área do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "não entra na área do vanzeiro"
+        },
+        {
+          "d": "Teste do link de convite",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/convite.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
         },
         {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },
     {
       "id": 8,
       "titulo": "PWA lapidado",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Aviso de nova versão, funcionamento básico offline e roteiro de teste em aparelho real.",
       "checks": [
         {
-          "d": "Aviso de atualização",
+          "d": "Aviso de nova versão",
           "tipo": "arquivo",
           "arquivo": "src/components/app/AtualizacaoApp.tsx"
+        },
+        {
+          "d": "Aviso: Atualizar agora e Depois",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AtualizacaoApp.tsx",
+          "regex": "Atualizar agora[\\s\\S]*Depois"
+        },
+        {
+          "d": "Faixa de 'sem internet'",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/SemConexao.tsx"
+        },
+        {
+          "d": "Avisos montados no app inteiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "<AtualizacaoApp />[\\s\\S]*<SemConexao />"
         },
         {
           "d": "SW aceita atualizar sob comando",
@@ -842,9 +1100,106 @@
           "regex": "SKIP_WAITING"
         },
         {
+          "d": "SW não se atualiza sozinho na instalação",
+          "tipo": "naoContem",
+          "arquivo": "public/sw.js",
+          "regex": "\\(event\\) => \\{\\s*(self\\.skipWaiting\\(\\)|event\\.waitUntil\\(self\\.skipWaiting)"
+        },
+        {
+          "d": "SW usa o carimbo do build",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "importScripts\\(\"/build-id.js\"\\)"
+        },
+        {
+          "d": "SW guarda todos os arquivos do app (offline)",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "/arquivos.json"
+        },
+        {
+          "d": "SW tem plano B offline em camadas",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "OFFLINE_URL"
+        },
+        {
+          "d": "Build carimba a versão e lista os arquivos",
+          "tipo": "contem",
+          "arquivo": "vite.config.ts",
+          "regex": "servicoOffline[\\s\\S]*arquivos\\.json|arquivos\\.json[\\s\\S]*servicoOffline"
+        },
+        {
+          "d": "App checa versão nova sem cache do navegador",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "updateViaCache: \"none\""
+        },
+        {
+          "d": "App detecta versão esperando e recarrega ao atualizar",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "export function atualizarApp"
+        },
+        {
+          "d": "Instalação capturada no app inteiro",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "export function capturarInstalacao"
+        },
+        {
+          "d": "Cartão de instalar também no perfil",
+          "tipo": "contem",
+          "arquivo": "src/components/app/PerfilTela.tsx",
+          "regex": "<InstalarApp"
+        },
+        {
+          "d": "Manifest com capturas de tela",
+          "tipo": "contem",
+          "arquivo": "public/manifest.webmanifest",
+          "regex": "\"screenshots\""
+        },
+        {
+          "d": "Captura: entrada",
+          "tipo": "arquivo",
+          "arquivo": "public/screenshots/entrada.png"
+        },
+        {
           "d": "Roteiro de teste em aparelho",
           "tipo": "arquivo",
           "arquivo": "docs/teste-em-aparelho.md"
+        },
+        {
+          "d": "Roteiro cobre Android e iPhone",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "## Android[\\s\\S]*## iPhone"
+        },
+        {
+          "d": "Roteiro cobre sem internet e nova versão",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "Sem internet[\\s\\S]*Nova versão"
+        },
+        {
+          "d": "Testes da lógica do PWA",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/pwa.test.tsx"
+        },
+        {
+          "d": "Testes do manifest e do service worker",
+          "tipo": "arquivo",
+          "arquivo": "src/test/pwa-arquivos.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
         },
         {
           "d": "Build passa",

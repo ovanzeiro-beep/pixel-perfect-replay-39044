@@ -18,9 +18,9 @@
 | 3 | Integridade dos dados | Excluir passageiro limpa cobranças/recibos/respostas; vencimento obrigatório em cobrança semanal/mensal; testes do `store.ts` | **Concluída** |
 | 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | **Concluída** |
 | 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | **Concluída** |
-| 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | Pendente |
-| 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | Pendente |
-| 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | Pendente |
+| 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | **Concluída** |
+| 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | **Concluída** |
+| 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | **Concluída** |
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | Pendente |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
@@ -63,3 +63,37 @@ Em **Mais → Relatórios** (ou pelo botão no Financeiro):
 - **Combustível:** litros, preço por litro, consumo (km/L, método do tanque cheio) e custo por km. O consumo só aparece com 2 ou mais leituras de km.
 - **Compartilhar:** relatório em texto pelo celular ou WhatsApp; recibos também podem ser compartilhados ou copiados.
 - **Conferência:** um mês fechado nos relatórios dá exatamente o mesmo recebido, gastos e lucro do Financeiro (há teste para isso).
+
+## Alertas (Etapa 6)
+
+Aparecem no topo do Início do vanzeiro, com um selo vermelho no menu "Início" quando algo pede atenção:
+
+| Alerta | Quando aparece | Nível |
+| --- | --- | --- |
+| CNH | vence em até 60 dias (até 15 dias ou vencida = urgente) | atenção / urgente |
+| Pagamentos atrasados | qualquer cobrança vencida e em aberto (15 dias ou mais = urgente) | atenção / urgente |
+| Prazo de confirmação | faltam menos de 24h para fechar (véspera, 20h) e há quem não respondeu; depois do prazo vira urgente | atenção / urgente |
+| Viagem lotada | tem lista de espera | informação |
+
+- O prazo (véspera, 20h) está em `PRAZO` (`src/data/alertas.ts`) e aparece na ficha da viagem e na tela do passageiro, calculado de verdade.
+- "Dispensar" esconde o alerta; ele **volta sozinho** se a situação mudar (mais gente atrasada, CNH vencendo de vez). "Mostrar de novo" traz todos de volta.
+- Os alertas se atualizam a cada minuto. São avisos dentro do app; notificações no celular (push) ficam para a fase com servidor.
+
+## Área do passageiro (Etapa 7)
+
+- **Recibos:** Pagamentos → "Meus recibos" lista só os recibos do próprio passageiro; dá para abrir, compartilhar e copiar.
+- **Avisos:** no Início, em Pagamentos e em Minhas viagens aparecem pagamento atrasado, prazo para responder a viagem (véspera, 20h) e viagem cancelada.
+- **Minhas viagens:** mostra o prazo e o horário aproximado na parada do passageiro (saída + 20 min por cidade do trajeto; é estimativa).
+- **Convite de verdade:** o link `/convite/:id` abre o app, valida (convite enviado e passageiro ativo), cria a sessão e leva à confirmação dos dados. O botão "Simular aceite" do vanzeiro só aparece no modo demonstração.
+- **Limite do mock:** os dados ficam no aparelho do vanzeiro. O link de convite só funciona nesse mesmo aparelho; em outro celular aparece "Convite não encontrado". Isso só se resolve com banco de dados (fase futura).
+- **Testes de tela:** `src/test/passageiro-fluxo.test.tsx` renderiza as telas reais do passageiro (recibos, confirmar presença, convite, acesso).
+
+## PWA lapidado (Etapa 8)
+
+- **Offline de verdade:** na instalação o service worker guarda todos os arquivos do app (lista gerada em cada build, `arquivos.json`) e a tela de entrada. Sem internet o app abre, navega entre as telas e usa os dados do aparelho. Uma faixa amarela avisa "Sem internet".
+- **Nova versão sem susto:** cada build é carimbado (`build-id.js`). Quando há versão nova aparece "Nova versão do app disponível"; ela **só troca quando a pessoa toca em Atualizar** (dados e login continuam). "Depois" esconde; o aviso volta na próxima abertura.
+- **Instalar:** o cartão de instalação aparece na entrada e também em Meu perfil. O aviso do navegador é guardado no início do app (ele chega uma única vez).
+- **Janela de instalação do Android** com capturas de tela do app.
+- **Roteiro:** `docs/teste-em-aparelho.md` (Android, iPhone, offline, nova versão, convite, limites conhecidos).
+- **Validado com service worker real:** instalação, offline (tela visitada, navegação, tela nunca aberta), e atualização com rebuild e redeploy de verdade.
+- **Teste local de produção:** `NITRO_PRESET=node-server npx vite build` e `node .output/server/index.mjs` (o preview padrão é da Cloudflare e não roda no Node).

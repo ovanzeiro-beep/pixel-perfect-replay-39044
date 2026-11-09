@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
+import { Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
   vanzeiro,
 } from "@/data/exemplo";
@@ -8,6 +8,7 @@ import { useFrota, useViagens } from "@/data/store";
 import { diaSemana, rotuloDia } from "@/data/viagens";
 import { isoDe, resumoPassageiro } from "@/data/cobrancas";
 import { mesDe, resumoMes } from "@/data/financeiro";
+import { Alertas } from "@/components/app/Alertas";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -43,12 +44,6 @@ function Inicio() {
   const pct = prox?.lugares ? Math.min(100, Math.round((prox.vao.length / prox.lugares) * 100)) : 0;
   const semana = proximas.slice(0, 8);
 
-  const lotadas = proximas.filter((v) => v.situacao === "lotada" && v.espera.length > 0).slice(0, 1)
-    .map((v) => `Viagem de ${diaSemana(v.data).toLowerCase()} lotada — ${v.espera.length} na lista de espera`);
-  const semResposta = proximas.filter((v) => v.sem.length > 0).slice(0, 2)
-    .map((v) => `${v.sem.length} ${v.sem.length === 1 ? "passageiro ainda não confirmou" : "passageiros ainda não confirmaram"} a viagem de ${diaSemana(v.data).toLowerCase()} (${linha(v.linhaId).nome})`);
-  const avisos = [...semResposta, ...lotadas];
-
   const devedores = passageiros.filter((p) => p.emAberto > 0)
     .map((p) => ({ passageiroId: p.id, valor: p.emAberto, diasAtraso: resumoPassageiro(cobrancas, p.id, hojeIso).diasAtraso }));
   const totalAberto = soma(devedores);
@@ -67,7 +62,7 @@ function Inicio() {
         <h1 className="text-3xl font-extrabold text-primary">
           {agora ? saudacao(agora.getHours()) : "Olá"}, {primeiroNome}
         </h1>
-        <p className="mt-1 text-lg capitalize text-muted-foreground">
+        <p className="mt-1 text-lg text-muted-foreground first-letter:uppercase">
           {agora?.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" }) ?? "\u00a0"}
         </p>
       </div>
@@ -84,15 +79,7 @@ function Inicio() {
         );
       })}
 
-      {avisos.length > 0 && (
-        <div className="space-y-2">
-          {avisos.map((a) => (
-            <div key={a} className="flex items-start gap-3 rounded-2xl bg-accent/20 px-4 py-3 text-base font-semibold text-foreground">
-              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-accent-strong" /> {a}
-            </div>
-          ))}
-        </div>
-      )}
+      <Alertas />
 
       {prox ? (
       <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg">

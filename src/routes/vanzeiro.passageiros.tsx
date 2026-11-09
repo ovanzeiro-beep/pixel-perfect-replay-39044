@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { CheckCircle2, Clock, Copy, MapPin, MessageCircle, Pencil, Phone, Plus, Search, Send, Trash2, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { vanzeiro, linkConviteExemplo, type FormaPagamento } from "@/data/exemplo";
+import { vanzeiro, type FormaPagamento } from "@/data/exemplo";
+import { linkConvite } from "@/lib/convite";
 import {
   useFrota, salvarPassageiro, atualizarPassageiro, desativarPassageiro, excluirPassageiro, estaDevendo, DIAS,
   type Passageiro, type Linha,
@@ -84,7 +85,7 @@ function Passageiros() {
   const convidar = passageiros.find((p) => p.id === perguntarConvite);
 
   const enviarConvite = (p: Passageiro) => {
-    const msg = mensagemConvite(p.nome.split(" (")[0]!, vanzeiro.nome, linkConviteExemplo(p.id));
+    const msg = mensagemConvite(p.nome.split(" (")[0]!, vanzeiro.nome, linkConvite(p.id));
     window.open(`${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(msg)}`, "_blank");
     if (p.convite !== "no_app") atualizarPassageiro(p.id, { convite: "enviado" });
     toast.success("Convite enviado");
@@ -163,7 +164,7 @@ function Passageiros() {
           <div className="rounded-3xl bg-accent/15 p-4 space-y-3">
             <p className="text-lg font-extrabold">Convite para o app</p>
             <BotaoGrande variante="destaque" onClick={() => enviarConvite(aberto)}><Send className="h-5 w-5" /> Enviar convite</BotaoGrande>
-            <BotaoGrande variante="contorno" onClick={() => { void navigator.clipboard?.writeText(linkConviteExemplo(aberto.id)); toast.success("Link copiado"); }}><Copy className="h-5 w-5" /> Copiar link do convite</BotaoGrande>
+            <BotaoGrande variante="contorno" onClick={() => { void navigator.clipboard?.writeText(linkConvite(aberto.id)); toast.success("Link copiado"); }}><Copy className="h-5 w-5" /> Copiar link do convite</BotaoGrande>
             {modoDemo && aberto.convite !== "no_app" && (
               <button onClick={() => { atualizarPassageiro(aberto.id, { convite: "no_app" }); toast.success("Aceite simulado"); }} className="w-full py-2 text-sm font-semibold text-muted-foreground underline">Simular aceite (teste)</button>
             )}

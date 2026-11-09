@@ -102,7 +102,7 @@ function TelaConvite() {
         </button>
       </div>
       <p className="mt-8 text-center text-xs text-muted-foreground">
-        Sem banco de dados — modo demonstração
+        Versão de teste — o login ainda é simulado.
       </p>
     </div>
   );

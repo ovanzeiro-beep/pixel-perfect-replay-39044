@@ -29,3 +29,9 @@ export function deslocarMeses(data: string, hoje: Date = new Date(), limitar = f
   const h = isoDe(hoje);
   return limitar && r > h ? h : r;
 }
+
+/** Data de hoje (ou de `base`) somada a `n` dias, no formato AAAA-MM-DD. */
+export function somarDias(base: Date, n: number): string {
+  const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + n);
+  return fmt(d.getFullYear(), d.getMonth() + 1, d.getDate());
+}

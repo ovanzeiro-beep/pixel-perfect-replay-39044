@@ -8,23 +8,12 @@ import { useFrota, useViagens, responderViagemApp, confirmarParadaApp, responder
 import { vanzeiro } from "@/data/exemplo";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
-import { diaSemana, dataCurta, type Viagem } from "@/data/viagens";
+import { diaSemana, dataCurta, horarioNaParada, type Viagem } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
+import { prazoViagem } from "@/data/alertas";
+import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 
 const MOTIVOS_VOLTA = ["Voltei com a família", "Volto outro dia", "Já estou em casa", "Outro"] as const;
-
-function addMinutos(hhmm: string, min: number): string {
-  if (!hhmm || !hhmm.includes(":")) return hhmm;
-  const [h, m] = hhmm.split(":").map(Number);
-  const total = (h! * 60 + m! + min) % (24 * 60);
-  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-}
-
-function horarioEstimado(saida: string, cidadePassageiro: string, paradas: string[]): string {
-  const pos = paradas.findIndex((p) => p.toLowerCase().startsWith(cidadePassageiro.toLowerCase()));
-  if (pos <= 0) return saida;
-  return addMinutos(saida, pos * 20);
-}
 
 function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
   const [agora, setAgora] = useState(Date.now());
@@ -241,7 +230,7 @@ function InicioPassageiro() {
   const emAndamento = proxima?.situacao === "andamento";
 
   const resumo = resumoPassageiro(cobrancas, p.id, hoje);
-  const horario = proxima && linha ? horarioEstimado(proxima.saida, p.cidade, linha.paradas) : "";
+  const horario = proxima && linha ? horarioNaParada(proxima.saida, p.cidade, linha.paradas) : "";
 
   const whatsVanzeiro = `${linkWhatsApp(vanzeiro.telefone)}?text=${encodeURIComponent(`Olá, ${vanzeiro.nome}! Sou ${p.nome}.`)}`;
 
@@ -259,6 +248,8 @@ function InicioPassageiro() {
       <h1 className="text-3xl font-extrabold text-primary">
         Olá, {p.nome.split(" ")[0]}! 👋
       </h1>
+
+      <AvisosPassageiro />
 
       <section>
         <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Próxima viagem</h2>
@@ -295,6 +286,10 @@ function InicioPassageiro() {
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">Você será avisado se abrir uma vaga.</p>
                   </div>
+                )}
+
+                {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
+                  <p className="text-sm font-semibold text-muted-foreground">{prazoViagem(proxima.data, new Date()).rotulo}</p>
                 )}
 
                 {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
