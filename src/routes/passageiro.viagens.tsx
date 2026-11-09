@@ -3,14 +3,16 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { usePassageiroId } from "@/data/sessao";
 import { useFrota, useViagens, responderViagemApp } from "@/data/store";
 import { diaSemana, dataCurta } from "@/data/viagens";
 
 function MinhasViagens() {
-  const { passageiros, passageiroAtualId, linhas } = useFrota();
+  const { passageiros, linhas } = useFrota();
+  const passageiroId = usePassageiroId();
   const todasViagens = useViagens();
   const [aba, setAba] = useState<"proximas" | "anteriores">("proximas");
-  const p = passageiros.find((x) => x.id === passageiroAtualId);
+  const p = passageiros.find((x) => x.id === passageiroId);
   if (!p) return null;
 
   const minhasViagens = todasViagens.filter((v) => v.passageiroIds.includes(p.id));

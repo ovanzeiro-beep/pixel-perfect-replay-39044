@@ -19,7 +19,7 @@ export function somaMes(mes: string, n: number) {
   const d = new Date(a!, m! - 1 + n, 1);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
-const fimDoMes = (mes: string) => { const [a, m] = mes.split("-").map(Number); return `${mes}-${String(new Date(a!, m!, 0).getDate()).padStart(2, "0")}`; };
+export const fimDoMes = (mes: string) => { const [a, m] = mes.split("-").map(Number); return `${mes}-${String(new Date(a!, m!, 0).getDate()).padStart(2, "0")}`; };
 
 export function gastosDoMes(gastos: Gasto[], mes: string): Ocorrencia[] {
   const out: Ocorrencia[] = [];

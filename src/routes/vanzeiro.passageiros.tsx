@@ -9,6 +9,7 @@ import {
   type Passageiro, type Linha,
 } from "@/data/store";
 import { validarPassageiro, mensagemConvite, linkWhatsApp } from "@/lib/validacao";
+import { useModoDemo } from "@/lib/modoDemo";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar, Linha as Item } from "@/components/app/Formulario";
 
 export const Route = createFileRoute("/vanzeiro/passageiros")({
@@ -59,6 +60,7 @@ function Convite({ p }: { p: Passageiro }) {
 }
 
 function Passageiros() {
+  const modoDemo = useModoDemo();
   const { passageiros, linhas } = useFrota();
   const [busca, setBusca] = useState("");
   const [fLinha, setFLinha] = useState("");
@@ -162,7 +164,7 @@ function Passageiros() {
             <p className="text-lg font-extrabold">Convite para o app</p>
             <BotaoGrande variante="destaque" onClick={() => enviarConvite(aberto)}><Send className="h-5 w-5" /> Enviar convite</BotaoGrande>
             <BotaoGrande variante="contorno" onClick={() => { void navigator.clipboard?.writeText(linkConviteExemplo(aberto.id)); toast.success("Link copiado"); }}><Copy className="h-5 w-5" /> Copiar link do convite</BotaoGrande>
-            {aberto.convite !== "no_app" && (
+            {modoDemo && aberto.convite !== "no_app" && (
               <button onClick={() => { atualizarPassageiro(aberto.id, { convite: "no_app" }); toast.success("Aceite simulado"); }} className="w-full py-2 text-sm font-semibold text-muted-foreground underline">Simular aceite (teste)</button>
             )}
           </div>
@@ -259,18 +261,18 @@ function FormPassageiro({ pas, linhas, onFechar, onSalvo }: { pas: Passageiro | 
           <div className="grid grid-cols-3 gap-2">{FORMAS.map((x) => <button type="button" key={x.id} className={chip(f.formaPagamento === x.id)} onClick={() => mudaForma(x.id)}>{x.nome}</button>)}</div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Campo label="Valor (R$)" erro={erros.valor}><input inputMode="decimal" className={campoClasse} value={f.valor} onChange={muda("valor")} /></Campo>
+          <Campo label="Valor (R$)" obrigatorio erro={erros.valor}><input inputMode="decimal" className={campoClasse} value={f.valor} onChange={muda("valor")} /></Campo>
           {f.formaPagamento === "semanal" && (
-            <Campo label="Vence toda"><select className={campoClasse} value={f.vencimento} onChange={muda("vencimento")}><option value="">—</option>{SEMANA.map((d, i) => <option key={d} value={d}>{DIAS[i]!.curto}</option>)}</select></Campo>
+            <Campo label="Vence toda" obrigatorio erro={erros.vencimento}><select className={campoClasse} value={f.vencimento} onChange={muda("vencimento")}><option value="">—</option>{SEMANA.map((d, i) => <option key={d} value={d}>{DIAS[i]!.curto}</option>)}</select></Campo>
           )}
           {f.formaPagamento === "mensal" && (
-            <Campo label="Vence no dia"><select className={campoClasse} value={f.vencimento} onChange={muda("vencimento")}><option value="">—</option>{Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</select></Campo>
+            <Campo label="Vence no dia" obrigatorio erro={erros.vencimento}><select className={campoClasse} value={f.vencimento} onChange={muda("vencimento")}><option value="">—</option>{Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => <option key={d}>{d}</option>)}</select></Campo>
           )}
         </div>
 
         <p className="pt-2 text-lg font-extrabold text-primary">Contato de emergência (opcional)</p>
         <Campo label="Nome"><input className={campoClasse} value={f.emergenciaNome} onChange={muda("emergenciaNome")} /></Campo>
-        <Campo label="Telefone"><input type="tel" className={campoClasse} value={f.emergenciaTelefone} onChange={muda("emergenciaTelefone")} /></Campo>
+        <Campo label="Telefone" erro={erros.emergenciaTelefone}><input type="tel" className={campoClasse} value={f.emergenciaTelefone} onChange={muda("emergenciaTelefone")} /></Campo>
         <Campo label="Observações"><textarea className={`${campoClasse} min-h-24 py-3`} value={f.observacoes} onChange={muda("observacoes")} /></Campo>
         <BotaoGrande type="submit">Salvar passageiro</BotaoGrande>
       </form>

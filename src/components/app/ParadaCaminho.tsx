@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useModoDemo } from "@/lib/modoDemo";
 import { AlertTriangle, Check, Copy, MessageCircle, Phone, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import type { Passageiro } from "@/data/store";
@@ -45,6 +46,7 @@ export function ParadaAtual({ parada: p, bordo, onMudar, onSeguir }: { parada: P
   const mm = Math.floor(resta / 60000), ss = Math.floor((resta % 60000) / 1000);
   const aviso = avisoParada(p.minutos, saida);
   const faltando = bordo.filter((x) => !p.naVan[x.id]);
+  const modoDemo = useModoDemo();
   const mudar = (naVan: Record<string, "manual" | "app">) => onMudar({ ...p, naVan });
 
   const alternar = (id: string) => { const n = { ...p.naVan }; if (n[id]) delete n[id]; else n[id] = "manual"; mudar(n); };
@@ -114,7 +116,7 @@ export function ParadaAtual({ parada: p, bordo, onMudar, onSeguir }: { parada: P
       {faltando.length > 0 && <BotaoGrande variante="contorno" onClick={() => setConferir(true)}>Contei todos</BotaoGrande>}
       <button onClick={() => (faltando.length ? setAlerta(true) : seguir(""))}
         className={`flex min-h-16 w-full items-center justify-center rounded-2xl text-xl font-extrabold ${faltando.length ? "bg-muted text-muted-foreground" : "bg-success text-success-foreground"}`}>Seguir viagem</button>
-      {faltando.length > 0 && <button onClick={simular} className="w-full text-sm text-muted-foreground underline">Simular confirmações pelo app</button>}
+      {modoDemo && faltando.length > 0 && <button onClick={simular} className="w-full text-sm text-muted-foreground underline">Simular confirmações pelo app</button>}
 
       {conferir && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">

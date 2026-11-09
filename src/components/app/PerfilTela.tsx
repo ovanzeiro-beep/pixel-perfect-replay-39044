@@ -1,8 +1,11 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { encerrarSessao } from "@/data/sessao";
 import type { ReactNode } from "react";
 import { ArrowLeft, Repeat } from "lucide-react";
 
-export function PerfilTela({ nome, papel, trocarPara, voltar, children }: { nome: string; papel: string; trocarPara: "vanzeiro" | "passageiro"; voltar?: boolean; children?: ReactNode }) {
+export function PerfilTela({ nome, papel, voltar, children }: { nome: string; papel: string; voltar?: boolean; children?: ReactNode }) {
+  const navigate = useNavigate();
+  const sair = () => { encerrarSessao(); void navigate({ to: "/", replace: true }); };
   return (
     <div className="px-5 pt-6">
       {voltar && (
@@ -24,15 +27,15 @@ export function PerfilTela({ nome, papel, trocarPara, voltar, children }: { nome
       <div className="mt-6 rounded-3xl border-2 border-dashed border-accent bg-accent/10 p-5">
         <p className="text-sm font-bold uppercase tracking-wide text-accent-strong">Modo de teste</p>
         <Link
-          to={trocarPara === "vanzeiro" ? "/vanzeiro" : "/passageiro"}
+          to="/perfil"
           className="mt-3 flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-accent text-lg font-bold text-accent-foreground"
         >
-          <Repeat className="h-5 w-5" /> Ver como {trocarPara === "vanzeiro" ? "Vanzeiro" : "Passageiro"}
+          <Repeat className="h-5 w-5" /> Trocar de perfil
         </Link>
       </div>
-      <Link to="/" className="mt-4 flex min-h-14 items-center justify-center rounded-2xl border-2 border-primary text-lg font-bold text-primary">
+      <button onClick={sair} className="mt-4 flex min-h-14 w-full items-center justify-center rounded-2xl border-2 border-primary text-lg font-bold text-primary">
         Sair
-      </Link>
+      </button>
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ProtegeArea } from "@/components/app/ProtegeArea";
+import { destinoSeNegado, sessaoAtual } from "@/data/sessao";
 import { DndContext, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -22,7 +24,15 @@ export const Route = createFileRoute("/ida/$viagemId")({
       { property: "og:description", content: "Rota e embarque dos passageiros na viagem de ida." },
     ],
   }),
-  component: TelaIda,
+  beforeLoad: () => {
+    const destino = destinoSeNegado("vanzeiro", sessaoAtual());
+    if (destino) throw redirect({ to: destino });
+  },
+  component: () => (
+    <ProtegeArea papel="vanzeiro">
+      <TelaIda />
+    </ProtegeArea>
+  ),
 });
 
 const primeiro = (n: string) => n.split(" (")[0]!.split(" ")[0]!;
@@ -80,7 +90,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
   const desfazer = () => {
     const ult = ida.marcas[ida.marcas.length - 1];
     if (!ult) return;
-    if (ult.cobrou) lancarCobranca(ult.pid, -ult.cobrou);
+    if (ult.cobrou && !lancarCobranca(ult.pid, -ult.cobrou)) toast.warning("Não achei a cobrança dessa viagem. Confira em Dinheiro.");
     salvar({ ...ida, marcas: ida.marcas.slice(0, -1), fase: "paradas" });
     toast.success("Última marcação desfeita");
   };

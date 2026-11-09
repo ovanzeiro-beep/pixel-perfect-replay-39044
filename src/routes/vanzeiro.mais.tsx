@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bus, IdCard, MapPinned, Receipt, User, ChevronRight } from "lucide-react";
+import { BarChart3, Bus, History, IdCard, MapPinned, Receipt, User, ChevronRight } from "lucide-react";
 
 const itens = [
+  { to: "/vanzeiro/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/vanzeiro/historico", label: "Histórico de viagens", icon: History },
   { to: "/vanzeiro/vans", label: "Vans", icon: Bus },
   { to: "/vanzeiro/motoristas", label: "Motoristas", icon: IdCard },
   { to: "/vanzeiro/linhas", label: "Linhas", icon: MapPinned },

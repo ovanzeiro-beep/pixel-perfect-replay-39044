@@ -22,11 +22,13 @@ import { Route as PassageiroViagensRouteImport } from './routes/passageiro.viage
 import { Route as VanzeiroIndexRouteImport } from './routes/vanzeiro.index'
 import { Route as VanzeiroDinheiroRouteImport } from './routes/vanzeiro.dinheiro'
 import { Route as VanzeiroGastosRouteImport } from './routes/vanzeiro.gastos'
+import { Route as VanzeiroHistoricoRouteImport } from './routes/vanzeiro.historico'
 import { Route as VanzeiroLinhasRouteImport } from './routes/vanzeiro.linhas'
 import { Route as VanzeiroMaisRouteImport } from './routes/vanzeiro.mais'
 import { Route as VanzeiroMotoristasRouteImport } from './routes/vanzeiro.motoristas'
 import { Route as VanzeiroPassageirosRouteImport } from './routes/vanzeiro.passageiros'
 import { Route as VanzeiroPerfilRouteImport } from './routes/vanzeiro.perfil'
+import { Route as VanzeiroRelatoriosRouteImport } from './routes/vanzeiro.relatorios'
 import { Route as VanzeiroVansRouteImport } from './routes/vanzeiro.vans'
 import { Route as VanzeiroViagensRouteImport } from './routes/vanzeiro.viagens'
 
@@ -95,6 +97,11 @@ const VanzeiroGastosRoute = VanzeiroGastosRouteImport.update({
   path: '/gastos',
   getParentRoute: () => VanzeiroRoute,
 } as any)
+const VanzeiroHistoricoRoute = VanzeiroHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => VanzeiroRoute,
+} as any)
 const VanzeiroLinhasRoute = VanzeiroLinhasRouteImport.update({
   id: '/linhas',
   path: '/linhas',
@@ -120,6 +127,11 @@ const VanzeiroPerfilRoute = VanzeiroPerfilRouteImport.update({
   path: '/perfil',
   getParentRoute: () => VanzeiroRoute,
 } as any)
+const VanzeiroRelatoriosRoute = VanzeiroRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => VanzeiroRoute,
+} as any)
 const VanzeiroVansRoute = VanzeiroVansRouteImport.update({
   id: '/vans',
   path: '/vans',
@@ -143,11 +155,13 @@ export interface FileRoutesByFullPath {
   '/passageiro/viagens': typeof PassageiroViagensRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
   '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
+  '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
   '/vanzeiro/viagens': typeof VanzeiroViagensRoute
   '/passageiro/': typeof PassageiroIndexRoute
@@ -163,11 +177,13 @@ export interface FileRoutesByTo {
   '/passageiro/viagens': typeof PassageiroViagensRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
   '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
+  '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
   '/vanzeiro/viagens': typeof VanzeiroViagensRoute
   '/passageiro': typeof PassageiroIndexRoute
@@ -186,11 +202,13 @@ export interface FileRoutesById {
   '/passageiro/viagens': typeof PassageiroViagensRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
   '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
+  '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
   '/vanzeiro/viagens': typeof VanzeiroViagensRoute
   '/passageiro/': typeof PassageiroIndexRoute
@@ -210,11 +228,13 @@ export interface FileRouteTypes {
     | '/passageiro/viagens'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
+    | '/vanzeiro/historico'
     | '/vanzeiro/linhas'
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
     | '/vanzeiro/perfil'
+    | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
     | '/vanzeiro/viagens'
     | '/passageiro/'
@@ -230,11 +250,13 @@ export interface FileRouteTypes {
     | '/passageiro/viagens'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
+    | '/vanzeiro/historico'
     | '/vanzeiro/linhas'
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
     | '/vanzeiro/perfil'
+    | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
     | '/vanzeiro/viagens'
     | '/passageiro'
@@ -252,11 +274,13 @@ export interface FileRouteTypes {
     | '/passageiro/viagens'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
+    | '/vanzeiro/historico'
     | '/vanzeiro/linhas'
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
     | '/vanzeiro/perfil'
+    | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
     | '/vanzeiro/viagens'
     | '/passageiro/'
@@ -364,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VanzeiroGastosRouteImport
       parentRoute: typeof VanzeiroRoute
     }
+    '/vanzeiro/historico': {
+      id: '/vanzeiro/historico'
+      path: '/historico'
+      fullPath: '/vanzeiro/historico'
+      preLoaderRoute: typeof VanzeiroHistoricoRouteImport
+      parentRoute: typeof VanzeiroRoute
+    }
     '/vanzeiro/linhas': {
       id: '/vanzeiro/linhas'
       path: '/linhas'
@@ -397,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/perfil'
       fullPath: '/vanzeiro/perfil'
       preLoaderRoute: typeof VanzeiroPerfilRouteImport
+      parentRoute: typeof VanzeiroRoute
+    }
+    '/vanzeiro/relatorios': {
+      id: '/vanzeiro/relatorios'
+      path: '/relatorios'
+      fullPath: '/vanzeiro/relatorios'
+      preLoaderRoute: typeof VanzeiroRelatoriosRouteImport
       parentRoute: typeof VanzeiroRoute
     }
     '/vanzeiro/vans': {
@@ -439,11 +477,13 @@ const PassageiroRouteWithChildren = PassageiroRoute._addFileChildren(
 interface VanzeiroRouteChildren {
   VanzeiroDinheiroRoute: typeof VanzeiroDinheiroRoute
   VanzeiroGastosRoute: typeof VanzeiroGastosRoute
+  VanzeiroHistoricoRoute: typeof VanzeiroHistoricoRoute
   VanzeiroLinhasRoute: typeof VanzeiroLinhasRoute
   VanzeiroMaisRoute: typeof VanzeiroMaisRoute
   VanzeiroMotoristasRoute: typeof VanzeiroMotoristasRoute
   VanzeiroPassageirosRoute: typeof VanzeiroPassageirosRoute
   VanzeiroPerfilRoute: typeof VanzeiroPerfilRoute
+  VanzeiroRelatoriosRoute: typeof VanzeiroRelatoriosRoute
   VanzeiroVansRoute: typeof VanzeiroVansRoute
   VanzeiroViagensRoute: typeof VanzeiroViagensRoute
   VanzeiroIndexRoute: typeof VanzeiroIndexRoute
@@ -452,11 +492,13 @@ interface VanzeiroRouteChildren {
 const VanzeiroRouteChildren: VanzeiroRouteChildren = {
   VanzeiroDinheiroRoute: VanzeiroDinheiroRoute,
   VanzeiroGastosRoute: VanzeiroGastosRoute,
+  VanzeiroHistoricoRoute: VanzeiroHistoricoRoute,
   VanzeiroLinhasRoute: VanzeiroLinhasRoute,
   VanzeiroMaisRoute: VanzeiroMaisRoute,
   VanzeiroMotoristasRoute: VanzeiroMotoristasRoute,
   VanzeiroPassageirosRoute: VanzeiroPassageirosRoute,
   VanzeiroPerfilRoute: VanzeiroPerfilRoute,
+  VanzeiroRelatoriosRoute: VanzeiroRelatoriosRoute,
   VanzeiroVansRoute: VanzeiroVansRoute,
   VanzeiroViagensRoute: VanzeiroViagensRoute,
   VanzeiroIndexRoute: VanzeiroIndexRoute,

@@ -6,14 +6,14 @@ export type NavItem = { to: string; label: string; icon: LucideIcon; exact?: boo
 
 export function AppShell({ items }: { items: NavItem[] }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b bg-card px-5 py-3">
+    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col bg-background">
+      <header className="sticky top-0 z-10 border-b bg-card px-5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Logo />
       </header>
-      <main className="flex-1 pb-28">
+      <main className="flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t bg-card">
+      <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t bg-card pb-[env(safe-area-inset-bottom)]">
         <ul className="flex">
           {items.map((it) => (
             <li key={it.to} className="flex-1">

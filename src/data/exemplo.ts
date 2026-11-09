@@ -1,5 +1,11 @@
 // Todos os dados de exemplo do app ficam aqui. Depois trocamos por banco de dados sem mexer nas telas.
 
+import { deslocarMeses, deslocarSemanas } from "./datasRelativas";
+
+// As datas escritas aqui usam "hoje" = 09/11/2026 como referência; no fim do arquivo elas são
+// empurradas para perto do dia real (semanas ou meses inteiros), então os exemplos nunca ficam velhos.
+const HOJE = new Date();
+
 export type FormaPagamento = "por_viagem" | "semanal" | "mensal";
 export type SituacaoPagamento = "em_dia" | "atrasado_1_semana" | "pago_na_hora";
 
@@ -107,34 +113,7 @@ export const passageiros: {
   { id: "p22", nome: "Reginaldo Pires", telefone: "(43) 99178-5536", endereco: "Rua Maranhão, 266", cidade: "Andirá", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "em_dia" },
 ];
 
-// Passageiro usado nos testes da área do passageiro
-export const passageiroAtualId = "p1";
-
-// ===== Etapa 2: dados para a tela Início do Vanzeiro =====
-
-export type ViagemSemana = {
-  id: string;
-  linhaId: string;
-  dia: string; // ex.: "Sexta"
-  data: string; // AAAA-MM-DD
-  saida: string; // HH:MM
-  vanId: string;
-  motoristaId: string;
-  confirmados: number;
-  naoConfirmados: number;
-  listaEspera: number;
-};
-
-export const viagensSemana: ViagemSemana[] = [
-  { id: "v1", linhaId: "l3", dia: "Segunda", data: "2026-11-09", saida: "06:40", vanId: "van2", motoristaId: "m1", confirmados: 5, naoConfirmados: 0, listaEspera: 0 },
-  { id: "v2", linhaId: "l2", dia: "Segunda", data: "2026-11-09", saida: "18:15", vanId: "van2", motoristaId: "m2", confirmados: 5, naoConfirmados: 0, listaEspera: 0 },
-  { id: "v3", linhaId: "l1", dia: "Sexta", data: "2026-11-13", saida: "17:30", vanId: "van1", motoristaId: "m1", confirmados: 11, naoConfirmados: 3, listaEspera: 0 },
-  { id: "v4", linhaId: "l1", dia: "Sábado", data: "2026-11-14", saida: "05:30", vanId: "van1", motoristaId: "m1", confirmados: 15, naoConfirmados: 0, listaEspera: 2 },
-  { id: "v5", linhaId: "l1", dia: "Domingo", data: "2026-11-15", saida: "16:00", vanId: "van1", motoristaId: "m2", confirmados: 9, naoConfirmados: 0, listaEspera: 0 },
-];
-
-// Viagem em destaque no Início
-export const proximaViagemId = "v3";
+// ===== Dados para a tela Início do Vanzeiro =====
 
 // Quem está devendo (passageiros com situação "atrasado_1_semana")
 export const cobrancasEmAberto = [
@@ -144,35 +123,15 @@ export const cobrancasEmAberto = [
   { passageiroId: "p10", valor: 90, diasAtraso: 7 },
 ];
 
-// Recebido no mês (novembro/2026)
-export const recebimentosMes = [
-  { passageiroId: "p1", valor: 300, data: "2026-11-07" },
-  { passageiroId: "p2", valor: 300, data: "2026-11-07" },
-  { passageiroId: "p5", valor: 150, data: "2026-11-07" },
-  { passageiroId: "p4", valor: 150, data: "2026-11-06" },
-  { passageiroId: "p6", valor: 90, data: "2026-11-02" },
-  { passageiroId: "p7", valor: 320, data: "2026-11-02" },
-  { passageiroId: "p9", valor: 320, data: "2026-11-03" },
-  { passageiroId: "p11", valor: 250, data: "2026-11-05" },
-  { passageiroId: "p12", valor: 250, data: "2026-11-05" },
-  { passageiroId: "p14", valor: 65, data: "2026-11-02" },
-  { passageiroId: "p15", valor: 250, data: "2026-11-05" },
-];
-
 // Gastos do mês
-export const gastosMes = [
+const gastosMesBase = [
   { id: "g1", descricao: "Diesel", valor: 680, data: "2026-11-03", vanId: "van1" },
   { id: "g2", descricao: "Diesel", valor: 410, data: "2026-11-04", vanId: "van2" },
   { id: "g3", descricao: "Manutenção (troca de óleo)", valor: 320, data: "2026-11-05", vanId: "van2" },
   { id: "g4", descricao: "Pedágio", valor: 96, data: "2026-11-07", vanId: "van1" },
 ];
 
-// Ainda falta receber neste mês (inclui os atrasados + o que vence até o fim do mês)
-export const aReceberRestoMes = [
-  { descricao: "Atrasados", valor: 580 },
-  { descricao: "Semanais que vencem no mês", valor: 735 },
-  { descricao: "Viagens de fim de semana previstas", valor: 1200 },
-];
+export const gastosMes = gastosMesBase.map((g) => ({ ...g, data: deslocarMeses(g.data, HOJE, true) }));
 
 // ===== Etapa 5: detalhes dos passageiros =====
 export type DetalhePassageiro = {
@@ -180,7 +139,7 @@ export type DetalhePassageiro = {
   emergenciaNome: string; emergenciaTelefone: string; observacoes: string;
   convite: "nao_enviado" | "enviado" | "no_app"; ultimoPagamento: string;
 };
-export const detalhesPassageiros: Record<string, DetalhePassageiro> = {
+const detalhesBase: Record<string, DetalhePassageiro> = {
   p1: { numero: "412", bairro: "Centro", referencia: "Casa amarela, portão azul", vencimento: "", emergenciaNome: "José Lima (marido)", emergenciaTelefone: "(43) 99701-5566", observacoes: "Leva mala grande.", convite: "no_app", ultimoPagamento: "2026-11-07" },
   p2: { numero: "1020", bairro: "Vila Nova", referencia: "Ao lado da farmácia", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-07" },
   p3: { numero: "88", bairro: "Jardim América", referencia: "Esquina com a padaria", vencimento: "", emergenciaNome: "Paulo Ferreira (filho)", emergenciaTelefone: "(43) 99612-0099", observacoes: "", convite: "enviado", ultimoPagamento: "2026-10-24" },
@@ -197,6 +156,10 @@ export const detalhesPassageiros: Record<string, DetalhePassageiro> = {
   p14: { numero: "22", bairro: "Vila São Pedro", referencia: "", vencimento: "segunda", emergenciaNome: "Simone Pereira (mãe)", emergenciaTelefone: "(43) 99280-3345", observacoes: "", convite: "nao_enviado", ultimoPagamento: "2026-11-02" },
   p15: { numero: "310", bairro: "Jardim América", referencia: "Portão cinza", vencimento: "5", emergenciaNome: "Fábio Barbosa (pai)", emergenciaTelefone: "(43) 99963-0198", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-05" },
 };
+
+export const detalhesPassageiros: Record<string, DetalhePassageiro> = Object.fromEntries(
+  Object.entries(detalhesBase).map(([id, d]) => [id, { ...d, ultimoPagamento: d.ultimoPagamento ? deslocarSemanas(d.ultimoPagamento, HOJE) : "" }]),
+);
 
 export const linkConviteExemplo = (id: string) => `https://ovanzeiro.app/convite/${id}`;
 
@@ -216,7 +179,7 @@ export const exemploViagens = {
 // ===== Etapa 10: cobranças de exemplo (últimas semanas e meses) =====
 // pago: [valor, data, forma]. Sem "pago" = em aberto. Semana = data de vencimento (início da semana).
 export type CobrancaExemplo = { pid: string; tipo: "viagem" | "semana" | "mes"; venc: string; valor: number; pago?: [number, string, "dinheiro" | "pix"] };
-export const cobrancasExemplo: CobrancaExemplo[] = [
+const cobrancasBase: CobrancaExemplo[] = [
   { pid: "p1", tipo: "viagem", venc: "2026-11-06", valor: 150, pago: [150, "2026-11-07", "pix"] },
   { pid: "p1", tipo: "viagem", venc: "2026-11-07", valor: 150, pago: [150, "2026-11-07", "pix"] },
   { pid: "p2", tipo: "viagem", venc: "2026-11-06", valor: 150, pago: [150, "2026-11-07", "dinheiro"] },
@@ -245,7 +208,7 @@ export const cobrancasExemplo: CobrancaExemplo[] = [
 
 // ===== Etapa 11: gastos de exemplo dos últimos 6 meses (os de novembro estão em gastosMes) =====
 // [valor, data, categoria, vanId, linhaId, descrição, litros?, km?, repete todo mês?]
-export const gastosExemplo: [number, string, string, string, string, string, (number | undefined)?, (number | undefined)?, boolean?][] = [
+const gastosExemploBase: [number, string, string, string, string, string, (number | undefined)?, (number | undefined)?, boolean?][] = [
   [1200, "2026-06-10", "Outros", "van2", "", "Parcela da van", undefined, undefined, true],
   [380, "2026-06-15", "Documentos e seguro", "van1", "", "Seguro da van", undefined, undefined, true],
   [600, "2026-06-30", "Pagamento de motorista", "", "", "Diárias do motorista"],
@@ -276,8 +239,8 @@ export const gastosExemplo: [number, string, string, string, string, string, (nu
 
 // Histórico de recebimentos de junho a outubro (para o Financeiro ter meses anteriores)
 {
-  const tem = new Set(cobrancasExemplo.map((c) => `${c.pid}_${c.tipo}_${c.venc}`));
-  const add = (c: CobrancaExemplo) => { const k = `${c.pid}_${c.tipo}_${c.venc}`; if (!tem.has(k)) { tem.add(k); cobrancasExemplo.push(c); } };
+  const tem = new Set(cobrancasBase.map((c) => `${c.pid}_${c.tipo}_${c.venc}`));
+  const add = (c: CobrancaExemplo) => { const k = `${c.pid}_${c.tipo}_${c.venc}`; if (!tem.has(k)) { tem.add(k); cobrancasBase.push(c); } };
   const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const mensais: [string, number, string][] = [["p7", 320, "05"], ["p9", 320, "05"], ["p11", 250, "05"], ["p12", 250, "05"], ["p13", 250, "01"], ["p15", 250, "05"]];
   const semanais: [string, number][] = [["p6", 90], ["p8", 90], ["p10", 90], ["p14", 65]];
@@ -294,3 +257,14 @@ export const gastosExemplo: [number, string, string, string, string, string, (nu
     [sextas[0], sextas[2]].filter(Boolean).forEach((s, j) => porViagem.forEach((pid, i) => add({ pid, tipo: "viagem", venc: s!, valor: 150, pago: [150, s!, (i + j) % 2 ? "dinheiro" : "pix"] })));
   }
 }
+
+// ===== Datas empurradas para perto de hoje =====
+// Cobranças de mês seguem o dia do mês (vencimento 1 ou 5); as de semana e de viagem seguem o dia da semana.
+export const cobrancasExemplo: CobrancaExemplo[] = cobrancasBase.map((c) => {
+  const mudar = (d: string, limitar: boolean) => (c.tipo === "mes" ? deslocarMeses(d, HOJE, limitar) : deslocarSemanas(d, HOJE));
+  return { ...c, venc: mudar(c.venc, false), ...(c.pago ? { pago: [c.pago[0], mudar(c.pago[1], true), c.pago[2]] as [number, string, "dinheiro" | "pix"] } : {}) };
+});
+
+export const gastosExemplo = gastosExemploBase.map(
+  (g) => [g[0], deslocarMeses(g[1], HOJE, true), ...g.slice(2)] as typeof g,
+);

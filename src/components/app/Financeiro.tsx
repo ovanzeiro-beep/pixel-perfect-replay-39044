@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, MessageCircle, TrendingDown, TrendingUp } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BarChart3, ChevronLeft, ChevronRight, MessageCircle, TrendingDown, TrendingUp } from "lucide-react";
 import { useFrota } from "@/data/store";
 import { brl, isoDe } from "@/data/cobrancas";
 import { mesCurto, mesDe, nomeMes, porCategoria, porLinha, porVan, resumoMes, somaMes, variacao } from "@/data/financeiro";
@@ -98,6 +99,8 @@ export function Financeiro() {
           {pv.map((v) => <li key={v.nome} className="flex justify-between py-3 text-lg"><span className="font-bold">{v.nome}</span><span className="font-extrabold text-destructive">{brl(v.valor)}</span></li>)}
         </ul>
       </section>
+
+      <Link to="/vanzeiro/relatorios" className="flex min-h-16 items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card text-lg font-extrabold text-primary"><BarChart3 className="h-6 w-6" /> Relatórios completos (van, linha, ocupação)</Link>
 
       <a href={`https://wa.me/?text=${encodeURIComponent(texto)}`} target="_blank" rel="noreferrer" className="flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-success text-lg font-extrabold text-success-foreground"><MessageCircle className="h-6 w-6" /> Enviar resumo pelo WhatsApp</a>
     </div>

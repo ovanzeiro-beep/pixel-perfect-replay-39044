@@ -3,12 +3,16 @@ import { Link } from "@tanstack/react-router";
 import { DndContext, PointerSensor, TouchSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, Check, CheckCircle2, Flag, GripVertical, MapPin, MessageCircle, Navigation, Phone, Route as RouteIcon, Smartphone, Undo2, UserPlus, UserX } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Flag, History, Share2, GripVertical, MapPin, MessageCircle, Navigation, Phone, Route as RouteIcon, Smartphone, Undo2, UserPlus, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { lancarCobranca, type Passageiro } from "@/data/store";
+import { ResumoViagem } from "@/components/app/ResumoViagem";
+import { textoResumoViagem } from "@/data/manifesto";
+import { compartilharTexto } from "@/lib/compartilhar";
+import { useModoDemo } from "@/lib/modoDemo";
 import {
-  aindaNaVan, chamadaVolta, cobrancaSoVolta, encerrarParadaVolta, horaDe, partesRota, pendentesVolta, rotaVolta, textoFaltam, totalCobrado,
+  aindaNaVan, chamadaVolta, cobrancaSoVolta, encerrarParadaVolta, horaDe, partesRota, pendentesVolta, rotaVolta, textoFaltam,
   type Ida, type Viagem, type Volta,
 } from "@/data/viagens";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
@@ -64,12 +68,27 @@ export function TelaVolta({ v, ida, salvar, nomeLinha, vanNome, passageiros }: {
           )}
       </header>
       <div className="space-y-4 px-4 pt-4">
-        {ida.encerrada ? <ResumoViagem ida={ida} passageiros={passageiros} />
+        {ida.encerrada ? <Encerrada v={v} ida={ida} nomeLinha={nomeLinha} passageiros={passageiros} />
           : volta?.fase === "chamada" ? <Chamada ida={ida} volta={volta} setVolta={setVolta} passageiros={passageiros} linhaId={v.linhaId} />
           : volta ? <EntregaVolta ida={ida} volta={volta} setVolta={setVolta} salvar={salvar} passageiros={passageiros} />
           : null}
       </div>
     </div>
+  );
+}
+
+function Encerrada({ v, ida, nomeLinha, passageiros }: { v: Viagem; ida: Ida; nomeLinha: string; passageiros: Passageiro[] }) {
+  const enviar = async () => {
+    const r = await compartilharTexto(textoResumoViagem({ linhaNome: nomeLinha, data: v.data, ida, passageiros }), `Viagem concluída — ${nomeLinha}`);
+    if (r === "whatsapp") toast.success("Abrindo o WhatsApp com o resumo");
+  };
+  return (
+    <>
+      <ResumoViagem ida={ida} passageiros={passageiros} />
+      <BotaoGrande variante="destaque" onClick={enviar}><Share2 className="h-5 w-5" /> Compartilhar resumo</BotaoGrande>
+      <Link to="/vanzeiro/historico" className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card text-lg font-bold text-primary"><History className="h-5 w-5" /> Ver histórico de viagens</Link>
+      <Link to="/vanzeiro" className="flex min-h-12 w-full items-center justify-center text-lg font-bold text-primary underline">Voltar ao início</Link>
+    </>
   );
 }
 
@@ -81,6 +100,7 @@ function Chamada({ ida, volta, setVolta, passageiros, linhaId }: { ida: Ida; vol
   const [conferir, setConferir] = useState(false);
   const [adicionar, setAdicionar] = useState(false);
   const [busca, setBusca] = useState("");
+  const modoDemo = useModoDemo();
 
   const lista = chamadaVolta(ida, volta).map(pas).filter((p): p is Passageiro => !!p);
   const ficaram = ida.marcas.filter((m) => m.r === "ficou").map((m) => pas(m.pid)).filter((p): p is Passageiro => !!p);
@@ -164,7 +184,7 @@ function Chamada({ ida, volta, setVolta, passageiros, linhaId }: { ida: Ida; vol
       <BotaoGrande variante="contorno" onClick={() => setAdicionar(true)}><UserPlus className="h-5 w-5" /> Adicionar passageiro na volta</BotaoGrande>
       {pendentes.length > 0 && <BotaoGrande variante="contorno" onClick={() => setConferir(true)}>Contei todos</BotaoGrande>}
       <button onClick={seguir} className={`flex min-h-16 w-full items-center justify-center rounded-2xl text-xl font-extrabold ${pendentes.length ? "bg-muted text-muted-foreground" : "bg-success text-success-foreground"}`}>Seguir viagem</button>
-      {pendentes.length > 0 && <button onClick={simular} className="w-full text-sm text-muted-foreground underline">Simular confirmações pelo app</button>}
+      {modoDemo && pendentes.length > 0 && <button onClick={simular} className="w-full text-sm text-muted-foreground underline">Simular confirmações pelo app</button>}
 
       {conferir && (
         <Modal>
@@ -336,43 +356,5 @@ function ItemEntrega({ id, n, p, destaque }: { id: string; n: number; p: Passage
       </div>
       <button {...attributes} {...listeners} aria-label={`Arrastar ${p.nome}`} className="flex h-12 w-12 touch-none items-center justify-center rounded-xl text-muted-foreground"><GripVertical className="h-6 w-6" /></button>
     </li>
-  );
-}
-
-/** Resumo da viagem concluída (usado na tela da viagem e na ficha). */
-export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Passageiro[] }) {
-  const nome = (id: string) => passageiros.find((p) => p.id === id)?.nome ?? "Passageiro";
-  const volta = ida.volta;
-  const embarcaram = ida.marcas.filter((m) => m.r !== "faltou").length + (volta?.extras.length ?? 0);
-  const entregues = volta?.entregas.filter((e) => e.r !== "ficou").length ?? 0;
-  const naoVoltaram = volta ? Object.entries(volta.status).flatMap(([pid, s]) => (s.r === "nao" ? [{ pid, motivo: s.motivo }] : [])) : [];
-  const paradas = [...(ida.paradas ?? []).map((p) => ({ ...p, trecho: "Ida" })), ...(volta?.paradas ?? []).map((p) => ({ ...p, trecho: "Volta" }))];
-  const ficaram = paradas.flatMap((p) => p.ficaram.map((f) => ({ ...f, trecho: p.trecho })));
-  const cobrancas = [...ida.marcas.filter((m) => m.cobrou > 0), ...(volta?.extras.filter((e) => e.cobrou > 0) ?? [])];
-  const viajaram = [...ida.marcas.filter((m) => m.r !== "faltou").map((m) => m.pid), ...(volta?.extras.map((e) => e.pid) ?? [])];
-  const planos = new Set(viajaram.filter((id) => { const f = passageiros.find((p) => p.id === id)?.formaPagamento; return f === "semanal" || f === "mensal"; })).size;
-  const L = ({ r, v }: { r: string; v: React.ReactNode }) => <div className="flex justify-between gap-3 py-2"><span className="text-muted-foreground">{r}</span><b className="text-right">{v}</b></div>;
-  return (
-    <section className="space-y-3 rounded-3xl bg-card p-5 shadow-sm">
-      <h2 className="text-xl font-extrabold text-primary">Resumo da viagem</h2>
-      <div className="divide-y text-lg">
-        <L r="Saída" v={ida.inicio ? horaDe(ida.inicio) : "—"} />
-        <L r="Chegada" v={ida.encerrada ? horaDe(ida.encerrada) : "—"} />
-        <L r="Embarcaram" v={embarcaram} />
-        <L r="Entregues" v={entregues} />
-        <L r="Total da viagem" v={brl(totalCobrado(ida))} />
-      </div>
-      {planos > 0 && <p className="text-muted-foreground">{planos} {planos === 1 ? "passageiro" : "passageiros"} com plano semanal/mensal</p>}
-      {naoVoltaram.length > 0 && <div><p className="font-extrabold">Não voltaram</p>{naoVoltaram.map((n) => <p key={n.pid}>{nome(n.pid)} — {n.motivo}</p>)}</div>}
-      {ficaram.length > 0 && <div><p className="font-extrabold">Ficaram em parada</p>{ficaram.map((f, i) => <p key={i}>{nome(f.pid)} ({f.trecho}, {f.hora}) — {f.motivo}</p>)}</div>}
-      <div>
-        <p className="font-extrabold">Paradas feitas</p>
-        {paradas.length === 0 ? <p className="text-muted-foreground">Nenhuma</p> : paradas.map((p, i) => <p key={i}>{p.trecho} · {horaDe(p.inicio)} · {p.local || "Sem local"} · {p.minutos} min</p>)}
-      </div>
-      <div>
-        <p className="font-extrabold">Cobranças criadas</p>
-        {cobrancas.length === 0 ? <p className="text-muted-foreground">Nenhuma</p> : cobrancas.map((c, i) => <p key={i} className="flex justify-between"><span>{nome(c.pid)}</span><b>{brl(c.cobrou)}</b></p>)}
-      </div>
-    </section>
   );
 }

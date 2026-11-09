@@ -249,3 +249,30 @@ export function partesRota(enderecos: string[], max = 10): string[] {
   }
   return out;
 }
+
+/** Tira um passageiro de tudo o que a viagem guardou dele (respostas, espera, ida e volta). */
+export function semPassageiro(aj: Ajuste, pid: string): Ajuste {
+  const tira = <T,>(r: Record<string, T> | undefined) => (r ? Object.fromEntries(Object.entries(r).filter(([k]) => k !== pid)) as Record<string, T> : r);
+  const limpaParada = <P extends { naVan?: Record<string, unknown> }>(p: P | undefined): P | undefined => (p ? { ...p, ...(p.naVan ? { naVan: tira(p.naVan) } : {}) } : p);
+  const limpaFeitas = (ps: ParadaFeita[] | undefined) => ps?.map((p) => ({ ...p, ficaram: p.ficaram.filter((f) => f.pid !== pid) }));
+  const { ida, ...resto } = aj;
+  const novo: Ajuste = {
+    ...resto,
+    respostas: tira(aj.respostas)!,
+    espera: aj.espera.filter((x) => x !== pid),
+    extras: aj.extras.filter((x) => x !== pid),
+  };
+  if (!ida) return novo;
+  const { volta, parada, paradas, ...restoIda } = ida;
+  const novaIda: Ida = { ...restoIda, ordem: ida.ordem.filter((x) => x !== pid), marcas: ida.marcas.filter((m) => m.pid !== pid) };
+  const p = limpaParada(parada); if (p) novaIda.parada = p;
+  const ps = limpaFeitas(paradas); if (ps) novaIda.paradas = ps;
+  if (volta) {
+    const { parada: vp, paradas: vps, ...restoVolta } = volta;
+    const nv: Volta = { ...restoVolta, status: tira(volta.status)!, extras: volta.extras.filter((x) => x.pid !== pid), ordem: volta.ordem.filter((x) => x !== pid), entregas: volta.entregas.filter((x) => x.pid !== pid) };
+    const vpp = limpaParada(vp); if (vpp) nv.parada = vpp;
+    const vpf = limpaFeitas(vps); if (vpf) nv.paradas = vpf;
+    novaIda.volta = nv;
+  }
+  return { ...novo, ida: novaIda };
+}

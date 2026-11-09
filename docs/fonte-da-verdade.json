@@ -1,0 +1,901 @@
+{
+  "projeto": "O Vanzeiro",
+  "regras": [
+    "Tudo roda em dados de exemplo (mock). Nenhum banco de dados nesta fase.",
+    "Uma etapa só vira 'concluida' quando TODOS os seus checks passam em `node scripts/conferir.mjs`.",
+    "Depois de cada etapa: rodar a conferência, registrar com --registrar e commitar o resultado."
+  ],
+  "etapas": [
+    {
+      "id": 0,
+      "titulo": "Visual do login e PWA em tela cheia",
+      "status": "concluida",
+      "objetivo": "Login profissional com logo nova e app instalável, em tela cheia, com opção de instalar no navegador.",
+      "checks": [
+        {
+          "d": "Manifest existe e pede fullscreen",
+          "tipo": "contem",
+          "arquivo": "public/manifest.webmanifest",
+          "regex": "\"display\": \"fullscreen\""
+        },
+        {
+          "d": "Service worker existe",
+          "tipo": "arquivo",
+          "arquivo": "public/sw.js"
+        },
+        {
+          "d": "Tela offline existe",
+          "tipo": "arquivo",
+          "arquivo": "public/offline.html"
+        },
+        {
+          "d": "Ícone 192",
+          "tipo": "arquivo",
+          "arquivo": "public/icons/icon-192.png"
+        },
+        {
+          "d": "Ícone 512",
+          "tipo": "arquivo",
+          "arquivo": "public/icons/icon-512.png"
+        },
+        {
+          "d": "Ícone maskable (Android)",
+          "tipo": "arquivo",
+          "arquivo": "public/icons/icon-maskable-512.png"
+        },
+        {
+          "d": "Ícone da tela inicial do iPhone",
+          "tipo": "arquivo",
+          "arquivo": "public/icons/apple-touch-icon.png"
+        },
+        {
+          "d": "Raiz do app liga o manifest",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "rel: \"manifest\""
+        },
+        {
+          "d": "Viewport cobre a tela toda (notch)",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "viewport-fit=cover"
+        },
+        {
+          "d": "Captura o convite de instalação",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "beforeinstallprompt"
+        },
+        {
+          "d": "Login mostra o convite de instalação",
+          "tipo": "contem",
+          "arquivo": "src/routes/index.tsx",
+          "regex": "InstalarApp"
+        },
+        {
+          "d": "Menu inferior respeita a área segura",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AppShell.tsx",
+          "regex": "safe-area-inset-bottom"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build de produção passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "titulo": "Fundação do mock: persistência e datas relativas",
+      "status": "concluida",
+      "objetivo": "Os dados sobrevivem ao recarregar a página (localStorage, versionado) e os exemplos acompanham a data de hoje.",
+      "checks": [
+        {
+          "d": "Módulo de persistência",
+          "tipo": "arquivo",
+          "arquivo": "src/data/persistencia.ts"
+        },
+        {
+          "d": "Usa localStorage com versão de schema",
+          "tipo": "contem",
+          "arquivo": "src/data/persistencia.ts",
+          "regex": "localStorage[\\s\\S]*versao|versao[\\s\\S]*localStorage"
+        },
+        {
+          "d": "Store carrega e salva sozinho (iniciarPersistencia)",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function iniciarPersistencia"
+        },
+        {
+          "d": "Persistência ligada na raiz do app",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "iniciarPersistencia"
+        },
+        {
+          "d": "Função restaurarExemplo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function restaurarExemplo"
+        },
+        {
+          "d": "Botão Restaurar exemplo na tela de perfil",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "restaurarExemplo"
+        },
+        {
+          "d": "Datas de exemplo acompanham hoje (módulo)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/datasRelativas.ts"
+        },
+        {
+          "d": "Exemplo usa o deslocamento de datas",
+          "tipo": "contem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "deslocarMeses[\\s\\S]*deslocarSemanas|deslocarSemanas[\\s\\S]*deslocarMeses"
+        },
+        {
+          "d": "Dados mortos removidos do exemplo",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "viagensSemana|recebimentosMes|aReceberRestoMes|proximaViagemId"
+        },
+        {
+          "d": "Gerador de IDs com contador",
+          "tipo": "contem",
+          "arquivo": "src/data/ids.ts",
+          "regex": "contadorId"
+        },
+        {
+          "d": "Store não gera mais ID só com Date.now",
+          "tipo": "naoContem",
+          "arquivo": "src/data/store.ts",
+          "regex": "Date\\.now\\(\\)\\.toString"
+        },
+        {
+          "d": "Teste da persistência",
+          "tipo": "arquivo",
+          "arquivo": "src/data/persistencia.test.ts"
+        },
+        {
+          "d": "Teste das datas relativas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/datasRelativas.test.ts"
+        },
+        {
+          "d": "Teste dos IDs",
+          "tipo": "arquivo",
+          "arquivo": "src/data/ids.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "Sessão e papéis (login simulado de verdade)",
+      "status": "concluida",
+      "objetivo": "Entrar guarda quem é você e seu papel (vanzeiro ou passageiro); rotas protegidas; botão Sair.",
+      "checks": [
+        {
+          "d": "Módulo de sessão",
+          "tipo": "arquivo",
+          "arquivo": "src/data/sessao.ts"
+        },
+        {
+          "d": "Sessão tem entrar e encerrar",
+          "tipo": "contem",
+          "arquivo": "src/data/sessao.ts",
+          "regex": "entrarComoPassageiro[\\s\\S]*encerrarSessao"
+        },
+        {
+          "d": "Sessão fica salva no aparelho",
+          "tipo": "contem",
+          "arquivo": "src/data/sessao.ts",
+          "regex": "armazenamentoLocal"
+        },
+        {
+          "d": "Guard de tela reutilizável",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ProtegeArea.tsx"
+        },
+        {
+          "d": "Área do vanzeiro protegida (rota)",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "beforeLoad"
+        },
+        {
+          "d": "Área do vanzeiro protegida (tela)",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "ProtegeArea"
+        },
+        {
+          "d": "Área do passageiro protegida (rota)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.tsx",
+          "regex": "beforeLoad"
+        },
+        {
+          "d": "Área do passageiro protegida (tela)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.tsx",
+          "regex": "ProtegeArea"
+        },
+        {
+          "d": "Viagem em andamento (/ida) protegida",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "ProtegeArea[\\s\\S]*beforeLoad|beforeLoad[\\s\\S]*ProtegeArea"
+        },
+        {
+          "d": "Login manda quem já entrou para sua área",
+          "tipo": "contem",
+          "arquivo": "src/routes/index.tsx",
+          "regex": "caminhoInicial"
+        },
+        {
+          "d": "Escolha de perfil cria a sessão (vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/perfil.tsx",
+          "regex": "entrarComoVanzeiro"
+        },
+        {
+          "d": "Escolha de perfil cria a sessão (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/perfil.tsx",
+          "regex": "entrarComoPassageiro"
+        },
+        {
+          "d": "Botão Sair encerra a sessão (vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/components/app/PerfilTela.tsx",
+          "regex": "encerrarSessao"
+        },
+        {
+          "d": "Botão Sair encerra a sessão (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "encerrarSessao"
+        },
+        {
+          "d": "Sem passageiro global no exemplo",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Sem passageiro global no store",
+          "tipo": "naoContem",
+          "arquivo": "src/data/store.ts",
+          "regex": "setPassageiroAtual|usePassageiroAtual"
+        },
+        {
+          "d": "Tela index lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela viagens lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela pagamentos lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela perfil lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela convite lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.convite.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Teste da sessão",
+          "tipo": "arquivo",
+          "arquivo": "src/data/sessao.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "titulo": "Integridade dos dados",
+      "status": "concluida",
+      "objetivo": "Excluir/desativar não deixa lixo; cobrança sempre tem vencimento; validações fechadas; store coberto por testes.",
+      "checks": [
+        {
+          "d": "Excluir passageiro apaga as cobranças dele",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?cobrancas: estado\\.cobrancas\\.filter"
+        },
+        {
+          "d": "Excluir passageiro apaga os recibos dele",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?recibos: estado\\.recibos\\.filter"
+        },
+        {
+          "d": "Excluir passageiro limpa as viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?semPassageiro"
+        },
+        {
+          "d": "Helper que tira o passageiro de uma viagem",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "export function semPassageiro"
+        },
+        {
+          "d": "Excluir linha limpa viagens, gastos e cobranças",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirLinha[\\s\\S]*?gastos:[\\s\\S]*?cobrancas:"
+        },
+        {
+          "d": "Excluir van limpa gastos e viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirVan[\\s\\S]*?gastos:[\\s\\S]*?ajustes:"
+        },
+        {
+          "d": "Excluir motorista limpa viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirMotorista[\\s\\S]*?ajustes:"
+        },
+        {
+          "d": "Cobrança de viagem devolve se deu certo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function lancarCobranca\\([^)]*\\): boolean"
+        },
+        {
+          "d": "Desfazer marcação avisa se não achou a cobrança",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Não achei a cobrança"
+        },
+        {
+          "d": "Vencimento exigido para semanal/mensal",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "formaPagamento === \"semanal\" && !p\\.vencimento"
+        },
+        {
+          "d": "Telefone brasileiro validado",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "export function telefoneValido"
+        },
+        {
+          "d": "Valor do passageiro obrigatório",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "Escreva o valor combinado"
+        },
+        {
+          "d": "Formulário mostra o erro de vencimento",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "erros\\.vencimento"
+        },
+        {
+          "d": "Testes do store",
+          "tipo": "arquivo",
+          "arquivo": "src/data/store.test.ts"
+        },
+        {
+          "d": "Teste de exclusão em cascata",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "excluirPassageiro"
+        },
+        {
+          "d": "Teste de cobrança negativa/desfazer",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "lancarCobranca"
+        },
+        {
+          "d": "Teste de exclusão de linha/van/motorista",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "excluirLinha[\\s\\S]*excluirVan|excluirVan[\\s\\S]*excluirLinha"
+        },
+        {
+          "d": "Teste de coerência dos dados de exemplo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "dados de exemplo são coerentes"
+        },
+        {
+          "d": "Testes de vencimento e telefone",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.test.ts",
+          "regex": "telefoneValido"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "titulo": "Viagem de ponta a ponta",
+      "status": "concluida",
+      "objetivo": "Ciclo completo: preparar, ida, volta, encerrar, resumo e histórico. Atalhos de teste só no modo demonstração.",
+      "checks": [
+        {
+          "d": "Resumo da viagem em arquivo próprio",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ResumoViagem.tsx"
+        },
+        {
+          "d": "Resumo não fica mais escondido dentro da volta",
+          "tipo": "naoContem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "export function ResumoViagem"
+        },
+        {
+          "d": "Botão Encerrar viagem",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "Encerrar viagem"
+        },
+        {
+          "d": "Fim da viagem: compartilhar resumo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "Compartilhar resumo"
+        },
+        {
+          "d": "Fim da viagem: ir ao histórico",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "/vanzeiro/historico"
+        },
+        {
+          "d": "Regras do histórico",
+          "tipo": "arquivo",
+          "arquivo": "src/data/historico.ts"
+        },
+        {
+          "d": "Histórico lista só viagens encerradas",
+          "tipo": "contem",
+          "arquivo": "src/data/historico.ts",
+          "regex": "export function historicoViagens"
+        },
+        {
+          "d": "Tela de histórico de viagens",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/vanzeiro.historico.tsx"
+        },
+        {
+          "d": "Histórico com filtro por linha",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.historico.tsx",
+          "regex": "Todas as linhas"
+        },
+        {
+          "d": "Histórico no menu Mais",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "/vanzeiro/historico"
+        },
+        {
+          "d": "Dados de exemplo trazem viagens realizadas",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "semearHistorico"
+        },
+        {
+          "d": "Lista/manifesto da viagem",
+          "tipo": "arquivo",
+          "arquivo": "src/data/manifesto.ts"
+        },
+        {
+          "d": "Lista da viagem segue a ordem do trajeto",
+          "tipo": "contem",
+          "arquivo": "src/data/manifesto.ts",
+          "regex": "ordenarParadas"
+        },
+        {
+          "d": "Ficha da viagem compartilha a lista",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "Compartilhar lista da viagem"
+        },
+        {
+          "d": "Compartilhar (celular ou WhatsApp)",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/compartilhar.ts"
+        },
+        {
+          "d": "Modo demonstração",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/modoDemo.ts"
+        },
+        {
+          "d": "Atalho simulado da volta só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "modoDemo && pendentes"
+        },
+        {
+          "d": "Atalho simulado da parada só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ParadaCaminho.tsx",
+          "regex": "modoDemo && faltando"
+        },
+        {
+          "d": "Aceite simulado só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "modoDemo && aberto\\.convite"
+        },
+        {
+          "d": "Interruptor do modo demo no perfil",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "definirModoDemo"
+        },
+        {
+          "d": "Teste do histórico",
+          "tipo": "arquivo",
+          "arquivo": "src/data/historico.test.ts"
+        },
+        {
+          "d": "Teste da lista/resumo para compartilhar",
+          "tipo": "arquivo",
+          "arquivo": "src/data/manifesto.test.ts"
+        },
+        {
+          "d": "Teste do modo demonstração",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/modoDemo.test.ts"
+        },
+        {
+          "d": "Teste: histórico bate com as cobranças",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "histórico de exemplo"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "titulo": "Dinheiro e relatórios",
+      "status": "concluida",
+      "objetivo": "Lucro por van, linha e período; ocupação média; comprovante para compartilhar.",
+      "checks": [
+        {
+          "d": "Cálculos de relatório",
+          "tipo": "arquivo",
+          "arquivo": "src/data/relatorios.ts"
+        },
+        {
+          "d": "Período por atalhos e personalizado",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function periodoPreset[\\s\\S]*export function periodoValido|export const periodoValido[\\s\\S]*export function periodoPreset"
+        },
+        {
+          "d": "Lucro por van com receita vinda da linha",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function relatorioPeriodo[\\s\\S]*porVan"
+        },
+        {
+          "d": "Lucro por linha",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "porLinha"
+        },
+        {
+          "d": "Ocupação média das viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function ocupacaoPorLinha"
+        },
+        {
+          "d": "Combustível (litros, preço, consumo, custo/km)",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function combustivelPorVan"
+        },
+        {
+          "d": "Relatório em texto para compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function textoRelatorio"
+        },
+        {
+          "d": "Testes dos relatórios",
+          "tipo": "arquivo",
+          "arquivo": "src/data/relatorios.test.ts"
+        },
+        {
+          "d": "Teste: período fechado bate com o Financeiro mensal",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.test.ts",
+          "regex": "bate com o Financeiro mensal"
+        },
+        {
+          "d": "Teste: somas por van e linha fecham com o total",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.test.ts",
+          "regex": "fecham com o total"
+        },
+        {
+          "d": "Tela de relatórios",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx"
+        },
+        {
+          "d": "Tela: escolha de período",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Outro período"
+        },
+        {
+          "d": "Tela: ocupação e combustível",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Ocupação das viagens[\\s\\S]*Combustível"
+        },
+        {
+          "d": "Tela: compartilhar relatório",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Compartilhar relatório"
+        },
+        {
+          "d": "Relatórios no menu Mais",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "/vanzeiro/relatorios"
+        },
+        {
+          "d": "Financeiro leva aos relatórios",
+          "tipo": "contem",
+          "arquivo": "src/components/app/Financeiro.tsx",
+          "regex": "/vanzeiro/relatorios"
+        },
+        {
+          "d": "Recibo: compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "compartilharTexto\\(texto"
+        },
+        {
+          "d": "Recibo: copiar texto",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "Recibo copiado"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "titulo": "Alertas e prazos",
+      "status": "pendente",
+      "objetivo": "Avisos dentro do app: CNH vencendo, cobranças em atraso, prazo de confirmação da viagem.",
+      "checks": [
+        {
+          "d": "Regras de alerta",
+          "tipo": "arquivo",
+          "arquivo": "src/data/alertas.ts"
+        },
+        {
+          "d": "Testes dos alertas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/alertas.test.ts"
+        },
+        {
+          "d": "Início do vanzeiro mostra alertas",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.index.tsx",
+          "regex": "alertas"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "titulo": "Área do passageiro completa",
+      "status": "pendente",
+      "objetivo": "Passageiro confirma, vê parada/horário, débitos e recibos; aceite de convite sem atalhos falsos.",
+      "checks": [
+        {
+          "d": "Teste do fluxo do passageiro",
+          "tipo": "arquivo",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx"
+        },
+        {
+          "d": "Recibos visíveis ao passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "[Rr]ecibo"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "titulo": "PWA lapidado",
+      "status": "pendente",
+      "objetivo": "Aviso de nova versão, funcionamento básico offline e roteiro de teste em aparelho real.",
+      "checks": [
+        {
+          "d": "Aviso de atualização",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/AtualizacaoApp.tsx"
+        },
+        {
+          "d": "SW aceita atualizar sob comando",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "SKIP_WAITING"
+        },
+        {
+          "d": "Roteiro de teste em aparelho",
+          "tipo": "arquivo",
+          "arquivo": "docs/teste-em-aparelho.md"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "titulo": "Qualidade final e congelamento do mock",
+      "status": "pendente",
+      "objetivo": "Textos em português, testes de tela, lint limpo e uma interface única de dados para trocar o mock pelo banco depois.",
+      "checks": [
+        {
+          "d": "Página 404 em português",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "Página não encontrada"
+        },
+        {
+          "d": "Interface de repositório (ponto de troca para o banco)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/repositorio.ts"
+        },
+        {
+          "d": "Testes de rotas",
+          "tipo": "arquivo",
+          "arquivo": "src/test/rotas.test.tsx"
+        },
+        {
+          "d": "Lint limpo",
+          "tipo": "comando",
+          "cmd": "npx eslint ."
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    }
+  ]
+}
