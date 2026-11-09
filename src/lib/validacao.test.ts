@@ -20,3 +20,11 @@ describe("validação", () => {
     expect(Object.keys(validarMotorista({ nome: "", telefone: "" })).sort()).toEqual(["nome", "telefone"]);
   });
 });
+
+import { validarLinha } from "./validacao";
+describe("validação de linha", () => {
+  it("nome obrigatório", () => {
+    expect(validarLinha({ nome: "", frequencia: "semanal", dias: ["seg"], data: "" }).nome).toBeDefined();
+    expect(validarLinha({ nome: "X", frequencia: "semanal", dias: ["seg"], data: "" })).toEqual({});
+  });
+});

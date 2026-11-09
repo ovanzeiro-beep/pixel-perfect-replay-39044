@@ -33,3 +33,11 @@ export function validarMotorista(m: { nome: string; telefone: string }) {
 export function linkWhatsApp(tel: string) {
   return `https://wa.me/55${tel.replace(/\D/g, "")}`;
 }
+
+export function validarLinha(l: { nome: string; frequencia: "semanal" | "unica"; dias: string[]; data: string }) {
+  const e: Partial<Record<"nome" | "dias" | "data", string>> = {};
+  if (!l.nome.trim()) e.nome = "Escreva o nome da linha.";
+  if (l.frequencia === "semanal" && l.dias.length === 0) e.dias = "Escolha pelo menos um dia da semana.";
+  if (l.frequencia === "unica" && !l.data) e.data = "Escolha a data da viagem.";
+  return e;
+}
