@@ -56,7 +56,7 @@ export function resumoPassageiro(cobs: Cobranca[], pid: string, hoje: string) {
 }
 
 /** Marca um pagamento: quita primeiro as cobranças mais antigas; o resto continua em aberto. */
-export function pagar(cobs: Cobranca[], pid: string, valor: number, forma: Forma, data: string, numero: number, soIds?: string[]): { cobs: Cobranca[]; recibo: Recibo | null } {
+export function pagar(cobs: Cobranca[], pid: string, valor: number, forma: Forma, data: string, numero: number, soIds?: string[] | undefined): { cobs: Cobranca[]; recibo: Recibo | null } {
   let resta = Math.round(valor * 100) / 100;
   if (resta <= 0) return { cobs, recibo: null };
   const ordem = cobs.filter((c) => c.pid === pid && aberto(c) > 0 && (!soIds || soIds.includes(c.id))).sort((a, b) => a.vencimento.localeCompare(b.vencimento));

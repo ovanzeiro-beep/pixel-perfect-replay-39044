@@ -143,7 +143,7 @@ export function lancarCobranca(passageiroId: string, valor: number) {
 }
 
 /** Marca pagamento (quita as mais antigas primeiro) e devolve o recibo. */
-export function marcarPagamento(pid: string, valor: number, forma: Forma, data: string, soIds?: string[]): Recibo | null {
+export function marcarPagamento(pid: string, valor: number, forma: Forma, data: string, soIds?: string[] | undefined): Recibo | null {
   const numero = estado.recibos.reduce((m, r) => Math.max(m, r.numero), 0) + 1;
   const r = pagar(estado.cobrancas, pid, valor, forma, data, numero, soIds);
   if (!r.recibo) return null;

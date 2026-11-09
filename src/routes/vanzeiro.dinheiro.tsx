@@ -81,7 +81,7 @@ function Cobrancas() {
   const [filtro, setFiltro] = useState<(typeof FILTROS)[number]["id"]>("todos");
   const [linhaId, setLinhaId] = useState("");
   const [busca, setBusca] = useState("");
-  const [pagando, setPagando] = useState<{ p: Passageiro; ids?: string[]; valor: number } | null>(null);
+  const [pagando, setPagando] = useState<{ p: Passageiro; ids?: string[] | undefined; valor: number } | null>(null);
   const [recibo, setRecibo] = useState<Recibo | null>(null);
   const { cobrar, aviso } = useCobrar();
 
