@@ -21,14 +21,14 @@ export const useFrota = () => useSyncExternalStore(assinar, () => estado, () => 
 
 const novoId = (p: string) => `${p}${Date.now().toString(36)}`;
 
-export function salvarVan(v: Omit<Van, "id"> & { id?: string }) {
+export function salvarVan(v: Omit<Van, "id"> & { id?: string | undefined }) {
   const van = { ...v, id: v.id || novoId("van") } as Van;
   set({ ...estado, vans: v.id ? estado.vans.map((x) => (x.id === v.id ? van : x)) : [...estado.vans, van] });
 }
 export function excluirVan(id: string) {
   set({ vans: estado.vans.filter((v) => v.id !== id), motoristas: estado.motoristas.map((m) => (m.vanId === id ? { ...m, vanId: "" } : m)) });
 }
-export function salvarMotorista(m: Omit<Motorista, "id" | "proprio"> & { id?: string }) {
+export function salvarMotorista(m: Omit<Motorista, "id" | "proprio"> & { id?: string | undefined }) {
   const atual = estado.motoristas.find((x) => x.id === m.id);
   const mot: Motorista = { ...m, id: m.id || novoId("m"), proprio: atual?.proprio ?? false };
   set({ ...estado, motoristas: atual ? estado.motoristas.map((x) => (x.id === mot.id ? mot : x)) : [...estado.motoristas, mot] });

@@ -13,7 +13,7 @@ export function Painel({ titulo, onFechar, children }: { titulo: string; onFecha
   );
 }
 
-export function Campo({ label, erro, obrigatorio, children }: { label: string; erro?: string; obrigatorio?: boolean; children: ReactNode }) {
+export function Campo({ label, erro, obrigatorio, children }: { label: string; erro?: string | undefined; obrigatorio?: boolean; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-1 block text-base font-bold">{label}{obrigatorio && <span className="text-destructive"> *</span>}</span>
