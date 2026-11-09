@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Clock, Copy, MapPin, MessageCircle, Pencil, Phone, Plus, Search, Send, Trash2, UserX } from "lucide-react";
 import { toast } from "sonner";
@@ -155,6 +155,8 @@ function Passageiros() {
             <Item rotulo="Observações" valor={aberto.observacoes} />
             <Item rotulo="Convite" valor={<Convite p={aberto} />} />
           </div>
+
+          <Link to="/vanzeiro/dinheiro" search={{ p: aberto.id }} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card text-lg font-bold text-primary">Ver histórico de pagamentos</Link>
 
           <div className="rounded-3xl bg-accent/15 p-4 space-y-3">
             <p className="text-lg font-extrabold">Convite para o app</p>

@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { ArrowLeft, Repeat } from "lucide-react";
 
-export function PerfilTela({ nome, papel, trocarPara, voltar }: { nome: string; papel: string; trocarPara: "vanzeiro" | "passageiro"; voltar?: boolean }) {
+export function PerfilTela({ nome, papel, trocarPara, voltar, children }: { nome: string; papel: string; trocarPara: "vanzeiro" | "passageiro"; voltar?: boolean; children?: ReactNode }) {
   return (
     <div className="px-5 pt-6">
       {voltar && (
@@ -19,6 +20,7 @@ export function PerfilTela({ nome, papel, trocarPara, voltar }: { nome: string; 
           <p className="text-muted-foreground">{papel}</p>
         </div>
       </div>
+      {children}
       <div className="mt-6 rounded-3xl border-2 border-dashed border-accent bg-accent/10 p-5">
         <p className="text-sm font-bold uppercase tracking-wide text-accent-strong">Modo de teste</p>
         <Link

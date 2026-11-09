@@ -1,6 +1,7 @@
 // Guarda vans e motoristas na memória da tela (voltam ao original ao recarregar).
 import { useMemo, useSyncExternalStore } from "react";
-import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens } from "./exemplo";
+import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens, cobrancasExemplo } from "./exemplo";
+import { aberto, cancelarCobranca, desfazerPagamento, gerarPeriodicas, idCobranca, isoDe, pagar, refMes, refSemana, refViagem, type Cobranca, type Forma, type Recibo } from "./cobrancas";
 import { semearAjustes, montarViagens, type Ajuste } from "./viagens";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
@@ -27,7 +28,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste> };
+type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string };
 let estado: Estado = {
   vans: vansIniciais.map((v) => ({ ...v, situacao: v.situacao as Van["situacao"] })),
   motoristas: motoristasIniciais.map((m) => ({ ...m, vanId: vansIniciais.find((v) => v.motoristaId === m.id)?.id ?? "" })),
@@ -40,9 +41,32 @@ let estado: Estado = {
     ...p, endereco: p.endereco.split(",")[0]!, ...(detalhesPassageiros[p.id] ?? detalheVazio), linhaIds: linhaId ? [linhaId] : [], ativo: true,
     emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
   })),
-  ajustes: {},
+  ajustes: {}, cobrancas: [], recibos: [], chavePix: "",
 };
 estado = { ...estado, ajustes: semearAjustes(estado.linhas, estado.passageiros, estado.vans, new Date(), exemploViagens) };
+{
+  // Cobranças de exemplo: cada pagamento de exemplo vira um recibo
+  const ref = (t: Cobranca["tipo"], v: string) => (t === "viagem" ? refViagem(v) : t === "semana" ? refSemana(v) : refMes(v));
+  const recibos: Recibo[] = [];
+  const cobrancas: Cobranca[] = cobrancasExemplo.map((c) => {
+    const cob: Cobranca = { id: idCobranca(c.pid, c.tipo, c.venc), pid: c.pid, tipo: c.tipo, ref: ref(c.tipo, c.venc), vencimento: c.venc, valor: c.valor, pagamentos: [] };
+    if (c.pago) {
+      const numero = recibos.length + 1;
+      recibos.push({ numero, pid: c.pid, valor: c.pago[0], refs: [cob.ref], forma: c.pago[2], data: c.pago[1] });
+      cob.pagamentos.push({ valor: c.pago[0], data: c.pago[1], forma: c.pago[2], recibo: numero });
+    }
+    return cob;
+  });
+  estado = comAberto({ ...estado, recibos, cobrancas: gerarPeriodicas(cobrancas, estado.passageiros, isoDe(new Date())) });
+}
+/** O "deve agora" de cada passageiro vem sempre das cobranças. */
+function comAberto(e: Estado): Estado {
+  const tot: Record<string, number> = {};
+  for (const c of e.cobrancas) tot[c.pid] = (tot[c.pid] ?? 0) + aberto(c);
+  const ult: Record<string, string> = {};
+  for (const c of e.cobrancas) for (const p of c.pagamentos) if (p.data > (ult[c.pid] ?? "")) ult[c.pid] = p.data;
+  return { ...e, passageiros: e.passageiros.map((p) => ({ ...p, emAberto: tot[p.id] ?? 0, ultimoPagamento: ult[p.id] ?? p.ultimoPagamento })) };
+}
 const ouvintes = new Set<() => void>();
 const set = (e: Estado) => { estado = e; ouvintes.forEach((f) => f()); };
 const assinar = (f: () => void) => { ouvintes.add(f); return () => ouvintes.delete(f); };
@@ -107,5 +131,29 @@ export function ajustarViagem(id: string, aj: Ajuste) {
 
 /** Soma (ou tira, com valor negativo) uma cobrança no que o passageiro deve. */
 export function lancarCobranca(passageiroId: string, valor: number) {
-  set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === passageiroId ? { ...p, emAberto: Math.max(0, p.emAberto + valor) } : p)) });
+  const hoje = isoDe(new Date());
+  let cobrancas = estado.cobrancas;
+  if (valor > 0) {
+    cobrancas = [...cobrancas, { id: `${passageiroId}_viagem_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, pid: passageiroId, tipo: "viagem", ref: refViagem(hoje), vencimento: hoje, valor, pagamentos: [] }];
+  } else if (valor < 0) {
+    const alvo = [...cobrancas].reverse().find((c) => c.pid === passageiroId && c.tipo === "viagem" && c.valor === -valor && c.pagamentos.length === 0);
+    if (alvo) cobrancas = cobrancas.filter((c) => c !== alvo);
+  }
+  set(comAberto({ ...estado, cobrancas }));
 }
+
+/** Marca pagamento (quita as mais antigas primeiro) e devolve o recibo. */
+export function marcarPagamento(pid: string, valor: number, forma: Forma, data: string, soIds?: string[] | undefined): Recibo | null {
+  const numero = estado.recibos.reduce((m, r) => Math.max(m, r.numero), 0) + 1;
+  const r = pagar(estado.cobrancas, pid, valor, forma, data, numero, soIds);
+  if (!r.recibo) return null;
+  set(comAberto({ ...estado, cobrancas: r.cobs, recibos: [...estado.recibos, r.recibo] }));
+  return r.recibo;
+}
+export function desfazerRecibo(numero: number) {
+  set(comAberto({ ...estado, cobrancas: desfazerPagamento(estado.cobrancas, numero), recibos: estado.recibos.filter((r) => r.numero !== numero) }));
+}
+export function cancelarCob(id: string, motivo: string) {
+  set(comAberto({ ...estado, cobrancas: cancelarCobranca(estado.cobrancas, id, motivo) }));
+}
+export function salvarChavePix(chave: string) { set({ ...estado, chavePix: chave.trim() }); }

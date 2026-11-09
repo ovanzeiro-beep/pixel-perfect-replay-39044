@@ -349,6 +349,8 @@ export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Pass
   const paradas = [...(ida.paradas ?? []).map((p) => ({ ...p, trecho: "Ida" })), ...(volta?.paradas ?? []).map((p) => ({ ...p, trecho: "Volta" }))];
   const ficaram = paradas.flatMap((p) => p.ficaram.map((f) => ({ ...f, trecho: p.trecho })));
   const cobrancas = [...ida.marcas.filter((m) => m.cobrou > 0), ...(volta?.extras.filter((e) => e.cobrou > 0) ?? [])];
+  const viajaram = [...ida.marcas.filter((m) => m.r !== "faltou").map((m) => m.pid), ...(volta?.extras.map((e) => e.pid) ?? [])];
+  const planos = new Set(viajaram.filter((id) => { const f = passageiros.find((p) => p.id === id)?.formaPagamento; return f === "semanal" || f === "mensal"; })).size;
   const L = ({ r, v }: { r: string; v: React.ReactNode }) => <div className="flex justify-between gap-3 py-2"><span className="text-muted-foreground">{r}</span><b className="text-right">{v}</b></div>;
   return (
     <section className="space-y-3 rounded-3xl bg-card p-5 shadow-sm">
@@ -360,6 +362,7 @@ export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Pass
         <L r="Entregues" v={entregues} />
         <L r="Total da viagem" v={brl(totalCobrado(ida))} />
       </div>
+      {planos > 0 && <p className="text-muted-foreground">{planos} {planos === 1 ? "passageiro" : "passageiros"} com plano semanal/mensal</p>}
       {naoVoltaram.length > 0 && <div><p className="font-extrabold">Não voltaram</p>{naoVoltaram.map((n) => <p key={n.pid}>{nome(n.pid)} — {n.motivo}</p>)}</div>}
       {ficaram.length > 0 && <div><p className="font-extrabold">Ficaram em parada</p>{ficaram.map((f, i) => <p key={i}>{nome(f.pid)} ({f.trecho}, {f.hora}) — {f.motivo}</p>)}</div>}
       <div>

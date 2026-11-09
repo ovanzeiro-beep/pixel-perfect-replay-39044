@@ -212,3 +212,33 @@ export const exemploViagens = {
   // A viagem mais recente desta linha nas "Anteriores" aparece cancelada:
   canceladaLinhaId: "l1",
 };
+
+// ===== Etapa 10: cobranças de exemplo (últimas semanas e meses) =====
+// pago: [valor, data, forma]. Sem "pago" = em aberto. Semana = data de vencimento (início da semana).
+export type CobrancaExemplo = { pid: string; tipo: "viagem" | "semana" | "mes"; venc: string; valor: number; pago?: [number, string, "dinheiro" | "pix"] };
+export const cobrancasExemplo: CobrancaExemplo[] = [
+  { pid: "p1", tipo: "viagem", venc: "2026-11-06", valor: 150, pago: [150, "2026-11-07", "pix"] },
+  { pid: "p1", tipo: "viagem", venc: "2026-11-07", valor: 150, pago: [150, "2026-11-07", "pix"] },
+  { pid: "p2", tipo: "viagem", venc: "2026-11-06", valor: 150, pago: [150, "2026-11-07", "dinheiro"] },
+  { pid: "p2", tipo: "viagem", venc: "2026-11-07", valor: 150, pago: [150, "2026-11-07", "dinheiro"] },
+  { pid: "p3", tipo: "viagem", venc: "2026-10-24", valor: 150, pago: [150, "2026-10-24", "pix"] },
+  { pid: "p3", tipo: "viagem", venc: "2026-11-01", valor: 150 },
+  { pid: "p4", tipo: "viagem", venc: "2026-11-06", valor: 150, pago: [150, "2026-11-06", "pix"] },
+  { pid: "p5", tipo: "viagem", venc: "2026-11-07", valor: 150, pago: [150, "2026-11-07", "dinheiro"] },
+  { pid: "p6", tipo: "semana", venc: "2026-10-26", valor: 90, pago: [90, "2026-10-26", "pix"] },
+  { pid: "p6", tipo: "semana", venc: "2026-11-02", valor: 90, pago: [90, "2026-11-02", "pix"] },
+  { pid: "p8", tipo: "semana", venc: "2026-10-26", valor: 90, pago: [90, "2026-10-27", "dinheiro"] },
+  { pid: "p8", tipo: "semana", venc: "2026-11-02", valor: 90 },
+  { pid: "p10", tipo: "semana", venc: "2026-10-26", valor: 90, pago: [90, "2026-10-26", "pix"] },
+  { pid: "p10", tipo: "semana", venc: "2026-11-02", valor: 90, pago: [40, "2026-11-04", "dinheiro"] },
+  { pid: "p14", tipo: "semana", venc: "2026-11-02", valor: 65, pago: [65, "2026-11-02", "pix"] },
+  { pid: "p7", tipo: "mes", venc: "2026-10-05", valor: 320, pago: [320, "2026-10-05", "pix"] },
+  { pid: "p7", tipo: "mes", venc: "2026-11-05", valor: 320, pago: [320, "2026-11-02", "pix"] },
+  { pid: "p9", tipo: "mes", venc: "2026-10-05", valor: 320, pago: [320, "2026-10-06", "dinheiro"] },
+  { pid: "p9", tipo: "mes", venc: "2026-11-05", valor: 320, pago: [320, "2026-11-03", "pix"] },
+  { pid: "p11", tipo: "mes", venc: "2026-11-05", valor: 250, pago: [250, "2026-11-05", "pix"] },
+  { pid: "p12", tipo: "mes", venc: "2026-11-05", valor: 250, pago: [250, "2026-11-05", "dinheiro"] },
+  { pid: "p13", tipo: "mes", venc: "2026-10-01", valor: 250, pago: [250, "2026-10-02", "pix"] },
+  { pid: "p13", tipo: "mes", venc: "2026-11-01", valor: 250 },
+  { pid: "p15", tipo: "mes", venc: "2026-11-05", valor: 250, pago: [250, "2026-11-05", "pix"] },
+];
