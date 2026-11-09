@@ -13,7 +13,7 @@ export type Marca = { pid: string; r: "embarcou" | "faltou" | "ficou"; cobrou: n
 export type Ficou = { pid: string; motivo: string; hora: string };
 export type ParadaFeita = { inicio: number; minutos: number; local: string; ficaram: Ficou[] };
 export type ParadaAtiva = { inicio: number; minutos: number; local: string; chamada: boolean; naVan: Record<string, "manual" | "app"> };
-export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva; paradas?: ParadaFeita[] };
+export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[] };
 
 const hm = (ms: number) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
 export const horaDe = hm;
