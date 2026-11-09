@@ -65,7 +65,7 @@ export function TelaVolta({ v, ida, salvar, nomeLinha, vanNome, passageiros }: {
       </header>
       <div className="space-y-4 px-4 pt-4">
         {ida.encerrada ? <ResumoViagem ida={ida} passageiros={passageiros} />
-          : volta?.fase === "chamada" ? <Chamada ida={ida} volta={volta} setVolta={setVolta} passageiros={passageiros} />
+          : volta?.fase === "chamada" ? <Chamada ida={ida} volta={volta} setVolta={setVolta} passageiros={passageiros} linhaId={v.linhaId} />
           : volta ? <EntregaVolta ida={ida} volta={volta} setVolta={setVolta} salvar={salvar} passageiros={passageiros} />
           : null}
       </div>
@@ -73,7 +73,7 @@ export function TelaVolta({ v, ida, salvar, nomeLinha, vanNome, passageiros }: {
   );
 }
 
-function Chamada({ ida, volta, setVolta, passageiros }: { ida: Ida; volta: Volta; setVolta: (v: Volta) => void; passageiros: Passageiro[] }) {
+function Chamada({ ida, volta, setVolta, passageiros, linhaId }: { ida: Ida; volta: Volta; setVolta: (v: Volta) => void; passageiros: Passageiro[]; linhaId: string }) {
   const pas = (id: string) => passageiros.find((p) => p.id === id);
   const [naoVolta, setNaoVolta] = useState<Passageiro | null>(null);
   const [motivo, setMotivo] = useState<(typeof MOTIVOS)[number] | "">("");
@@ -106,7 +106,7 @@ function Chamada({ ida, volta, setVolta, passageiros }: { ida: Ida; volta: Volta
   const candidatos = passageiros.filter((p) => p.ativo && !fora.has(p.id) && p.nome.toLowerCase().includes(busca.toLowerCase()));
   const adicionarP = (p: Passageiro) => {
     const cobrou = cobrancaSoVolta(ida, p.id, p.formaPagamento, p.valor);
-    if (cobrou) lancarCobranca(p.id, cobrou);
+    if (cobrou) lancarCobranca(p.id, cobrou, linhaId);
     setVolta({ ...volta, extras: [...volta.extras, { pid: p.id, cobrou }] });
     setAdicionar(false); setBusca("");
     toast.success(`${primeiro(p.nome)} entrou na volta${cobrou ? " · cobrança da viagem lançada" : ""}`);
