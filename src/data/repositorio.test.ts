@@ -4,7 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Repositorio } from "./repositorio";
 
 /** Itens do store que NÃO fazem parte do contrato: ajudas internas e regras de domínio. */
-const FORA_DO_CONTRATO = ["criarEstadoExemplo", "ehEstado", "TIPOS_LINHA", "DIAS", "estaDevendo"];
+const FORA_DO_CONTRATO = [
+  "criarEstadoExemplo",
+  "criarEstadoVazio",
+  "ehEstado",
+  "TIPOS_LINHA",
+  "DIAS",
+  "estaDevendo",
+];
 
 async function carregar() {
   localStorage.clear();

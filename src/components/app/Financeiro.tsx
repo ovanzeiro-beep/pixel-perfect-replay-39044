@@ -8,7 +8,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import { useFrota } from "@/data/repositorio";
+import { useFrota, useVanzeiro } from "@/data/repositorio";
 import { brl, isoDe } from "@/data/cobrancas";
 import {
   mesCurto,
@@ -22,7 +22,6 @@ import {
   variacao,
 } from "@/data/financeiro";
 import { ICONE_CATEGORIA } from "@/components/app/categorias";
-import { vanzeiro } from "@/data/exemplo";
 
 /** Diferença em relação ao mês anterior; `bomSubir` diz se subir é bom (verde). */
 function Variacao({ d, bomSubir }: { d: number; bomSubir: boolean }) {
@@ -40,6 +39,7 @@ function Variacao({ d, bomSubir }: { d: number; bomSubir: boolean }) {
 }
 
 export function Financeiro() {
+  const vanzeiro = useVanzeiro();
   const { cobrancas, gastos, linhas, vans, passageiros } = useFrota();
   const hoje = isoDe(new Date());
   const [mes, setMes] = useState(mesDe(hoje));

@@ -3,6 +3,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { readdirSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { semearExemploNoAparelho } from "./apoio";
 
 type Papel = "vanzeiro" | "passageiro";
 
@@ -10,6 +11,7 @@ type Papel = "vanzeiro" | "passageiro";
 const ACESSO: Record<string, "publica" | Papel> = {
   "/": "publica",
   "/perfil": "publica",
+  "/boas-vindas": "vanzeiro",
   "/convite/$passageiroId": "publica",
   "/vanzeiro": "vanzeiro",
   "/vanzeiro/": "vanzeiro",
@@ -34,7 +36,11 @@ const ACESSO: Record<string, "publica" | Papel> = {
 };
 
 // Quem já aceitou o convite (como a passageira de teste) é levado direto para o início em vez de ver a tela do convite.
-const DESTINO_FINAL: Record<string, string> = { "/passageiro/convite": "/passageiro" };
+const DESTINO_FINAL: Record<string, string> = {
+  "/passageiro/convite": "/passageiro",
+  // Quem já preencheu o perfil (como o vanzeiro de exemplo) não volta para as boas-vindas.
+  "/boas-vindas": "/vanzeiro",
+};
 
 const real = (rota: string) =>
   rota.replace("$viagemId", "l1_2026-11-13").replace("$passageiroId", "p1").replace(/\/$/, "") ||
@@ -42,8 +48,8 @@ const real = (rota: string) =>
 const casa = (rota: string) => (ACESSO[rota] === "publica" ? "/" : `/${rota.split("/")[1]}`);
 
 async function montar(caminho: string, papel?: Papel) {
-  localStorage.clear();
   vi.resetModules();
+  await semearExemploNoAparelho();
   const { routeTree } = await import("@/routeTree.gen");
   (routeTree.options as { shellComponent?: unknown }).shellComponent = undefined;
   const sessao = await import("@/data/sessao");

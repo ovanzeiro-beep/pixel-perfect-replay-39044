@@ -10,12 +10,12 @@
  *  - nenhuma tela importa `./store` direto.
  */
 import * as mock from "./store";
-import type { Estado, Linha, Motorista, Passageiro, Van } from "./store";
+import type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van } from "./store";
 import type { Forma, Recibo } from "./cobrancas";
 import type { Gasto } from "./financeiro";
 import type { Ajuste, Viagem } from "./viagens";
 
-export type { Estado, Linha, Motorista, Passageiro, Van };
+export type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van };
 // Regras e listas de domínio (não são acesso a dados): continuam saindo do mesmo lugar para as telas.
 export { TIPOS_LINHA, DIAS, estaDevendo } from "./store";
 
@@ -35,6 +35,8 @@ export interface Leitura {
   useViagens(): Viagem[];
   /** Fica verdadeiro quando os dados do aparelho/banco terminaram de carregar. */
   useDadosProntos(): boolean;
+  /** Dados do próprio vanzeiro (nome, cidade, telefone...) e se o primeiro acesso já foi concluído. */
+  useVanzeiro(): PerfilVanzeiro;
   /** Leitura pontual, fora de componentes (testes, funções). */
   obterEstado(): Estado;
 }
@@ -51,6 +53,12 @@ export interface Escrita {
   restaurarExemplo(): void;
   /** Troca todos os dados de uma vez: restaurar um backup ou desfazer uma restauração. */
   substituirTodosOsDados(estado: Estado): void;
+  /** Apaga tudo e volta ao primeiro acesso (conta vazia). Guarde antes uma cópia de segurança. */
+  comecarDoZero(): void;
+
+  // --- Perfil do vanzeiro
+  /** Salva os dados do vanzeiro e conclui o primeiro acesso; cria/atualiza também o motorista "próprio". */
+  salvarPerfil(perfil: Omit<PerfilVanzeiro, "configurado">): void;
 
   // --- Vans e motoristas
   salvarVan(van: Salvar<Van>): void;
@@ -113,10 +121,13 @@ export const repositorio: Repositorio = {
   useFrota: mock.useFrota,
   useViagens: mock.useViagens,
   useDadosProntos: mock.useDadosProntos,
+  useVanzeiro: mock.useVanzeiro,
   obterEstado: mock.obterEstado,
   iniciarPersistencia: mock.iniciarPersistencia,
   restaurarExemplo: mock.restaurarExemplo,
   substituirTodosOsDados: mock.substituirTodosOsDados,
+  comecarDoZero: mock.comecarDoZero,
+  salvarPerfil: mock.salvarPerfil,
   salvarVan: mock.salvarVan,
   excluirVan: mock.excluirVan,
   salvarMotorista: mock.salvarMotorista,
@@ -151,10 +162,13 @@ export const {
   useFrota,
   useViagens,
   useDadosProntos,
+  useVanzeiro,
   obterEstado,
   iniciarPersistencia,
   restaurarExemplo,
   substituirTodosOsDados,
+  comecarDoZero,
+  salvarPerfil,
   salvarVan,
   excluirVan,
   salvarMotorista,

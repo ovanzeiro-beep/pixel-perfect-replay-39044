@@ -2,14 +2,15 @@ import { QueryClient } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { semearExemploNoAparelho } from "./apoio";
 
 /** Monta o app inteiro (rotas reais) começando em `caminho`, com dados limpos de exemplo. */
 async function abrir(
   caminho: string,
   entrarComo?: string | ((store: typeof import("@/data/store")) => string),
 ) {
-  localStorage.clear();
   vi.resetModules();
+  await semearExemploNoAparelho();
   const { routeTree } = await import("@/routeTree.gen");
   // O "casco" <html> da raiz só vale no servidor; dentro do jsdom ele impede qualquer tela de aparecer.
   (routeTree.options as { shellComponent?: unknown }).shellComponent = undefined;
@@ -17,6 +18,11 @@ async function abrir(
   const store = await import("@/data/store");
   const id = typeof entrarComo === "function" ? entrarComo(store) : entrarComo;
   if (id) sessao.entrarComoPassageiro(id);
+  // Preparações feitas na memória precisam estar salvas no aparelho: o app carrega os dados salvos ao abrir.
+  if (typeof entrarComo === "function") {
+    const { gravar } = await import("@/data/persistencia");
+    gravar(localStorage, store.obterEstado());
+  }
   const router = createRouter({
     routeTree,
     context: { queryClient: new QueryClient() },

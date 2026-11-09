@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { vanzeiro, type FormaPagamento } from "@/data/exemplo";
+import { type FormaPagamento } from "@/data/exemplo";
 import { linkConvite } from "@/lib/convite";
 import {
   useFrota,
@@ -28,6 +28,7 @@ import {
   DIAS,
   type Passageiro,
   type Linha,
+  useVanzeiro,
 } from "@/data/repositorio";
 import { validarPassageiro, mensagemConvite, linkWhatsApp } from "@/lib/validacao";
 import { useModoDemo } from "@/lib/modoDemo";
@@ -126,6 +127,7 @@ function Convite({ p }: { p: Passageiro }) {
 }
 
 function Passageiros() {
+  const vanzeiro = useVanzeiro();
   const modoDemo = useModoDemo();
   const { passageiros, linhas } = useFrota();
   const [busca, setBusca] = useState("");

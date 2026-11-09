@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { useFrota, aceitarConvite } from "@/data/repositorio";
+import { useFrota, aceitarConvite, useVanzeiro } from "@/data/repositorio";
 import { usePassageiroId } from "@/data/sessao";
-import { vanzeiro } from "@/data/exemplo";
 
 function TelaConvite() {
+  const vanzeiro = useVanzeiro();
   const { passageiros } = useFrota();
   const passageiroId = usePassageiroId();
   const navigate = useNavigate();

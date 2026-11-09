@@ -12,11 +12,23 @@ function Carregando() {
   );
 }
 
-/** Só mostra a área para quem entrou com o papel certo. Quem não pode vai para o lugar certo. */
-export function ProtegeArea({ papel, children }: { papel: Papel; children: ReactNode }) {
+/**
+ * Só mostra a área para quem entrou com o papel certo. Quem não pode vai para o lugar certo.
+ * `perfil` (só para o vanzeiro): "exigido" manda para as boas-vindas quem ainda não preencheu os próprios dados;
+ * "pendente" faz o contrário (a tela de boas-vindas não abre para quem já preencheu).
+ */
+export function ProtegeArea({
+  papel,
+  perfil: modoPerfil,
+  children,
+}: {
+  papel: Papel;
+  perfil?: "exigido" | "pendente";
+  children: ReactNode;
+}) {
   const sessao = useSessao();
   const prontos = useDadosProntos();
-  const { passageiros } = useFrota();
+  const { passageiros, perfil } = useFrota();
   const navigate = useNavigate();
   const negado = destinoSeNegado(papel, sessao);
   const passageiroSumiu =
@@ -24,14 +36,32 @@ export function ProtegeArea({ papel, children }: { papel: Papel; children: React
     sessao?.papel === "passageiro" &&
     !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
 
+  const precisaConfigurar =
+    prontos && !negado && papel === "vanzeiro" && modoPerfil === "exigido" && !perfil.configurado;
+  const jaConfigurado =
+    prontos && !negado && papel === "vanzeiro" && modoPerfil === "pendente" && perfil.configurado;
+
   useEffect(() => {
     if (negado) void navigate({ to: negado, replace: true });
   }, [negado, navigate]);
 
   useEffect(() => {
+    if (precisaConfigurar) void navigate({ to: "/boas-vindas", replace: true });
+    else if (jaConfigurado) void navigate({ to: "/vanzeiro", replace: true });
+  }, [precisaConfigurar, jaConfigurado, navigate]);
+
+  useEffect(() => {
     if (passageiroSumiu) encerrarSessao();
   }, [passageiroSumiu]);
 
-  if (sessao === undefined || !prontos || negado || passageiroSumiu) return <Carregando />;
+  if (
+    sessao === undefined ||
+    !prontos ||
+    negado ||
+    passageiroSumiu ||
+    precisaConfigurar ||
+    jaConfigurado
+  )
+    return <Carregando />;
   return <>{children}</>;
 }

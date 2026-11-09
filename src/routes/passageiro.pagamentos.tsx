@@ -2,11 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { useFrota } from "@/data/repositorio";
+import { useFrota, useVanzeiro } from "@/data/repositorio";
 import { usePassageiroId } from "@/data/sessao";
 import { ListaRecibos } from "@/components/app/ListaRecibos";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
-import { vanzeiro } from "@/data/exemplo";
 import { brl, dataBR, estadoCob, nomeEstado, aberto, isoDe } from "@/data/cobrancas";
 import { linkWhatsApp } from "@/lib/validacao";
 
@@ -19,6 +18,7 @@ const COR_STATUS: Record<string, string> = {
 };
 
 function Pagamentos() {
+  const vanzeiro = useVanzeiro();
   const { passageiros, cobrancas, recibos, chavePix } = useFrota();
   const passageiroId = usePassageiroId();
   const p = passageiros.find((x) => x.id === passageiroId);

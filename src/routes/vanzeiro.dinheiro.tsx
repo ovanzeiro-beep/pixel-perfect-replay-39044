@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Financeiro } from "@/components/app/Financeiro";
 import { BotaoGrande, Campo, Confirmar, Painel, campoClasse } from "@/components/app/Formulario";
-import { vanzeiro } from "@/data/exemplo";
 import {
   useFrota,
   marcarPagamento,
   desfazerRecibo,
   cancelarCob,
   type Passageiro,
+  useVanzeiro,
 } from "@/data/repositorio";
 import {
   aberto,
@@ -415,6 +415,7 @@ function JanelaPagamento({
 }
 
 function JanelaRecibo({ r, onFechar }: { r: Recibo; onFechar: () => void }) {
+  const vanzeiro = useVanzeiro();
   const { passageiros } = useFrota();
   const p = passageiros.find((x) => x.id === r.pid);
   const texto = textoRecibo(r, vanzeiro.nome, p?.nome ?? "Passageiro");

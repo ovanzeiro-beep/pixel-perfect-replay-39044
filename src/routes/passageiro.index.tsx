@@ -10,8 +10,8 @@ import {
   responderViagemApp,
   confirmarParadaApp,
   responderVoltaApp,
+  useVanzeiro,
 } from "@/data/repositorio";
-import { vanzeiro } from "@/data/exemplo";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
 import { diaSemana, dataCurta, horarioNaParada, type Viagem } from "@/data/viagens";
@@ -244,6 +244,7 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
 }
 
 function InicioPassageiro() {
+  const vanzeiro = useVanzeiro();
   const { passageiros, cobrancas, linhas, chavePix } = useFrota();
   const passageiroId = usePassageiroId();
   const todasViagens = useViagens();

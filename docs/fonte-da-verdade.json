@@ -1560,6 +1560,237 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 11,
+      "titulo": "Extra: começar do zero (primeiro acesso real)",
+      "status": "concluida",
+      "objetivo": "Conta nova abre vazia, com boas-vindas e guia de primeiros passos; o nome e a cidade deixam de ser fixos; quem já usa o app não perde nada. Sem banco de dados.",
+      "checks": [
+        {
+          "d": "Conta vazia existe",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function criarEstadoVazio"
+        },
+        {
+          "d": "Perfil do vanzeiro faz parte dos dados",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export type PerfilVanzeiro"
+        },
+        {
+          "d": "Primeiro acesso começa vazio (nada salvo)",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "set\\(criarEstadoVazio\\(\\)\\)"
+        },
+        {
+          "d": "Dados antigos (sem perfil) continuam como estão",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "perfil: resto\\.perfil \\?\\? perfilDoExemplo\\(\\)"
+        },
+        {
+          "d": "Dado ilegível é guardado à parte antes de recomeçar",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "vanzeiro:dados-ilegiveis"
+        },
+        {
+          "d": "Salvar perfil cria/atualiza o motorista próprio",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function salvarPerfil"
+        },
+        {
+          "d": "Começar do zero",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function comecarDoZero"
+        },
+        {
+          "d": "Hook do perfil",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export const useVanzeiro"
+        },
+        {
+          "d": "Contrato: salvarPerfil",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "salvarPerfil\\(perfil: Omit<PerfilVanzeiro"
+        },
+        {
+          "d": "Contrato: comecarDoZero",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "comecarDoZero\\(\\): void"
+        },
+        {
+          "d": "Contrato: useVanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "useVanzeiro\\(\\): PerfilVanzeiro"
+        },
+        {
+          "d": "Backup aceita backup antigo sem perfil e recusa perfil estragado",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "dados do vanzeiro no backup estão inválidos"
+        },
+        {
+          "d": "Portão: vanzeiro sem perfil vai para as boas-vindas",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ProtegeArea.tsx",
+          "regex": "/boas-vindas"
+        },
+        {
+          "d": "Área do vanzeiro exige o perfil",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "perfil=\"exigido\""
+        },
+        {
+          "d": "Viagem em andamento exige o perfil",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "perfil=\"exigido\""
+        },
+        {
+          "d": "Tela de boas-vindas",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/boas-vindas.tsx"
+        },
+        {
+          "d": "Boas-vindas: opção de ver os dados de exemplo",
+          "tipo": "contem",
+          "arquivo": "src/routes/boas-vindas.tsx",
+          "regex": "Prefiro ver o app com dados de exemplo"
+        },
+        {
+          "d": "Boas-vindas: restaurar backup (troca de celular)",
+          "tipo": "contem",
+          "arquivo": "src/routes/boas-vindas.tsx",
+          "regex": "<BackupDados soRestaurar />"
+        },
+        {
+          "d": "Validação do perfil em português",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "export function validarPerfil"
+        },
+        {
+          "d": "Guia: passos e quando aparece",
+          "tipo": "contem",
+          "arquivo": "src/data/primeirosPassos.ts",
+          "regex": "export const guiaVisivel"
+        },
+        {
+          "d": "Guia na tela",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/PrimeirosPassos.tsx"
+        },
+        {
+          "d": "Guia no Início do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.index.tsx",
+          "regex": "<PrimeirosPassos />"
+        },
+        {
+          "d": "Editar os próprios dados",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/DadosDoVanzeiro.tsx"
+        },
+        {
+          "d": "Perfil: editar dados e começar do zero",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "<DadosDoVanzeiro />[\\s\\S]*Começar do zero"
+        },
+        {
+          "d": "Começar do zero guarda cópia para desfazer",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "guardarCopiaDeSeguranca\\(obterEstado\\(\\), \"decisão de começar do zero\"\\)"
+        },
+        {
+          "d": "Sem 'vanzeiro' fixo nas telas (passageiro)",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "import \\{ vanzeiro \\} from \"@/data/exemplo\""
+        },
+        {
+          "d": "Sem 'vanzeiro' fixo nas telas (relatórios)",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "import \\{ vanzeiro \\} from \"@/data/exemplo\""
+        },
+        {
+          "d": "Testes de primeiro acesso (dados)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/primeiroAcesso.test.ts"
+        },
+        {
+          "d": "Testes do guia",
+          "tipo": "arquivo",
+          "arquivo": "src/data/primeirosPassos.test.ts"
+        },
+        {
+          "d": "Testes do primeiro acesso (telas reais)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/primeiro-acesso.test.tsx"
+        },
+        {
+          "d": "Testes: todas as telas com a conta vazia",
+          "tipo": "arquivo",
+          "arquivo": "src/test/conta-nova.test.tsx"
+        },
+        {
+          "d": "Teste: dados antigos sem perfil continuam",
+          "tipo": "contem",
+          "arquivo": "src/data/primeiroAcesso.test.ts",
+          "regex": "continuam como estão"
+        },
+        {
+          "d": "Teste: troca de celular nas boas-vindas",
+          "tipo": "contem",
+          "arquivo": "src/test/primeiro-acesso.test.tsx",
+          "regex": "troca de celular"
+        },
+        {
+          "d": "Roteiro de celular cobre o primeiro acesso",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "## Primeiro acesso"
+        },
+        {
+          "d": "README descreve o primeiro acesso",
+          "tipo": "contem",
+          "arquivo": "README.md",
+          "regex": "[Pp]rimeiro acesso"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

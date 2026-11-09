@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e o extra de backup (10) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10) e de começar do zero (11) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -25,6 +25,7 @@
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | **Concluída** |
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | **Concluída** |
 | 10 | Extra: backup dos dados | Salvar backup em arquivo, restaurar com prévia, desfazer e lembrete (pedido depois do plano) | **Concluída** |
+| 11 | Extra: começar do zero | Conta nova abre vazia, boas-vindas, guia de primeiros passos, perfil editável (pedido depois do plano) | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -120,3 +121,15 @@ Como os dados ficam só no aparelho, limpar os dados do navegador ou trocar de c
 - **Lembrete:** o Início avisa "Faça um backup dos seus dados" quando houve 15 ou mais alterações e o último backup foi há 7 dias ou mais (ou nunca); vira urgente com 100 alterações ou 30 dias.
 - O arquivo de backup guarda tudo (passageiros, linhas, vans, cobranças, recibos, gastos, viagens). **Não** inclui o login (sessão) nem o modo demonstração.
 - Na futura fase de banco, o mesmo arquivo serve para importar os dados de quem já usa o app (`docs/MIGRACAO_BANCO.md`).
+
+## Extra: começar do zero (primeiro acesso real)
+
+Até aqui o app sempre abria com um vanzeiro e 22 passageiros de exemplo, e o nome "João Batista" estava fixo no código. Agora:
+
+- **Conta nova começa vazia.** No primeiro acesso (nada salvo no aparelho) o vanzeiro vê **Boas-vindas**: nome, celular com DDD, cidade, estado e (opcional) chave Pix. Isso cria o perfil dele e o motorista "próprio" (ele mesmo, que dirige). Em Meu perfil → **Seus dados** dá para editar depois.
+- **Quem já usa o app não perde nada.** Dados salvos por versões anteriores (sem perfil) continuam exatamente como estavam, com o vanzeiro de exemplo já configurado; não passam pelas boas-vindas. Se o dado salvo estiver ilegível, o app guarda uma cópia (`vanzeiro:dados-ilegiveis`) antes de começar vazio.
+- **Guia "Primeiros passos"** no Início: van, linha, passageiros (essenciais), convites, Pix e backup. Cada passo leva à tela de cadastro e é marcado quando feito; o guia some quando os três essenciais estão prontos ou em "Esconder este guia".
+- **Dados de exemplo continuam disponíveis** ("Prefiro ver o app com dados de exemplo" nas boas-vindas, ou Meu perfil → "Restaurar dados de exemplo"), para demonstração.
+- **Começar do zero** (Meu perfil): apaga tudo e volta ao primeiro acesso, guardando uma **cópia de segurança**; as boas-vindas oferecem "Desfazer".
+- **Troca de celular:** as boas-vindas também têm "Restaurar de um backup", então o celular novo entra direto com todos os dados, sem recadastrar nada.
+- **Telas vazias:** todas as telas abrem sem quebrar numa conta sem nenhum dado (um teste abre cada uma).

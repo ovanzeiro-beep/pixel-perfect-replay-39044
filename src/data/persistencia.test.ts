@@ -107,14 +107,14 @@ describe("persistencia do app (store)", () => {
     parar();
   });
 
-  it("dados salvos corrompidos são ignorados e o exemplo continua valendo", async () => {
-    localStorage.setItem(
-      CHAVE,
-      JSON.stringify({ versao: VERSAO, salvoEm: "x", dados: { vans: "não é lista" } }),
-    );
+  it("dados salvos ilegíveis não derrubam o app: a conta começa vazia e o arquivo ilegível é guardado à parte", async () => {
+    const ruim = JSON.stringify({ versao: VERSAO, salvoEm: "x", dados: { vans: "não é lista" } });
+    localStorage.setItem(CHAVE, ruim);
     const s = await import("./store");
     const parar = s.iniciarPersistencia();
-    expect(s.obterEstado().vans.length).toBe(2);
+    expect(s.obterEstado().vans).toEqual([]);
+    expect(s.obterEstado().perfil.configurado).toBe(false);
+    expect(localStorage.getItem("vanzeiro:dados-ilegiveis")).toBe(ruim);
     parar();
   });
 
