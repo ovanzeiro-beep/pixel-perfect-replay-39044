@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { useFrota, aceitarConvite } from "@/data/store";
+import { useFrota, aceitarConvite } from "@/data/repositorio";
 import { usePassageiroId } from "@/data/sessao";
 import { vanzeiro } from "@/data/exemplo";
 

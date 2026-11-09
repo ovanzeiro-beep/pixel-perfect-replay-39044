@@ -1,7 +1,7 @@
 import { brl } from "@/data/cobrancas";
 import { estatisticasIda } from "@/data/historico";
 import { horaDe, type Ida } from "@/data/viagens";
-import type { Passageiro } from "@/data/store";
+import type { Passageiro } from "@/data/repositorio";
 
 /** Resumo da viagem concluída (usado na tela da viagem e na ficha). */
 export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Passageiro[] }) {

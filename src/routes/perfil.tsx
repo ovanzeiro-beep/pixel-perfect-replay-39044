@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Bus, ChevronRight, User } from "lucide-react";
 import { Logo } from "@/components/app/Logo";
-import { useFrota, type Passageiro } from "@/data/store";
+import { useFrota, type Passageiro } from "@/data/repositorio";
 import { entrarComoPassageiro, entrarComoVanzeiro } from "@/data/sessao";
 
 function PickerPassageiro({

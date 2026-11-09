@@ -18,7 +18,7 @@ import {
   type Periodo,
   type PresetPeriodo,
 } from "@/data/relatorios";
-import { useFrota } from "@/data/store";
+import { useFrota } from "@/data/repositorio";
 import { vanzeiro } from "@/data/exemplo";
 import { campoClasse } from "@/components/app/Formulario";
 import { compartilharTexto } from "@/lib/compartilhar";

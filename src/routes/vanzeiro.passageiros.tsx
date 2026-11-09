@@ -28,7 +28,7 @@ import {
   DIAS,
   type Passageiro,
   type Linha,
-} from "@/data/store";
+} from "@/data/repositorio";
 import { validarPassageiro, mensagemConvite, linkWhatsApp } from "@/lib/validacao";
 import { useModoDemo } from "@/lib/modoDemo";
 import {

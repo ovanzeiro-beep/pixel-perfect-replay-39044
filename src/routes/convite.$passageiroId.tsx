@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { LinkIcon } from "lucide-react";
 import { LogoIcon } from "@/components/app/Logo";
 import { entrarComoPassageiro } from "@/data/sessao";
-import { useDadosProntos, useFrota } from "@/data/store";
+import { useDadosProntos, useFrota } from "@/data/repositorio";
 import { conviteValido } from "@/lib/convite";
 
 export const Route = createFileRoute("/convite/$passageiroId")({

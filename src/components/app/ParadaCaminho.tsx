@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useModoDemo } from "@/lib/modoDemo";
 import { AlertTriangle, Check, Copy, MessageCircle, Phone, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import type { Passageiro } from "@/data/store";
+import type { Passageiro } from "@/data/repositorio";
 import { avisoParada, saidaParada, textoFaltam, type ParadaAtiva } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande, campoClasse } from "@/components/app/Formulario";

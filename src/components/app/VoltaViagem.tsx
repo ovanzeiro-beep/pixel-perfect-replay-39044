@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { lancarCobranca, type Passageiro } from "@/data/store";
+import { lancarCobranca, type Passageiro } from "@/data/repositorio";
 import { ResumoViagem } from "@/components/app/ResumoViagem";
 import { textoResumoViagem } from "@/data/manifesto";
 import { compartilharTexto } from "@/lib/compartilhar";

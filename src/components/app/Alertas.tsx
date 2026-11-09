@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, BellRing, CreditCard, IdCard, Info, X } from "lucide-react";
 import type { Alerta, Nivel, TipoAlerta } from "@/data/alertas";
-import { dispensarAlerta, restaurarAlertas } from "@/data/store";
+import { dispensarAlerta, restaurarAlertas } from "@/data/repositorio";
 import { useAlertas } from "@/data/useAlertas";
 
 const ICONE: Record<TipoAlerta, typeof AlertTriangle> = {

@@ -10,7 +10,7 @@ import {
   responderViagemApp,
   confirmarParadaApp,
   responderVoltaApp,
-} from "@/data/store";
+} from "@/data/repositorio";
 import { vanzeiro } from "@/data/exemplo";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";

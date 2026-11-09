@@ -4,7 +4,7 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens, responderViagemApp } from "@/data/store";
+import { useFrota, useViagens, responderViagemApp } from "@/data/repositorio";
 import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
 import { prazoViagem } from "@/data/alertas";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";

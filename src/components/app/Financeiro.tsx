@@ -8,7 +8,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import { useFrota } from "@/data/store";
+import { useFrota } from "@/data/repositorio";
 import { brl, isoDe } from "@/data/cobrancas";
 import {
   mesCurto,

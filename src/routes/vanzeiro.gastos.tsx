@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { BotaoGrande, Campo, Confirmar, Painel, campoClasse } from "@/components/app/Formulario";
 import { ICONE_CATEGORIA } from "@/components/app/categorias";
-import { useFrota, salvarGasto, excluirGasto } from "@/data/store";
+import { useFrota, salvarGasto, excluirGasto } from "@/data/repositorio";
 import {
   CATEGORIAS,
   gastosDoMes,

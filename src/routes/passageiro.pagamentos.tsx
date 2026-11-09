@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { useFrota } from "@/data/store";
+import { useFrota } from "@/data/repositorio";
 import { usePassageiroId } from "@/data/sessao";
 import { ListaRecibos } from "@/components/app/ListaRecibos";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";

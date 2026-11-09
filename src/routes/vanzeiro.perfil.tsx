@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PerfilTela } from "@/components/app/PerfilTela";
 import { Campo, BotaoGrande, campoClasse } from "@/components/app/Formulario";
 import { vanzeiro } from "@/data/exemplo";
-import { useFrota, salvarChavePix, restaurarExemplo } from "@/data/store";
+import { useFrota, salvarChavePix, restaurarExemplo } from "@/data/repositorio";
 import { definirModoDemo, useModoDemo } from "@/lib/modoDemo";
 
 export const Route = createFileRoute("/vanzeiro/perfil")({

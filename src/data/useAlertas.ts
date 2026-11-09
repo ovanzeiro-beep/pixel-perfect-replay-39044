@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { contarAtencao, filtrarDispensados, gerarAlertas } from "./alertas";
-import { useFrota, useViagens } from "./store";
+import { useFrota, useViagens } from "./repositorio";
 
 /** Alertas atuais do vanzeiro (sem os dispensados). Recalcula a cada minuto para o prazo andar sozinho. */
 export function useAlertas() {

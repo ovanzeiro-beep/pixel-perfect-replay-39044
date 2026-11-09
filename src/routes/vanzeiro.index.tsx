@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import { vanzeiro } from "@/data/exemplo";
-import { useFrota, useViagens } from "@/data/store";
+import { useFrota, useViagens } from "@/data/repositorio";
 import { diaSemana, rotuloDia } from "@/data/viagens";
 import { isoDe, resumoPassageiro } from "@/data/cobrancas";
 import { mesDe, resumoMes } from "@/data/financeiro";

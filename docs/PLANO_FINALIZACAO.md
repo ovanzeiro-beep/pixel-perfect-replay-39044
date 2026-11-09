@@ -1,5 +1,7 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
+> **Status: todas as etapas (0 a 9) concluídas e conferidas** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
 ## Como a gente confere cada etapa (fonte da verdade + contraprova)
@@ -21,7 +23,7 @@
 | 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | **Concluída** |
 | 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | **Concluída** |
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | **Concluída** |
-| 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | Pendente |
+| 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -97,3 +99,12 @@ Aparecem no topo do Início do vanzeiro, com um selo vermelho no menu "Início" 
 - **Roteiro:** `docs/teste-em-aparelho.md` (Android, iPhone, offline, nova versão, convite, limites conhecidos).
 - **Validado com service worker real:** instalação, offline (tela visitada, navegação, tela nunca aberta), e atualização com rebuild e redeploy de verdade.
 - **Teste local de produção:** `NITRO_PRESET=node-server npx vite build` e `node .output/server/index.mjs` (o preview padrão é da Cloudflare e não roda no Node).
+
+## Qualidade final e congelamento do mock (Etapa 9)
+
+- **Lint limpo (zero erros e zero avisos):** o código foi formatado com Prettier (commit só de formatação, sem mudança de comportamento) e os últimos problemas reais foram corrigidos. A contraprova exige `eslint --max-warnings 0`.
+- **404 e telas de erro em português**, com a marca do app, inclusive a página de erro do servidor (HTML puro). Um teste proíbe frases-padrão em inglês na interface.
+- **Testes de rotas:** todas as rotas do app são classificadas (pública, só vanzeiro ou só passageiro) e cada uma é testada para quem entra, quem não entra e quem é de outro papel. Rota nova sem classificação faz o teste falhar de propósito.
+- **Repositório (`src/data/repositorio.ts`):** contrato tipado (`Leitura` + `Escrita`) cumprido pelo mock. Todas as telas importam dados só dele (um teste confere), e há uma suíte de contrato que roda contra qualquer implementação.
+- **Guia de migração:** [`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md) mapeia as tabelas, o que é calculado (não se grava), os cuidados e como pedir o banco ao Lovable.
+- **README** atualizado: o que o app faz, como rodar e a regra de ouro dos dados.

@@ -29,7 +29,7 @@ import {
   estaDevendo,
   type Linha,
   type Passageiro,
-} from "@/data/store";
+} from "@/data/repositorio";
 import { validarLinha } from "@/lib/validacao";
 import {
   Painel,

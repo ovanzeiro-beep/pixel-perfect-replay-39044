@@ -7,7 +7,7 @@ import { ResumoViagem } from "@/components/app/ResumoViagem";
 import { brl } from "@/data/cobrancas";
 import { historicoViagens, totaisHistorico, type ItemHistorico } from "@/data/historico";
 import { textoResumoViagem } from "@/data/manifesto";
-import { useFrota } from "@/data/store";
+import { useFrota } from "@/data/repositorio";
 import { dataCurta, diaSemana, doIso, horaDe } from "@/data/viagens";
 import { compartilharTexto } from "@/lib/compartilhar";
 

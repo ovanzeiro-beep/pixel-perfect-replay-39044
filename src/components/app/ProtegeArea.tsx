@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { LogoIcon } from "./Logo";
-import { useDadosProntos, useFrota } from "@/data/store";
+import { useDadosProntos, useFrota } from "@/data/repositorio";
 import { destinoSeNegado, encerrarSessao, useSessao, type Papel } from "@/data/sessao";
 
 function Carregando() {

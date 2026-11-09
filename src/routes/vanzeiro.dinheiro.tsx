@@ -12,7 +12,7 @@ import {
   desfazerRecibo,
   cancelarCob,
   type Passageiro,
-} from "@/data/store";
+} from "@/data/repositorio";
 import {
   aberto,
   brl,

@@ -14,7 +14,7 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { prazoViagem } from "@/data/alertas";
-import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/store";
+import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/repositorio";
 import {
   definirResposta,
   sobram,

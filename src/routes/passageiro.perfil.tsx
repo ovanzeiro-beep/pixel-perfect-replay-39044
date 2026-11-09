@@ -4,7 +4,7 @@ import { Check, Edit3, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { encerrarSessao, usePassageiroId } from "@/data/sessao";
-import { useFrota, atualizarPassageiro } from "@/data/store";
+import { useFrota, atualizarPassageiro } from "@/data/repositorio";
 import { vanzeiro } from "@/data/exemplo";
 import { linkWhatsApp } from "@/lib/validacao";
 

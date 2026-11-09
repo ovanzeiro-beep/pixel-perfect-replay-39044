@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { AlertTriangle, BellRing, Info } from "lucide-react";
 import { gerarAvisosPassageiro, type Nivel } from "@/data/alertas";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens } from "@/data/store";
+import { useFrota, useViagens } from "@/data/repositorio";
 
 const COR: Record<Nivel, string> = {
   urgente: "border-destructive/40 bg-destructive/10",

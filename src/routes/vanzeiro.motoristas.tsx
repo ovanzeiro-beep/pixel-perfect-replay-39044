@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, IdCard, MessageCircle, Pencil, Phone, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { useFrota, salvarMotorista, excluirMotorista, type Motorista } from "@/data/store";
+import { useFrota, salvarMotorista, excluirMotorista, type Motorista } from "@/data/repositorio";
 import { validarMotorista, linkWhatsApp } from "@/lib/validacao";
 import {
   Painel,
