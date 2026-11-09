@@ -41,13 +41,11 @@ function Inicio() {
   const pct = prox?.lugares ? Math.min(100, Math.round((prox.vao.length / prox.lugares) * 100)) : 0;
   const semana = proximas.slice(0, 8);
 
-  const avisos = proximas.slice(0, 6).flatMap((v) => {
-    const a: string[] = [];
-    const dia = diaSemana(v.data).toLowerCase();
-    if (v.sem.length > 0) a.push(`${v.sem.length} ${v.sem.length === 1 ? "passageiro ainda não confirmou" : "passageiros ainda não confirmaram"} a viagem de ${dia} (${linha(v.linhaId).nome})`);
-    if (v.situacao === "lotada" && v.espera.length > 0) a.push(`Viagem de ${dia} lotada — ${v.espera.length} na lista de espera`);
-    return a;
-  }).slice(0, 3);
+  const lotadas = proximas.filter((v) => v.situacao === "lotada" && v.espera.length > 0).slice(0, 1)
+    .map((v) => `Viagem de ${diaSemana(v.data).toLowerCase()} lotada — ${v.espera.length} na lista de espera`);
+  const semResposta = proximas.filter((v) => v.sem.length > 0).slice(0, 2)
+    .map((v) => `${v.sem.length} ${v.sem.length === 1 ? "passageiro ainda não confirmou" : "passageiros ainda não confirmaram"} a viagem de ${diaSemana(v.data).toLowerCase()} (${linha(v.linhaId).nome})`);
+  const avisos = [...semResposta, ...lotadas];
 
   const totalAberto = soma(cobrancasEmAberto);
   const top3 = [...cobrancasEmAberto].sort((a, b) => b.diasAtraso - a.diasAtraso).slice(0, 3);
