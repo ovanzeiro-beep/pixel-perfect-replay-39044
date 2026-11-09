@@ -1,6 +1,7 @@
 // Guarda vans e motoristas na memória da tela (voltam ao original ao recarregar).
-import { useSyncExternalStore } from "react";
-import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento } from "./exemplo";
+import { useMemo, useSyncExternalStore } from "react";
+import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens } from "./exemplo";
+import { semearAjustes, montarViagens, type Ajuste } from "./viagens";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [
@@ -26,7 +27,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[] };
+type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste> };
 let estado: Estado = {
   vans: vansIniciais.map((v) => ({ ...v, situacao: v.situacao as Van["situacao"] })),
   motoristas: motoristasIniciais.map((m) => ({ ...m, vanId: vansIniciais.find((v) => v.motoristaId === m.id)?.id ?? "" })),
@@ -36,10 +37,12 @@ let estado: Estado = {
     valorViagem: l.valorPorViagem || null, valorMensal: l.valorMensal || null, ativa: true, observacoes: l.observacoes,
   })),
   passageiros: passageirosIniciais.map(({ linhaId, situacao: _s, ...p }) => ({
-    ...p, endereco: p.endereco.split(",")[0]!, ...detalhesPassageiros[p.id]!, linhaIds: linhaId ? [linhaId] : [], ativo: true,
+    ...p, endereco: p.endereco.split(",")[0]!, ...(detalhesPassageiros[p.id] ?? detalheVazio), linhaIds: linhaId ? [linhaId] : [], ativo: true,
     emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
   })),
+  ajustes: {},
 };
+estado = { ...estado, ajustes: semearAjustes(estado.linhas, estado.passageiros, estado.vans, new Date(), exemploViagens) };
 const ouvintes = new Set<() => void>();
 const set = (e: Estado) => { estado = e; ouvintes.forEach((f) => f()); };
 const assinar = (f: () => void) => { ouvintes.add(f); return () => ouvintes.delete(f); };
@@ -92,4 +95,12 @@ export function atualizarPassageiro(id: string, mud: Partial<Passageiro>) {
 export function desativarPassageiro(id: string) { atualizarPassageiro(id, { ativo: false, linhaIds: [] }); }
 export function excluirPassageiro(id: string) {
   set({ ...estado, passageiros: estado.passageiros.filter((p) => p.id !== id) });
+}
+
+export function useViagens() {
+  const e = useFrota();
+  return useMemo(() => montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()), [e.linhas, e.passageiros, e.vans, e.ajustes]);
+}
+export function ajustarViagem(id: string, aj: Ajuste) {
+  set({ ...estado, ajustes: { ...estado.ajustes, [id]: aj } });
 }
