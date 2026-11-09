@@ -439,3 +439,62 @@ describe("avisos do passageiro", () => {
     expect(r.map((x) => x.nivel)).toEqual(["urgente", "atencao"]);
   });
 });
+
+describe("alerta de backup", () => {
+  const b = (o: { alteracoes: number; ultimoBackup: string | null }) =>
+    gerarAlertas(base({ backup: o })).filter((a) => a.tipo === "backup");
+  const haDias = (n: number) => new Date(AGORA.getTime() - n * 86400000).toISOString();
+
+  it("não avisa sem informação de backup, nem com poucas alterações", () => {
+    expect(gerarAlertas(base()).some((a) => a.tipo === "backup")).toBe(false);
+    expect(b({ alteracoes: 14, ultimoBackup: null })).toEqual([]);
+  });
+  it("nunca fez backup e já mexeu bastante: avisa", () => {
+    const [a] = b({ alteracoes: 15, ultimoBackup: null });
+    expect(a).toMatchObject({
+      id: "backup",
+      nivel: "atencao",
+      titulo: "Faça um backup dos seus dados",
+      acao: "Fazer backup",
+      destino: { to: "/vanzeiro/perfil" },
+    });
+    expect(a!.detalhe).toContain("nunca salvou um backup");
+    expect(a!.detalhe).toContain("15 alterações");
+  });
+  it("backup recente (menos de 7 dias) não gera aviso, mesmo com muitas alterações", () => {
+    expect(b({ alteracoes: 80, ultimoBackup: haDias(3) })).toEqual([]);
+    expect(b({ alteracoes: 80, ultimoBackup: haDias(6) })).toEqual([]);
+  });
+  it("backup antigo e muitas alterações: avisa dizendo há quantos dias", () => {
+    const [a] = b({ alteracoes: 20, ultimoBackup: haDias(7) });
+    expect(a!.nivel).toBe("atencao");
+    expect(a!.detalhe).toBe("O último backup foi há 7 dias; desde então foram 20 alterações.");
+    expect(b({ alteracoes: 20, ultimoBackup: haDias(1) })).toEqual([]);
+  });
+  it("vira urgente com 100 alterações ou 30 dias", () => {
+    expect(b({ alteracoes: 100, ultimoBackup: null })[0]!.nivel).toBe("urgente");
+    expect(b({ alteracoes: 20, ultimoBackup: haDias(30) })[0]!.nivel).toBe("urgente");
+    expect(b({ alteracoes: 20, ultimoBackup: haDias(29) })[0]!.nivel).toBe("atencao");
+  });
+  it("data de backup ilegível conta como 'nunca'", () => {
+    expect(b({ alteracoes: 20, ultimoBackup: "lixo" })[0]!.detalhe).toContain("nunca salvou");
+  });
+  it("dispensar volta se o nível mudar", () => {
+    const aten = b({ alteracoes: 20, ultimoBackup: null })[0]!;
+    const urg = b({ alteracoes: 100, ultimoBackup: null })[0]!;
+    expect(aten.assinatura).not.toBe(urg.assinatura);
+  });
+  it("entra na ordem: depois de cobranças, antes da lotação; conta no selo", () => {
+    const tudo = gerarAlertas(
+      base({
+        backup: { alteracoes: 20, ultimoBackup: null },
+        cobrancas: [cob({ pid: "a", vencimento: "2026-11-01" })],
+        viagens: [
+          viagem({ id: "l1_2026-11-14", data: "2026-11-14", situacao: "lotada", espera: ["b"] }),
+        ],
+      }),
+    );
+    expect(tudo.map((a) => a.tipo)).toEqual(["cobranca", "backup", "lotacao"]);
+    expect(contarAtencao(tudo)).toBe(2);
+  });
+});

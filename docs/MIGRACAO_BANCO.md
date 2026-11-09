@@ -21,7 +21,7 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 **Leitura:** `useFrota`, `useViagens`, `useDadosProntos`, `obterEstado`.
 
-**Ciclo de vida:** `iniciarPersistencia`, `restaurarExemplo`.
+**Ciclo de vida:** `iniciarPersistencia`, `restaurarExemplo`, `substituirTodosOsDados` (restaurar backup; com banco vira importação em lote).
 
 **Vans e motoristas:** `salvarVan`, `excluirVan`, `salvarMotorista`, `excluirMotorista`.
 
@@ -99,7 +99,7 @@ Para não ficar fora de sincronia, continuam derivados:
 5. Dinheiro e viagens (cobranças, recibos, ida e volta): são as partes com mais regras; conferir com os testes de `store.test.ts`, `cobrancas.test.ts` e `viagens.test.ts`.
 6. Trocar `src/data/sessao.ts` por login real e o link de convite por token.
 7. Trocar o ponto de `repositorio` para a implementação com banco; manter o mock disponível para o modo demonstração e para os testes.
-8. Importar os dados do aparelho do vanzeiro (opcional): ler `localStorage` (`vanzeiro:dados`) e gravar no banco uma vez.
+8. Importar os dados do aparelho do vanzeiro (opcional): ler `localStorage` (`vanzeiro:dados`) **ou o arquivo de backup** (`vanzeiro-backup-*.json`, formato versionado e com conferência de integridade: `src/data/backup.ts`) e gravar no banco uma vez. O backup em arquivo é um bom ponto de partida: vanzeiros que já usam o app podem enviar o arquivo e importar.
 
 ## Como pedir o banco ao Lovable
 

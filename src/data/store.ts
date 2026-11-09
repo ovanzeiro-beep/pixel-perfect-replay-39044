@@ -2,6 +2,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 import { novoId } from "./ids";
 import { armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
+import { registrarAlteracao, salvarMeta } from "./backup";
 import {
   vans as vansIniciais,
   motoristas as motoristasIniciais,
@@ -317,6 +318,22 @@ export function ehEstado(x: unknown): x is Estado {
   );
 }
 
+/** Deixa um estado vindo de fora (salvo no aparelho ou de um backup) pronto para uso. */
+function normalizarEstado(lido: Estado): Estado {
+  // Dados salvos antes da Etapa 2 traziam "passageiroAtualId"; agora quem é o passageiro vem da sessão.
+  const { passageiroAtualId: _antigo, ...resto } = lido as Estado & { passageiroAtualId?: string };
+  const base: Estado = { ...resto, alertasDispensados: resto.alertasDispensados ?? {} };
+  return comAberto({
+    ...base,
+    cobrancas: gerarPeriodicas(base.cobrancas, base.passageiros, isoDe(new Date())),
+  });
+}
+
+/** Troca todos os dados de uma vez (restaurar um backup ou desfazer uma restauração). */
+export function substituirTodosOsDados(novo: Estado) {
+  set(normalizarEstado(novo));
+}
+
 /** Carrega os dados salvos no aparelho e passa a salvar a cada mudança. Chamar uma vez, no navegador. */
 let persistenciaAtiva = false;
 export function iniciarPersistencia(): () => void {
@@ -328,31 +345,20 @@ export function iniciarPersistencia(): () => void {
   }
   persistenciaAtiva = true;
   const lido = ler(armazem, ehEstado);
-  // Dados salvos antes da Etapa 2 traziam "passageiroAtualId"; agora quem é o passageiro vem da sessão.
-  const salvo = lido
-    ? (({ passageiroAtualId: _antigo, ...resto }) =>
-        ({ ...resto, alertasDispensados: resto.alertasDispensados ?? {} }) as Estado)(
-        lido as Estado & { passageiroAtualId?: string },
-      )
-    : null;
-  if (salvo)
-    set(
-      comAberto({
-        ...salvo,
-        cobrancas: gerarPeriodicas(salvo.cobrancas, salvo.passageiros, isoDe(new Date())),
-      }),
-    );
+  if (lido) set(normalizarEstado(lido));
   marcarProntos();
   let timer: ReturnType<typeof setTimeout> | undefined;
   const gravarAgora = () => {
     clearTimeout(timer);
     timer = undefined;
     gravar(armazem, estado);
+    salvarMeta();
   };
   const aoOcultar = () => {
     if (document.visibilityState === "hidden") gravarAgora();
   };
   const desassinar = assinar(() => {
+    registrarAlteracao();
     clearTimeout(timer);
     timer = setTimeout(gravarAgora, 250);
   });

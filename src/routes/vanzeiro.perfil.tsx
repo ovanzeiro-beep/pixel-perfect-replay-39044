@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { PerfilTela } from "@/components/app/PerfilTela";
 import { Campo, BotaoGrande, campoClasse } from "@/components/app/Formulario";
 import { vanzeiro } from "@/data/exemplo";
-import { useFrota, salvarChavePix, restaurarExemplo } from "@/data/repositorio";
+import { useFrota, salvarChavePix, restaurarExemplo, obterEstado } from "@/data/repositorio";
+import { BackupDados } from "@/components/app/BackupDados";
+import { guardarCopiaDeSeguranca, zerarAlteracoes } from "@/data/backup";
 import { definirModoDemo, useModoDemo } from "@/lib/modoDemo";
 
 export const Route = createFileRoute("/vanzeiro/perfil")({
@@ -52,6 +54,7 @@ function PerfilVanzeiro() {
           Salvar chave Pix
         </BotaoGrande>
       </div>
+      <BackupDados />
       <div className="mt-4 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
         <h2 className="text-lg font-extrabold text-primary">Dados de teste</h2>
         <p className="text-sm text-muted-foreground">
@@ -81,7 +84,9 @@ function PerfilVanzeiro() {
             <BotaoGrande
               variante="perigo"
               onClick={() => {
+                guardarCopiaDeSeguranca(obterEstado(), "restauração dos dados de exemplo");
                 restaurarExemplo();
+                zerarAlteracoes();
                 setPix("");
                 setConfirmando(false);
                 toast.success("Dados de exemplo restaurados");
