@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet, Users } from "lucide-react";
+import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
   vanzeiro, vans, motoristas, linhas, passageiros, viagensSemana, proximaViagemId,
   cobrancasEmAberto, recebimentosMes, gastosMes, aReceberRestoMes,
@@ -156,7 +156,6 @@ function Inicio() {
           ))}
         </div>
       </section>
-      <span className="sr-only"><Users /></span>
     </div>
   );
 }
