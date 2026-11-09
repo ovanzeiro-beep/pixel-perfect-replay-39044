@@ -12,9 +12,10 @@ function TelaConvite() {
   const p = passageiros.find((x) => x.id === passageiroId);
   const [step, setStep] = useState<"convite" | "verificar" | "confirmado">("convite");
 
+  const convite = p?.convite;
   useEffect(() => {
-    if (p && p.convite === "no_app") void navigate({ to: "/passageiro" });
-  }, [p?.convite]);
+    if (convite === "no_app") void navigate({ to: "/passageiro" });
+  }, [convite, navigate]);
 
   if (!p) return null;
 

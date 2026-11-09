@@ -74,16 +74,18 @@ function Relatorios() {
   const [custom, setCustom] = useState<Periodo>({ de: periodoPreset("mes", hoje).de, ate: hoje });
   const periodo = preset === "outro" ? custom : periodoPreset(preset, hoje);
   const valido = periodoValido(periodo);
+  const { de, ate } = periodo;
 
   const dados = useMemo(() => {
     if (!valido) return null;
+    const intervalo = { de, ate };
     const linhaDoPassageiro = (pid: string) =>
       passageiros.find((p) => p.id === pid)?.linhaIds[0] ?? "";
-    const rel = relatorioPeriodo({ cobrancas, gastos, linhas, vans, linhaDoPassageiro }, periodo);
-    const ocupacao = ocupacaoPorLinha(historicoViagens(ajustes), linhas, vans, periodo);
-    const combustivel = combustivelPorVan(gastos, periodo, vans);
+    const rel = relatorioPeriodo({ cobrancas, gastos, linhas, vans, linhaDoPassageiro }, intervalo);
+    const ocupacao = ocupacaoPorLinha(historicoViagens(ajustes), linhas, vans, intervalo);
+    const combustivel = combustivelPorVan(gastos, intervalo, vans);
     return { rel, ocupacao, combustivel };
-  }, [valido, periodo.de, periodo.ate, cobrancas, gastos, linhas, vans, passageiros, ajustes]);
+  }, [valido, de, ate, cobrancas, gastos, linhas, vans, passageiros, ajustes]);
 
   const chip = (a: boolean) =>
     `min-h-11 shrink-0 rounded-full border-2 px-4 text-base font-bold ${a ? "border-primary bg-primary text-primary-foreground" : "bg-card text-foreground"}`;

@@ -246,7 +246,6 @@ export function criarEstadoExemplo(): Estado {
 let estado: Estado;
 // O servidor e a primeira renderização do navegador usam sempre este estado (evita erro de hidratação);
 // os dados salvos entram logo depois, em iniciarPersistencia().
-let estadoServidor: Estado;
 /** O "deve agora" de cada passageiro vem sempre das cobranças. */
 function comAberto(e: Estado): Estado {
   const tot: Record<string, number> = {};
@@ -264,7 +263,7 @@ function comAberto(e: Estado): Estado {
   };
 }
 estado = criarEstadoExemplo();
-estadoServidor = estado;
+const estadoServidor = estado;
 /** Aplica `f` a cada ajuste de viagem; devolve o mapa novo. */
 const mapAjustes = (a: Record<string, Ajuste>, f: (aj: Ajuste, id: string) => Ajuste | null) =>
   Object.fromEntries(
