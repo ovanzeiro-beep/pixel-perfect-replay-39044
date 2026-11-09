@@ -20,3 +20,15 @@ describe("lotação e lista de espera", () => {
     expect(aplicarNovaVan(a, "v", 2).espera).toEqual(["c"]);
   });
 });
+
+import { ordenarParadas, partesRota } from "./viagens";
+describe("ida", () => {
+  it("ordena paradas pelas cidades do trajeto", () => {
+    const cid: Record<string, string> = { a: "Londrina", b: "Jacarezinho", c: "Andirá" };
+    expect(ordenarParadas(["a", "b", "c"], (i) => cid[i]!, ["Jacarezinho", "Cambará", "Andirá", "Londrina"])).toEqual(["b", "c", "a"]);
+  });
+  it("divide rota com muitas paradas em partes de até 10", () => {
+    expect(partesRota(Array.from({ length: 12 }, (_, i) => `E${i}`))).toHaveLength(2);
+    expect(partesRota(Array.from({ length: 10 }, (_, i) => `E${i}`))).toHaveLength(1);
+  });
+});
