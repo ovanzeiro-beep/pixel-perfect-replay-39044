@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:30 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:38 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -9,18 +9,13 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:30 UTC.
 | 2 — Sessão e papéis (login simulado de verdade) | concluida | 22/22 | OK |
 | 3 — Integridade dos dados | concluida | 19/19 | OK |
 | 4 — Viagem de ponta a ponta | concluida | 24/24 | OK |
-| 5 — Dinheiro e relatórios | pendente | 0/3 | pendente |
+| 5 — Dinheiro e relatórios | concluida | 18/18 | OK |
 | 6 — Alertas e prazos | pendente | 0/3 | pendente |
 | 7 — Área do passageiro completa | pendente | 0/2 | pendente |
 | 8 — PWA lapidado | pendente | 0/3 | pendente |
 | 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
 
 ## O que falta
-
-**Etapa 5 — Dinheiro e relatórios**
-- Cálculos de relatório
-- Testes dos relatórios
-- Tela de relatórios
 
 **Etapa 6 — Alertas e prazos**
 - Regras de alerta

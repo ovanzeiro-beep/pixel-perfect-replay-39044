@@ -17,7 +17,7 @@
 | 2 | Sessão e papéis | Entrar guarda quem é e o papel; rotas `/vanzeiro` e `/passageiro` protegidas; botão Sair; passageiro vem da sessão | **Concluída** |
 | 3 | Integridade dos dados | Excluir passageiro limpa cobranças/recibos/respostas; vencimento obrigatório em cobrança semanal/mensal; testes do `store.ts` | **Concluída** |
 | 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | **Concluída** |
-| 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | Pendente |
+| 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | **Concluída** |
 | 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | Pendente |
 | 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | Pendente |
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | Pendente |
@@ -51,3 +51,15 @@ Banco de dados, login Google real, envio real de WhatsApp/notificação push, pa
 4. **Resumo:** horários, embarques, entregas, cobranças; "Compartilhar resumo" e "Ver histórico de viagens".
 5. **Histórico** (Mais → Histórico de viagens): todas as viagens realizadas, por mês, com filtro por linha e resumo de cada uma.
 6. **Modo demonstração** (Perfil do vanzeiro): só quando ligado aparecem os atalhos que simulam respostas dos passageiros.
+
+## Relatórios (Etapa 5)
+
+Em **Mais → Relatórios** (ou pelo botão no Financeiro):
+
+- **Período:** este mês, mês passado, últimos 3 meses, este ano ou datas à escolha.
+- **Lucro por van:** o que entra vem das linhas que a van faz; os gastos, da van (ou da linha, se o gasto não tiver van).
+- **Lucro por linha** e linha "Gastos gerais" para o que não é de nenhuma.
+- **Ocupação:** embarques ÷ lugares da van nas viagens realizadas (respeita troca de van na viagem).
+- **Combustível:** litros, preço por litro, consumo (km/L, método do tanque cheio) e custo por km. O consumo só aparece com 2 ou mais leituras de km.
+- **Compartilhar:** relatório em texto pelo celular ou WhatsApp; recibos também podem ser compartilhados ou copiados.
+- **Conferência:** um mês fechado nos relatórios dá exatamente o mesmo recebido, gastos e lucro do Financeiro (há teste para isso).

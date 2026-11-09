@@ -646,7 +646,7 @@
     {
       "id": 5,
       "titulo": "Dinheiro e relatórios",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Lucro por van, linha e período; ocupação média; comprovante para compartilhar.",
       "checks": [
         {
@@ -655,9 +655,57 @@
           "arquivo": "src/data/relatorios.ts"
         },
         {
+          "d": "Período por atalhos e personalizado",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function periodoPreset[\\s\\S]*export function periodoValido|export const periodoValido[\\s\\S]*export function periodoPreset"
+        },
+        {
+          "d": "Lucro por van com receita vinda da linha",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function relatorioPeriodo[\\s\\S]*porVan"
+        },
+        {
+          "d": "Lucro por linha",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "porLinha"
+        },
+        {
+          "d": "Ocupação média das viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function ocupacaoPorLinha"
+        },
+        {
+          "d": "Combustível (litros, preço, consumo, custo/km)",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function combustivelPorVan"
+        },
+        {
+          "d": "Relatório em texto para compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.ts",
+          "regex": "export function textoRelatorio"
+        },
+        {
           "d": "Testes dos relatórios",
           "tipo": "arquivo",
           "arquivo": "src/data/relatorios.test.ts"
+        },
+        {
+          "d": "Teste: período fechado bate com o Financeiro mensal",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.test.ts",
+          "regex": "bate com o Financeiro mensal"
+        },
+        {
+          "d": "Teste: somas por van e linha fecham com o total",
+          "tipo": "contem",
+          "arquivo": "src/data/relatorios.test.ts",
+          "regex": "fecham com o total"
         },
         {
           "d": "Tela de relatórios",
@@ -665,9 +713,61 @@
           "arquivo": "src/routes/vanzeiro.relatorios.tsx"
         },
         {
+          "d": "Tela: escolha de período",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Outro período"
+        },
+        {
+          "d": "Tela: ocupação e combustível",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Ocupação das viagens[\\s\\S]*Combustível"
+        },
+        {
+          "d": "Tela: compartilhar relatório",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "Compartilhar relatório"
+        },
+        {
+          "d": "Relatórios no menu Mais",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "/vanzeiro/relatorios"
+        },
+        {
+          "d": "Financeiro leva aos relatórios",
+          "tipo": "contem",
+          "arquivo": "src/components/app/Financeiro.tsx",
+          "regex": "/vanzeiro/relatorios"
+        },
+        {
+          "d": "Recibo: compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "compartilharTexto\\(texto"
+        },
+        {
+          "d": "Recibo: copiar texto",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "Recibo copiado"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

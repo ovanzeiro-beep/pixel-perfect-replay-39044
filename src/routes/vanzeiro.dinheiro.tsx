@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Copy, MessageCircle, Receipt, Search, Undo2, Wallet, XCircle } from "lucide-react";
+import { Copy, MessageCircle, Receipt, Search, Share2, Undo2, Wallet, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Financeiro } from "@/components/app/Financeiro";
@@ -12,6 +12,7 @@ import {
   type Cobranca, type Forma, type Recibo,
 } from "@/data/cobrancas";
 import { linkWhatsApp } from "@/lib/validacao";
+import { compartilharTexto } from "@/lib/compartilhar";
 
 export const Route = createFileRoute("/vanzeiro/dinheiro")({
   validateSearch: (s: Record<string, unknown>): { p?: string } => (typeof s["p"] === "string" ? { p: s["p"] } : {}),
@@ -212,6 +213,10 @@ function JanelaRecibo({ r, onFechar }: { r: Recibo; onFechar: () => void }) {
         <h3 className="flex items-center gap-2 text-xl font-extrabold"><Receipt className="h-6 w-6 text-primary" /> Recibo</h3>
         <pre className="whitespace-pre-wrap rounded-2xl bg-muted p-4 font-sans text-base">{texto}</pre>
         {p && <a href={`${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(texto)}`} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-success text-lg font-bold text-success-foreground"><MessageCircle className="h-5 w-5" /> Enviar recibo pelo WhatsApp</a>}
+        <div className="grid grid-cols-2 gap-3">
+          <BotaoGrande variante="contorno" onClick={async () => { const x = await compartilharTexto(texto, `Recibo nº ${String(r.numero).padStart(4, "0")}`); if (x === "whatsapp") toast.success("Abrindo o WhatsApp com o recibo"); }}><Share2 className="h-5 w-5" /> Compartilhar</BotaoGrande>
+          <BotaoGrande variante="contorno" onClick={() => { void navigator.clipboard?.writeText(texto).then(() => toast.success("Recibo copiado"), () => toast.error("Não deu para copiar")); }}><Copy className="h-5 w-5" /> Copiar</BotaoGrande>
+        </div>
         <BotaoGrande variante="contorno" onClick={onFechar}>Fechar</BotaoGrande>
       </div>
     </div>
