@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Bell, Bus, Clock, MessageCircle, Play, Repeat, UserPlus, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -139,7 +139,9 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
       </div>
       <Barra v={v} />
 
-      {editavel && <BotaoGrande variante="destaque" onClick={() => setConstrucao(true)}><Play className="h-6 w-6" /> Iniciar viagem</BotaoGrande>}
+      {(editavel || v.ajuste.ida) && !v.ajuste.cancelada && (
+        <Link to="/ida/$viagemId" params={{ viagemId: v.id }} className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-xl font-extrabold text-accent-foreground"><Play className="h-6 w-6" /> {v.ajuste.ida ? "Abrir viagem" : "Iniciar viagem"}</Link>
+      )}
 
       {grupos.map((g) => g.ids.length > 0 && (
         <section key={g.titulo}>

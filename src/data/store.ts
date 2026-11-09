@@ -104,3 +104,8 @@ export function useViagens() {
 export function ajustarViagem(id: string, aj: Ajuste) {
   set({ ...estado, ajustes: { ...estado.ajustes, [id]: aj } });
 }
+
+/** Soma (ou tira, com valor negativo) uma cobrança no que o passageiro deve. */
+export function lancarCobranca(passageiroId: string, valor: number) {
+  set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === passageiroId ? { ...p, emAberto: Math.max(0, p.emAberto + valor) } : p)) });
+}
