@@ -6,6 +6,7 @@ import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linha
 import type { Categoria, Gasto } from "./financeiro";
 import { aberto, cancelarCobranca, desfazerPagamento, gerarPeriodicas, idCobranca, isoDe, pagar, refMes, refSemana, refViagem, type Cobranca, type Forma, type Recibo } from "./cobrancas";
 import { definirResposta, semearAjustes, montarViagens, semPassageiro, type Ajuste } from "./viagens";
+import { semearHistorico } from "./historico";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [
@@ -69,7 +70,9 @@ export function criarEstadoExemplo(): Estado {
     }
     return cob;
   });
-  return comAberto({ ...comAjustes, recibos, cobrancas: gerarPeriodicas(cobrancas, comAjustes.passageiros, isoDe(agora)) });
+  const todas = gerarPeriodicas(cobrancas, comAjustes.passageiros, isoDe(agora));
+  const ajustes = semearHistorico(comAjustes.ajustes, comAjustes.linhas, todas, isoDe(agora));
+  return comAberto({ ...comAjustes, ajustes, recibos, cobrancas: todas });
 }
 
 let estado: Estado;

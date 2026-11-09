@@ -16,7 +16,7 @@
 | 1 | Fundação do mock | Dados persistem ao recarregar (localStorage versionado), "restaurar exemplo", datas relativas a hoje, IDs sem colisão | **Concluída** |
 | 2 | Sessão e papéis | Entrar guarda quem é e o papel; rotas `/vanzeiro` e `/passageiro` protegidas; botão Sair; passageiro vem da sessão | **Concluída** |
 | 3 | Integridade dos dados | Excluir passageiro limpa cobranças/recibos/respostas; vencimento obrigatório em cobrança semanal/mensal; testes do `store.ts` | **Concluída** |
-| 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | Pendente |
+| 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | **Concluída** |
 | 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | Pendente |
 | 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | Pendente |
 | 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | Pendente |
@@ -42,3 +42,12 @@ Banco de dados, login Google real, envio real de WhatsApp/notificação push, pa
 3. `/vanzeiro/*`, `/ida/*` só abrem para o vanzeiro e `/passageiro/*` só para o passageiro; quem não pode é redirecionado.
 4. Abrir o app já logado (inclusive pelo ícone instalado) vai direto para a área; "Sair" apaga a sessão.
 5. Ao trocar o login simulado por login real, só `src/data/sessao.ts` muda.
+
+## Ciclo da viagem (Etapa 4)
+
+1. **Preparar:** na ficha da viagem, "Compartilhar lista da viagem" manda a lista (ordem do trajeto, telefone e endereço, espera e quem não respondeu) pelo celular ou WhatsApp.
+2. **Ida:** embarque parada a parada, paradas no caminho, destino.
+3. **Volta:** chamada, entrega na ordem inversa, "Encerrar viagem".
+4. **Resumo:** horários, embarques, entregas, cobranças; "Compartilhar resumo" e "Ver histórico de viagens".
+5. **Histórico** (Mais → Histórico de viagens): todas as viagens realizadas, por mês, com filtro por linha e resumo de cada uma.
+6. **Modo demonstração** (Perfil do vanzeiro): só quando ligado aparecem os atalhos que simulam respostas dos passageiros.

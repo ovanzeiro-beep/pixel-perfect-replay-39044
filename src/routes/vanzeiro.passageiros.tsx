@@ -9,6 +9,7 @@ import {
   type Passageiro, type Linha,
 } from "@/data/store";
 import { validarPassageiro, mensagemConvite, linkWhatsApp } from "@/lib/validacao";
+import { useModoDemo } from "@/lib/modoDemo";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar, Linha as Item } from "@/components/app/Formulario";
 
 export const Route = createFileRoute("/vanzeiro/passageiros")({
@@ -59,6 +60,7 @@ function Convite({ p }: { p: Passageiro }) {
 }
 
 function Passageiros() {
+  const modoDemo = useModoDemo();
   const { passageiros, linhas } = useFrota();
   const [busca, setBusca] = useState("");
   const [fLinha, setFLinha] = useState("");
@@ -162,7 +164,7 @@ function Passageiros() {
             <p className="text-lg font-extrabold">Convite para o app</p>
             <BotaoGrande variante="destaque" onClick={() => enviarConvite(aberto)}><Send className="h-5 w-5" /> Enviar convite</BotaoGrande>
             <BotaoGrande variante="contorno" onClick={() => { void navigator.clipboard?.writeText(linkConviteExemplo(aberto.id)); toast.success("Link copiado"); }}><Copy className="h-5 w-5" /> Copiar link do convite</BotaoGrande>
-            {aberto.convite !== "no_app" && (
+            {modoDemo && aberto.convite !== "no_app" && (
               <button onClick={() => { atualizarPassageiro(aberto.id, { convite: "no_app" }); toast.success("Aceite simulado"); }} className="w-full py-2 text-sm font-semibold text-muted-foreground underline">Simular aceite (teste)</button>
             )}
           </div>

@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:23 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:30 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -8,7 +8,7 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:23 UTC.
 | 1 — Fundação do mock: persistência e datas relativas | concluida | 14/14 | OK |
 | 2 — Sessão e papéis (login simulado de verdade) | concluida | 22/22 | OK |
 | 3 — Integridade dos dados | concluida | 19/19 | OK |
-| 4 — Viagem de ponta a ponta | pendente | 1/5 | pendente |
+| 4 — Viagem de ponta a ponta | concluida | 24/24 | OK |
 | 5 — Dinheiro e relatórios | pendente | 0/3 | pendente |
 | 6 — Alertas e prazos | pendente | 0/3 | pendente |
 | 7 — Área do passageiro completa | pendente | 0/2 | pendente |
@@ -16,12 +16,6 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:23 UTC.
 | 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
 
 ## O que falta
-
-**Etapa 4 — Viagem de ponta a ponta**
-- Resumo ao encerrar a viagem
-- Histórico de viagens
-- Atalhos simulados só em modo demo
-- Manifesto/lista da viagem para compartilhar
 
 **Etapa 5 — Dinheiro e relatórios**
 - Cálculos de relatório

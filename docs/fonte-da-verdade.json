@@ -488,40 +488,158 @@
     {
       "id": 4,
       "titulo": "Viagem de ponta a ponta",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Ciclo completo: preparar, ida, volta, encerrar, resumo e histórico. Atalhos de teste só no modo demonstração.",
       "checks": [
         {
-          "d": "Resumo ao encerrar a viagem",
+          "d": "Resumo da viagem em arquivo próprio",
           "tipo": "arquivo",
           "arquivo": "src/components/app/ResumoViagem.tsx"
         },
         {
-          "d": "Histórico de viagens",
+          "d": "Resumo não fica mais escondido dentro da volta",
+          "tipo": "naoContem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "export function ResumoViagem"
+        },
+        {
+          "d": "Botão Encerrar viagem",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "Encerrar viagem"
+        },
+        {
+          "d": "Fim da viagem: compartilhar resumo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "Compartilhar resumo"
+        },
+        {
+          "d": "Fim da viagem: ir ao histórico",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "/vanzeiro/historico"
+        },
+        {
+          "d": "Regras do histórico",
+          "tipo": "arquivo",
+          "arquivo": "src/data/historico.ts"
+        },
+        {
+          "d": "Histórico lista só viagens encerradas",
+          "tipo": "contem",
+          "arquivo": "src/data/historico.ts",
+          "regex": "export function historicoViagens"
+        },
+        {
+          "d": "Tela de histórico de viagens",
           "tipo": "arquivo",
           "arquivo": "src/routes/vanzeiro.historico.tsx"
         },
         {
-          "d": "Botão de encerrar viagem",
+          "d": "Histórico com filtro por linha",
           "tipo": "contem",
-          "arquivo": "src/routes/ida.$viagemId.tsx",
-          "regex": "[Ee]ncerrar"
+          "arquivo": "src/routes/vanzeiro.historico.tsx",
+          "regex": "Todas as linhas"
         },
         {
-          "d": "Atalhos simulados só em modo demo",
+          "d": "Histórico no menu Mais",
           "tipo": "contem",
-          "arquivo": "src/components/app/VoltaViagem.tsx",
-          "regex": "modoDemo"
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "/vanzeiro/historico"
         },
         {
-          "d": "Manifesto/lista da viagem para compartilhar",
+          "d": "Dados de exemplo trazem viagens realizadas",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "semearHistorico"
+        },
+        {
+          "d": "Lista/manifesto da viagem",
           "tipo": "arquivo",
           "arquivo": "src/data/manifesto.ts"
+        },
+        {
+          "d": "Lista da viagem segue a ordem do trajeto",
+          "tipo": "contem",
+          "arquivo": "src/data/manifesto.ts",
+          "regex": "ordenarParadas"
+        },
+        {
+          "d": "Ficha da viagem compartilha a lista",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "Compartilhar lista da viagem"
+        },
+        {
+          "d": "Compartilhar (celular ou WhatsApp)",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/compartilhar.ts"
+        },
+        {
+          "d": "Modo demonstração",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/modoDemo.ts"
+        },
+        {
+          "d": "Atalho simulado da volta só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "modoDemo && pendentes"
+        },
+        {
+          "d": "Atalho simulado da parada só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ParadaCaminho.tsx",
+          "regex": "modoDemo && faltando"
+        },
+        {
+          "d": "Aceite simulado só em modo demo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "modoDemo && aberto\\.convite"
+        },
+        {
+          "d": "Interruptor do modo demo no perfil",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "definirModoDemo"
+        },
+        {
+          "d": "Teste do histórico",
+          "tipo": "arquivo",
+          "arquivo": "src/data/historico.test.ts"
+        },
+        {
+          "d": "Teste da lista/resumo para compartilhar",
+          "tipo": "arquivo",
+          "arquivo": "src/data/manifesto.test.ts"
+        },
+        {
+          "d": "Teste do modo demonstração",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/modoDemo.test.ts"
+        },
+        {
+          "d": "Teste: histórico bate com as cobranças",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "histórico de exemplo"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
         },
         {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

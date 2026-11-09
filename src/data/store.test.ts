@@ -180,3 +180,30 @@ describe("dados de exemplo são coerentes", () => {
     expect(e.recibos.filter((r) => !pas.has(r.pid))).toEqual([]);
   });
 });
+
+describe("histórico de exemplo", () => {
+  it("viagens passadas viram viagens realizadas, e o histórico bate com as cobranças", async () => {
+    const { historicoViagens } = await import("./historico");
+    const e = s.obterEstado();
+    const itens = historicoViagens(e.ajustes);
+    expect(itens.length).toBeGreaterThan(0);
+    const hoje = new Date();
+    const iso = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
+    for (const i of itens) {
+      expect(i.data < iso).toBe(true);
+      for (const m of i.ida.marcas.filter((x) => x.cobrou > 0)) {
+        const c = e.cobrancas.find((x) => x.pid === m.pid && x.tipo === "viagem" && x.vencimento === i.data && !x.cancelada);
+        expect(c?.valor).toBe(m.cobrou);
+      }
+    }
+  });
+
+  it("excluir um passageiro também o tira do histórico", async () => {
+    const { historicoViagens } = await import("./historico");
+    const com = historicoViagens(s.obterEstado().ajustes).find((i) => i.ida.marcas.length > 0)!;
+    const pid = com.ida.marcas[0]!.pid;
+    s.excluirPassageiro(pid);
+    const depois = historicoViagens(s.obterEstado().ajustes);
+    expect(depois.some((i) => JSON.stringify(i.ida).includes(`"${pid}"`))).toBe(false);
+  });
+});

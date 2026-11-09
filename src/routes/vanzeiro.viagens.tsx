@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bell, Bus, Clock, MessageCircle, Play, Repeat, UserPlus, XCircle } from "lucide-react";
+import { Bell, Bus, Clock, MessageCircle, Play, Repeat, Share2, UserPlus, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { prazoConfirmacao } from "@/data/exemplo";
 import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/store";
 import { definirResposta, sobram, aplicarNovaVan, rotuloDia, horaDe, diaSemana, dataCurta, type Viagem, type Situacao, type Resposta, type Ajuste } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
-import { ResumoViagem } from "@/components/app/VoltaViagem";
+import { ResumoViagem } from "@/components/app/ResumoViagem";
+import { textoManifesto } from "@/data/manifesto";
+import { compartilharTexto } from "@/lib/compartilhar";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar } from "@/components/app/Formulario";
 
 export const Route = createFileRoute("/vanzeiro/viagens")({
@@ -142,6 +144,13 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
 
       {(editavel || v.ajuste.ida) && !v.ajuste.cancelada && (
         <Link to="/ida/$viagemId" params={{ viagemId: v.id }} className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-xl font-extrabold text-accent-foreground"><Play className="h-6 w-6" /> {v.ajuste.ida ? "Abrir viagem" : "Iniciar viagem"}</Link>
+      )}
+
+      {!v.ajuste.cancelada && v.vao.length > 0 && (
+        <BotaoGrande variante="contorno" onClick={async () => {
+          const r = await compartilharTexto(textoManifesto({ viagem: v, linha, van, motorista: motoristas.find((m) => m.id === v.motoristaId), passageiros }), `Lista da viagem — ${linha?.nome ?? ""}`);
+          if (r === "whatsapp") toast.success("Abrindo o WhatsApp com a lista");
+        }}><Share2 className="h-5 w-5" /> Compartilhar lista da viagem</BotaoGrande>
       )}
 
       {v.ajuste.ida?.encerrada && <ResumoViagem ida={v.ajuste.ida} passageiros={passageiros} />}
