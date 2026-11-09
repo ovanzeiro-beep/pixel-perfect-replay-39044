@@ -73,7 +73,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
 
   const marcar = (p: Passageiro, r: "embarcou" | "faltou") => {
     const cobrou = r === "embarcou" && p.formaPagamento === "por_viagem" ? p.valor : 0;
-    if (cobrou) lancarCobranca(p.id, cobrou);
+    if (cobrou) lancarCobranca(p.id, cobrou, v.linhaId);
     salvar({ ...ida, marcas: [...ida.marcas, { pid: p.id, r, cobrou }] });
     toast.success(r === "embarcou" ? `${primeiro(p.nome)} embarcou${cobrou ? " · cobrança da viagem lançada" : ""}` : `${primeiro(p.nome)} não apareceu`);
   };

@@ -3,7 +3,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens, cobrancasExemplo, gastosMes, gastosExemplo } from "./exemplo";
 import type { Categoria, Gasto } from "./financeiro";
 import { aberto, cancelarCobranca, desfazerPagamento, gerarPeriodicas, idCobranca, isoDe, pagar, refMes, refSemana, refViagem, type Cobranca, type Forma, type Recibo } from "./cobrancas";
-import { semearAjustes, montarViagens, type Ajuste } from "./viagens";
+import { definirResposta, semearAjustes, montarViagens, type Ajuste } from "./viagens";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [
@@ -29,7 +29,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[] };
+type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[]; passageiroAtualId: string };
 let estado: Estado = {
   vans: vansIniciais.map((v) => ({ ...v, situacao: v.situacao as Van["situacao"] })),
   motoristas: motoristasIniciais.map((m) => ({ ...m, vanId: vansIniciais.find((v) => v.motoristaId === m.id)?.id ?? "" })),
@@ -42,7 +42,7 @@ let estado: Estado = {
     ...p, endereco: p.endereco.split(",")[0]!, ...(detalhesPassageiros[p.id] ?? detalheVazio), linhaIds: linhaId ? [linhaId] : [], ativo: true,
     emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
   })),
-  ajustes: {}, cobrancas: [], recibos: [], chavePix: "",
+  ajustes: {}, cobrancas: [], recibos: [], chavePix: "", passageiroAtualId: "p1",
   gastos: [
     ...gastosMes.map((g) => ({ id: g.id, valor: g.valor, data: g.data, categoria: (g.descricao === "Diesel" ? "Diesel" : g.descricao === "Pedágio" ? "Pedágio" : "Manutenção") as Categoria,
       vanId: g.vanId, linhaId: g.descricao === "Pedágio" ? "l1" : "", descricao: g.descricao === "Diesel" || g.descricao === "Pedágio" ? "" : g.descricao, litros: null, km: null, mensal: false })),
@@ -56,7 +56,8 @@ estado = { ...estado, ajustes: semearAjustes(estado.linhas, estado.passageiros, 
   const ref = (t: Cobranca["tipo"], v: string) => (t === "viagem" ? refViagem(v) : t === "semana" ? refSemana(v) : refMes(v));
   const recibos: Recibo[] = [];
   const cobrancas: Cobranca[] = cobrancasExemplo.map((c) => {
-    const cob: Cobranca = { id: idCobranca(c.pid, c.tipo, c.venc), pid: c.pid, tipo: c.tipo, ref: ref(c.tipo, c.venc), vencimento: c.venc, valor: c.valor, pagamentos: [] };
+    const linhaIdCob = c.tipo === "viagem" ? (estado.passageiros.find((p) => p.id === c.pid)?.linhaIds[0] ?? undefined) : undefined;
+    const cob: Cobranca = { id: idCobranca(c.pid, c.tipo, c.venc), pid: c.pid, tipo: c.tipo, ref: ref(c.tipo, c.venc), vencimento: c.venc, valor: c.valor, pagamentos: [], ...(linhaIdCob ? { linhaId: linhaIdCob } : {}) };
     if (c.pago) {
       const numero = recibos.length + 1;
       recibos.push({ numero, pid: c.pid, valor: c.pago[0], refs: [cob.ref], forma: c.pago[2], data: c.pago[1] });
@@ -137,11 +138,11 @@ export function ajustarViagem(id: string, aj: Ajuste) {
 }
 
 /** Soma (ou tira, com valor negativo) uma cobrança no que o passageiro deve. */
-export function lancarCobranca(passageiroId: string, valor: number) {
+export function lancarCobranca(passageiroId: string, valor: number, linhaId?: string) {
   const hoje = isoDe(new Date());
   let cobrancas = estado.cobrancas;
   if (valor > 0) {
-    cobrancas = [...cobrancas, { id: `${passageiroId}_viagem_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, pid: passageiroId, tipo: "viagem", ref: refViagem(hoje), vencimento: hoje, valor, pagamentos: [] }];
+    cobrancas = [...cobrancas, { id: `${passageiroId}_viagem_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, pid: passageiroId, tipo: "viagem", ref: refViagem(hoje), vencimento: hoje, valor, pagamentos: [], ...(linhaId ? { linhaId } : {}) }];
   } else if (valor < 0) {
     const alvo = [...cobrancas].reverse().find((c) => c.pid === passageiroId && c.tipo === "viagem" && c.valor === -valor && c.pagamentos.length === 0);
     if (alvo) cobrancas = cobrancas.filter((c) => c !== alvo);
@@ -170,3 +171,29 @@ export function salvarGasto(g: Omit<Gasto, "id"> & { id?: string | undefined }) 
   set({ ...estado, gastos: g.id ? estado.gastos.map((x) => (x.id === g.id ? { ...g, id } : x)) : [...estado.gastos, { ...g, id }] });
 }
 export function excluirGasto(id: string) { set({ ...estado, gastos: estado.gastos.filter((g) => g.id !== id) }); }
+
+export const usePassageiroAtual = () => useSyncExternalStore(assinar, () => estado.passageiroAtualId, () => estado.passageiroAtualId);
+export function setPassageiroAtual(id: string) { set({ ...estado, passageiroAtualId: id }); }
+export function aceitarConvite(pid: string) {
+  set({ ...estado, passageiros: estado.passageiros.map((p) => p.id === pid ? { ...p, convite: "no_app" as const } : p) });
+}
+export function responderViagemApp(pid: string, viagemId: string, vai: boolean) {
+  const aj = estado.ajustes[viagemId]; if (!aj) return;
+  const [linhaId] = viagemId.split("_");
+  const linha = estado.linhas.find((l) => l.id === linhaId);
+  const vanId = aj.vanId ?? linha?.vanId ?? "";
+  const lugares = estado.vans.find((v) => v.id === vanId)?.lugares ?? 0;
+  const { ajuste } = definirResposta(aj, pid, vai ? "vai" : "nao", lugares);
+  set({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: ajuste } });
+}
+export function confirmarParadaApp(pid: string, viagemId: string) {
+  const aj = estado.ajustes[viagemId]; if (!aj?.ida?.parada) return;
+  const parada = { ...aj.ida.parada, naVan: { ...aj.ida.parada.naVan, [pid]: "app" as const } };
+  set({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: { ...aj, ida: { ...aj.ida, parada } } } });
+}
+export function responderVoltaApp(pid: string, viagemId: string, naVan: boolean, motivo?: string) {
+  const aj = estado.ajustes[viagemId]; if (!aj?.ida?.volta) return;
+  const novoStatus = naVan ? { r: "na_van" as const, via: "app" as const } : { r: "nao" as const, motivo: motivo ?? "" };
+  const status = { ...aj.ida.volta.status, [pid]: novoStatus };
+  set({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: { ...aj, ida: { ...aj.ida, volta: { ...aj.ida.volta, status } } } } });
+}

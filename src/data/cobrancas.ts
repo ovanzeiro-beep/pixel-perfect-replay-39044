@@ -4,7 +4,7 @@ export type Pagto = { valor: number; data: string; forma: Forma; recibo: number 
 export type TipoCobranca = "viagem" | "semana" | "mes";
 export type Cobranca = {
   id: string; pid: string; tipo: TipoCobranca; ref: string; vencimento: string; valor: number;
-  pagamentos: Pagto[]; cancelada?: string; // motivo
+  pagamentos: Pagto[]; cancelada?: string; linhaId?: string; // motivo
 };
 export type Recibo = { numero: number; pid: string; valor: number; refs: string[]; forma: Forma; data: string };
 type PassageiroCob = { id: string; formaPagamento: string; valor: number; vencimento: string; ativo: boolean };

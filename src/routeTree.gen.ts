@@ -15,6 +15,7 @@ import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as VanzeiroRouteImport } from './routes/vanzeiro'
 import { Route as IdaViagemIdRouteImport } from './routes/ida.$viagemId'
 import { Route as PassageiroIndexRouteImport } from './routes/passageiro.index'
+import { Route as PassageiroConviteRouteImport } from './routes/passageiro.convite'
 import { Route as PassageiroPagamentosRouteImport } from './routes/passageiro.pagamentos'
 import { Route as PassageiroPerfilRouteImport } from './routes/passageiro.perfil'
 import { Route as PassageiroViagensRouteImport } from './routes/passageiro.viagens'
@@ -57,6 +58,11 @@ const IdaViagemIdRoute = IdaViagemIdRouteImport.update({
 const PassageiroIndexRoute = PassageiroIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PassageiroRoute,
+} as any)
+const PassageiroConviteRoute = PassageiroConviteRouteImport.update({
+  id: '/convite',
+  path: '/convite',
   getParentRoute: () => PassageiroRoute,
 } as any)
 const PassageiroPagamentosRoute = PassageiroPagamentosRouteImport.update({
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/perfil': typeof PerfilRoute
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/vanzeiro'
     | '/ida/$viagemId'
+    | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/'
     | '/perfil'
     | '/ida/$viagemId'
+    | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/vanzeiro'
     | '/ida/$viagemId'
+    | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -301,6 +313,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/passageiro/'
       preLoaderRoute: typeof PassageiroIndexRouteImport
+      parentRoute: typeof PassageiroRoute
+    }
+    '/passageiro/convite': {
+      id: '/passageiro/convite'
+      path: '/convite'
+      fullPath: '/passageiro/convite'
+      preLoaderRoute: typeof PassageiroConviteRouteImport
       parentRoute: typeof PassageiroRoute
     }
     '/passageiro/pagamentos': {
@@ -398,6 +417,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface PassageiroRouteChildren {
+  PassageiroConviteRoute: typeof PassageiroConviteRoute
   PassageiroPagamentosRoute: typeof PassageiroPagamentosRoute
   PassageiroPerfilRoute: typeof PassageiroPerfilRoute
   PassageiroViagensRoute: typeof PassageiroViagensRoute
@@ -405,6 +425,7 @@ interface PassageiroRouteChildren {
 }
 
 const PassageiroRouteChildren: PassageiroRouteChildren = {
+  PassageiroConviteRoute: PassageiroConviteRoute,
   PassageiroPagamentosRoute: PassageiroPagamentosRoute,
   PassageiroPerfilRoute: PassageiroPerfilRoute,
   PassageiroViagensRoute: PassageiroViagensRoute,

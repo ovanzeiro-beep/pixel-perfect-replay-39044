@@ -61,7 +61,7 @@ export function porCategoria(gastos: Gasto[], mes: string) {
 export function porLinha(cobs: Cobranca[], gastos: Gasto[], mes: string, linhas: { id: string; nome: string }[], linhaDoPassageiro: (pid: string) => string) {
   const oc = gastosDoMes(gastos, mes);
   const rec: Record<string, number> = {};
-  for (const c of cobs) for (const p of c.pagamentos) if (mesDe(p.data) === mes) { const l = linhaDoPassageiro(c.pid); rec[l] = (rec[l] ?? 0) + p.valor; }
+  for (const c of cobs) for (const p of c.pagamentos) if (mesDe(p.data) === mes) { const l = c.tipo === "viagem" ? (c.linhaId ?? linhaDoPassageiro(c.pid)) : linhaDoPassageiro(c.pid); rec[l] = (rec[l] ?? 0) + p.valor; }
   const linhasR = linhas.map((l) => { const r = rec[l.id] ?? 0, g = soma(oc.filter((x) => x.linhaId === l.id)); return { id: l.id, nome: l.nome, recebido: r, gastos: g, lucro: Math.round((r - g) * 100) / 100 }; });
   const ids = new Set(linhas.map((l) => l.id));
   const gerais = soma(oc.filter((x) => !x.linhaId || !ids.has(x.linhaId)));
