@@ -3,7 +3,6 @@ import { useState } from "react";
 import { ArrowLeft, Bus, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { linhas } from "@/data/exemplo";
 import { useFrota, salvarVan, excluirVan, type Van } from "@/data/store";
 import { validarVan, formatarPlaca, normalizarPlaca } from "@/lib/validacao";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar, Linha } from "@/components/app/Formulario";
@@ -20,7 +19,6 @@ export const Route = createFileRoute("/vanzeiro/vans")({
   component: Vans,
 });
 
-const linhasDa = (id: string) => linhas.filter((l) => l.vanId === id);
 
 function Situacao({ s }: { s: Van["situacao"] }) {
   return s === "rodando"
@@ -29,7 +27,8 @@ function Situacao({ s }: { s: Van["situacao"] }) {
 }
 
 function Vans() {
-  const { vans, motoristas } = useFrota();
+  const { vans, motoristas, linhas } = useFrota();
+  const linhasDa = (id: string) => linhas.filter((l) => l.vanId === id);
   const [abertaId, setAbertaId] = useState<string | null>(null);
   const [editando, setEditando] = useState<Van | "nova" | null>(null);
   const [excluindo, setExcluindo] = useState<Van | null>(null);
