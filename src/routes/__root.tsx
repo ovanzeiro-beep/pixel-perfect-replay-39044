@@ -132,7 +132,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] mx-auto max-w-md space-y-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] print:hidden mx-auto max-w-md space-y-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="pointer-events-auto space-y-2">
           <AtualizacaoApp />
           <SemConexao />

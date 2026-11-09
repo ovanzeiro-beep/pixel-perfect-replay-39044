@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10) e de começar do zero (11) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -26,6 +26,7 @@
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | **Concluída** |
 | 10 | Extra: backup dos dados | Salvar backup em arquivo, restaurar com prévia, desfazer e lembrete (pedido depois do plano) | **Concluída** |
 | 11 | Extra: começar do zero | Conta nova abre vazia, boas-vindas, guia de primeiros passos, perfil editável (pedido depois do plano) | **Concluída** |
+| 12 | Extra: exportar relatórios | Planilhas (recebimentos, gastos, resumo) e PDF do relatório, para o contador | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -133,3 +134,14 @@ Até aqui o app sempre abria com um vanzeiro e 22 passageiros de exemplo, e o no
 - **Começar do zero** (Meu perfil): apaga tudo e volta ao primeiro acesso, guardando uma **cópia de segurança**; as boas-vindas oferecem "Desfazer".
 - **Troca de celular:** as boas-vindas também têm "Restaurar de um backup", então o celular novo entra direto com todos os dados, sem recadastrar nada.
 - **Telas vazias:** todas as telas abrem sem quebrar numa conta sem nenhum dado (um teste abre cada uma).
+
+## Extra: exportar relatórios (planilha e PDF)
+
+Em **Mais → Relatórios → Exportar** (vale o período escolhido):
+
+- **Planilha de recebimentos:** cada pagamento (data, passageiro, referência, forma, valor, nº do recibo, linha e van) com o total.
+- **Planilha de gastos:** cada gasto (os "todo mês" aparecem em cada mês) com van, linha, litros, km e o total.
+- **Planilha do resumo:** recebido, gastos e lucro, por van e por linha, ocupação das viagens e combustível.
+- Formato **CSV brasileiro** (separador `;`, vírgula nos decimais, UTF-8 com BOM para o Excel ler os acentos). No celular abre o compartilhar; sem ele, baixa. Texto que começaria com `=`, `+`, `-` ou `@` (nomes, descrições) recebe um apóstrofo para a planilha **não executar como fórmula**.
+- Os totais das planilhas **batem com o relatório da tela** (há teste para os 4 períodos prontos).
+- **Imprimir ou salvar em PDF:** usa a impressão do navegador, com uma folha de estilo própria: cabeçalho com nome, cidade e período, sem menu, botões nem avisos.

@@ -49,6 +49,13 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 4. **Nova versão**
    - [ ] Repetir o item "Nova versão" (no iPhone pode precisar fechar o app por completo e abrir de novo).
 
+## Exportar e imprimir
+
+- [ ] Mais → Relatórios → escolha um período → **Exportar**: "Planilha de recebimentos", "Planilha de gastos" e "Planilha do resumo". No celular abre o **compartilhar** (WhatsApp, Drive, e-mail); sem ele, baixa o arquivo `vanzeiro-…csv`.
+- [ ] Abra o arquivo no **Excel** ou no **Planilhas Google**: colunas separadas, **acentos certos**, valores com vírgula (ex.: 150,00) reconhecidos como número.
+- [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
+- [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
+
 ## Primeiro acesso (conta nova)
 
 - [ ] Instale o app e entre ("Entrar com Google" → "Sou vanzeiro"): abre a tela **"Bem-vindo ao O Vanzeiro"** (conta vazia, sem passageiros de exemplo).

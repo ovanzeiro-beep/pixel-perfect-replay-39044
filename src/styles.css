@@ -209,3 +209,10 @@ body {
     user-select: text;
   }
 }
+
+/* Impressão e PDF: avisos flutuantes (toasts) não saem no papel. */
+@media print {
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+}

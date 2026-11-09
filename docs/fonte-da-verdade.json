@@ -1791,6 +1791,151 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 12,
+      "titulo": "Extra: exportar relatórios (planilha e PDF)",
+      "status": "concluida",
+      "objetivo": "Baixar recebimentos, gastos e o resumo do período em planilha (CSV para Excel/Planilhas Google) e imprimir ou salvar o relatório em PDF.",
+      "checks": [
+        {
+          "d": "Lógica das planilhas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/exportacao.ts"
+        },
+        {
+          "d": "CSV brasileiro: separador ';' e BOM UTF-8",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "SEPARADOR = \";\"[\\s\\S]*String\\.fromCharCode\\(0xfeff\\)|String\\.fromCharCode\\(0xfeff\\)[\\s\\S]*SEPARADOR = \";\""
+        },
+        {
+          "d": "Proteção contra fórmula na planilha",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "\\[=\\+"
+        },
+        {
+          "d": "Planilha de recebimentos",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "export function linhasRecebimentos"
+        },
+        {
+          "d": "Planilha de gastos",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "export function linhasGastos"
+        },
+        {
+          "d": "Planilha do resumo (van, linha, ocupação, combustível)",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "export function linhasResumo"
+        },
+        {
+          "d": "Nome do arquivo com tipo e período",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.ts",
+          "regex": "export const nomeDoArquivoExportado"
+        },
+        {
+          "d": "Tela: cartão Exportar",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "aria-label=\"Exportar\""
+        },
+        {
+          "d": "Tela: baixar ou compartilhar a planilha",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "salvarArquivo\\([\\s\\S]*text/csv"
+        },
+        {
+          "d": "Tela: imprimir ou salvar em PDF",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "window\\.print\\(\\)"
+        },
+        {
+          "d": "Impressão: cabeçalho com nome, cidade e período",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "O Vanzeiro — Relatório"
+        },
+        {
+          "d": "Impressão: menu e cabeçalho do app escondidos",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AppShell.tsx",
+          "regex": "print:hidden"
+        },
+        {
+          "d": "Impressão: avisos flutuantes escondidos",
+          "tipo": "contem",
+          "arquivo": "src/styles.css",
+          "regex": "@media print[\\s\\S]*data-sonner-toaster"
+        },
+        {
+          "d": "Testes das planilhas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/exportacao.test.ts"
+        },
+        {
+          "d": "Teste: planilhas batem com o relatório",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.test.ts",
+          "regex": "batem com o relatório da tela"
+        },
+        {
+          "d": "Teste: proteção contra fórmula",
+          "tipo": "contem",
+          "arquivo": "src/data/exportacao.test.ts",
+          "regex": "viraria fórmula na planilha"
+        },
+        {
+          "d": "Teste da tela de exportação",
+          "tipo": "arquivo",
+          "arquivo": "src/test/exportar-fluxo.test.tsx"
+        },
+        {
+          "d": "Teste: BOM nos bytes do arquivo",
+          "tipo": "contem",
+          "arquivo": "src/test/exportar-fluxo.test.tsx",
+          "regex": "0xef, 0xbb, 0xbf"
+        },
+        {
+          "d": "Roteiro de celular cobre exportar e imprimir",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "## Exportar e imprimir"
+        },
+        {
+          "d": "README cita as planilhas",
+          "tipo": "contem",
+          "arquivo": "README.md",
+          "regex": "planilha"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
