@@ -2,10 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
-  vanzeiro, viagensSemana, proximaViagemId,
+  vanzeiro,
   cobrancasEmAberto, recebimentosMes, gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
-import { useFrota } from "@/data/store";
+import { useFrota, useViagens } from "@/data/store";
+import { diaSemana, rotuloDia } from "@/data/viagens";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -28,22 +29,25 @@ function saudacao(h: number) {
 
 function Inicio() {
   const { vans, motoristas, linhas, passageiros } = useFrota();
+  const viagens = useViagens();
   const linha = (id: string) => linhas.find((l) => l.id === id) ?? { nome: "Linha excluída" };
-  const lugares = (vanId: string) => vans.find((v) => v.id === vanId)?.lugares ?? 0;
   const [agora, setAgora] = useState<Date | null>(null);
   useEffect(() => setAgora(new Date()), []);
 
-  const prox = viagensSemana.find((v) => v.id === proximaViagemId)!;
-  const proxVan = vans.find((v) => v.id === prox.vanId) ?? { modelo: "Van não definida", apelido: "Van não definida", lugares: 0 };
-  const proxMot = motoristas.find((m) => m.id === prox.motoristaId) ?? { nome: "Sem motorista" };
-  const pct = proxVan.lugares ? Math.min(100, Math.round((prox.confirmados / proxVan.lugares) * 100)) : 0;
+  const proximas = viagens.filter((v) => !v.passada);
+  const prox = proximas[0];
+  const proxVan = vans.find((v) => v.id === prox?.vanId) ?? { apelido: "Van não definida" };
+  const proxMot = motoristas.find((m) => m.id === prox?.motoristaId) ?? { nome: "Sem motorista" };
+  const pct = prox?.lugares ? Math.min(100, Math.round((prox.vao.length / prox.lugares) * 100)) : 0;
+  const semana = proximas.slice(0, 8);
 
-  const avisos = viagensSemana.flatMap((v) => {
+  const avisos = proximas.slice(0, 6).flatMap((v) => {
     const a: string[] = [];
-    if (v.naoConfirmados > 0) a.push(`${v.naoConfirmados} passageiros ainda não confirmaram a viagem de ${v.dia.toLowerCase()}`);
-    if (v.confirmados >= lugares(v.vanId) && v.listaEspera > 0) a.push(`Viagem de ${v.dia.toLowerCase()} lotada — ${v.listaEspera} na lista de espera`);
+    const dia = diaSemana(v.data).toLowerCase();
+    if (v.sem.length > 0) a.push(`${v.sem.length} ${v.sem.length === 1 ? "passageiro ainda não confirmou" : "passageiros ainda não confirmaram"} a viagem de ${dia} (${linha(v.linhaId).nome})`);
+    if (v.situacao === "lotada" && v.espera.length > 0) a.push(`Viagem de ${dia} lotada — ${v.espera.length} na lista de espera`);
     return a;
-  });
+  }).slice(0, 3);
 
   const totalAberto = soma(cobrancasEmAberto);
   const top3 = [...cobrancasEmAberto].sort((a, b) => b.diasAtraso - a.diasAtraso).slice(0, 3);
@@ -74,34 +78,38 @@ function Inicio() {
         </div>
       )}
 
+      {prox ? (
       <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg">
         <p className="text-sm font-bold uppercase tracking-wide text-accent">Próxima viagem</p>
         <h2 className="mt-1 text-2xl font-extrabold">{linha(prox.linhaId).nome}</h2>
-        <p className="mt-1 flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> {prox.dia}, saída às {prox.saida}</p>
+        <p className="mt-1 flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> {agora ? rotuloDia(prox.data, agora) : diaSemana(prox.data)}, saída às {prox.saida}</p>
         <p className="mt-1 flex items-center gap-2 opacity-90"><Bus className="h-5 w-5" /> {proxVan.apelido} · {proxMot.nome}</p>
         <div className="mt-4">
           <div className="flex justify-between text-base font-bold">
-            <span>Lugares confirmados</span><span>{prox.confirmados} de {proxVan.lugares}</span>
+            <span>Lugares confirmados</span><span>{prox.vao.length} de {prox.lugares}</span>
           </div>
           <div className="mt-2 h-3 overflow-hidden rounded-full bg-primary-foreground/20">
             <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
           </div>
         </div>
-        <Link to="/vanzeiro/viagens" className="mt-5 flex min-h-14 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground">
+        <Link to="/vanzeiro/viagens" search={{ v: prox.id }} className="mt-5 flex min-h-14 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground">
           Ver viagem
         </Link>
       </section>
+      ) : (
+        <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg"><p className="text-lg font-bold">Nenhuma viagem agendada.</p></section>
+      )}
 
       <section className="rounded-3xl bg-card p-5 shadow-sm">
         <h2 className="text-xl font-extrabold text-primary">Viagens da semana</h2>
         <ul className="mt-3 divide-y">
-          {viagensSemana.map((v) => (
+          {semana.map((v) => (
             <li key={v.id} className="flex items-center justify-between py-3">
               <div>
-                <p className="font-bold">{v.dia} · {v.saida}</p>
+                <p className="font-bold">{diaSemana(v.data)} · {v.saida}</p>
                 <p className="text-muted-foreground">{linha(v.linhaId).nome}</p>
               </div>
-              <span className="rounded-full bg-success/15 px-3 py-1 font-bold text-success">{v.confirmados}/{lugares(v.vanId)}</span>
+              <span className="rounded-full bg-success/15 px-3 py-1 font-bold text-success">{v.vao.length}/{v.lugares}</span>
             </li>
           ))}
         </ul>

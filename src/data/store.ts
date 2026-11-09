@@ -1,8 +1,7 @@
 // Guarda vans e motoristas na memória da tela (voltam ao original ao recarregar).
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens } from "./exemplo";
 import { semearAjustes, montarViagens, type Ajuste } from "./viagens";
-import { useMemo } from "react";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [

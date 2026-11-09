@@ -22,7 +22,7 @@ export const Route = createFileRoute("/vanzeiro/viagens")({
   component: Viagens,
 });
 
-export const SITUACAO: Record<Situacao, { nome: string; cls: string }> = {
+const SITUACAO: Record<Situacao, { nome: string; cls: string }> = {
   agendada: { nome: "Agendada", cls: "bg-primary/10 text-primary" },
   lotada: { nome: "Lotada", cls: "bg-accent/25 text-accent-strong" },
   andamento: { nome: "Em andamento", cls: "bg-primary text-primary-foreground" },
