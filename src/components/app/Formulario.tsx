@@ -35,7 +35,7 @@ export function BotaoGrande({ children, onClick, variante = "primario", type = "
   return <button type={type} onClick={onClick} className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl text-lg font-bold ${v}`}>{children}</button>;
 }
 
-export function Confirmar({ titulo, texto, onSim, onNao, children }: { titulo: string; texto: string; onSim: () => void; onNao: () => void; children?: ReactNode }) {
+export function Confirmar({ titulo, texto, onSim, onNao, children, sim = "Sim, excluir" }: { titulo: string; texto: string; onSim: () => void; onNao: () => void; children?: ReactNode; sim?: string }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">
       <div className="w-full max-w-md rounded-3xl bg-card p-6">
@@ -43,7 +43,7 @@ export function Confirmar({ titulo, texto, onSim, onNao, children }: { titulo: s
         <p className="mt-2 text-lg text-muted-foreground">{texto}</p>
         {children}
         <div className="mt-5 space-y-3">
-          <button onClick={onSim} className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-destructive text-lg font-bold text-destructive-foreground">Sim, excluir</button>
+          <button onClick={onSim} className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-destructive text-lg font-bold text-destructive-foreground">{sim}</button>
           <BotaoGrande variante="contorno" onClick={onNao}>Cancelar</BotaoGrande>
         </div>
       </div>

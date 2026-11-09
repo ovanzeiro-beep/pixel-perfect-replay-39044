@@ -108,7 +108,7 @@ function Cobrancas() {
         <div className="rounded-3xl bg-destructive/10 p-4"><p className="font-bold text-muted-foreground">Em aberto</p><p className="text-3xl font-extrabold text-destructive">{brl(totalEmAberto(cobrancas))}</p></div>
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-3xl bg-success/10 p-4"><p className="text-sm font-bold text-muted-foreground">Recebido no mês</p><p className="text-xl font-extrabold text-success">{brl(recebidoNoMes(cobrancas, hoje))}</p></div>
-          <div className="rounded-3xl bg-accent/15 p-4"><p className="text-sm font-bold text-muted-foreground">Vence nos próximos 7 dias</p><p className="text-xl font-extrabold text-accent-strong">{brl(venceEm7Dias(cobrancas, hoje))}</p></div>
+          <div className="rounded-3xl bg-accent/15 p-4"><p className="text-sm font-bold text-muted-foreground">Vence nos próximos 7 dias</p><p className="text-xl font-extrabold text-accent-strong">{brl(venceEm7Dias(cobrancas, hoje, passageiros))}</p></div>
         </div>
       </div>
 
@@ -290,7 +290,7 @@ function Historico({ p, onFechar, onPagar, onRecibo, onCobrar, onCopiarPix }: { 
 
       {desfazer && (
         <Confirmar titulo="Desfazer pagamento?" texto={`O pagamento de ${brl(desfazer.valor)} (recibo nº ${String(desfazer.numero).padStart(4, "0")}) será desfeito e o valor volta a ficar em aberto.`}
-          onSim={() => { desfazerRecibo(desfazer.numero); setDesfazer(null); toast.success("Pagamento desfeito"); }} onNao={() => setDesfazer(null)} />
+          onSim={() => { desfazerRecibo(desfazer.numero); setDesfazer(null); toast.success("Pagamento desfeito"); }} onNao={() => setDesfazer(null)} sim="Sim, desfazer" />
       )}
       {cancelar && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">

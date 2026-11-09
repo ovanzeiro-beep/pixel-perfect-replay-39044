@@ -76,8 +76,8 @@ export const desfazerPagamento = (cobs: Cobranca[], numero: number) =>
   cobs.map((c) => (c.pagamentos.some((p) => p.recibo === numero) ? { ...c, pagamentos: c.pagamentos.filter((p) => p.recibo !== numero) } : c));
 export const cancelarCobranca = (cobs: Cobranca[], id: string, motivo: string) => cobs.map((c) => (c.id === id ? { ...c, cancelada: motivo } : c));
 
-/** Cria as cobranças semanais e mensais no dia do vencimento (e as que vencem nos próximos 7 dias). */
-export function gerarPeriodicas(cobs: Cobranca[], passageiros: PassageiroCob[], hoje: string): Cobranca[] {
+/** Cria as cobranças semanais e mensais no dia do vencimento (com `frente` > 0, prevê as dos próximos dias). */
+export function gerarPeriodicas(cobs: Cobranca[], passageiros: PassageiroCob[], hoje: string, frente = 0): Cobranca[] {
   const existe = new Set(cobs.map((c) => c.id));
   const novas: Cobranca[] = [];
   const add = (p: PassageiroCob, tipo: TipoCobranca, venc: string, ref: string) => {
@@ -90,7 +90,7 @@ export function gerarPeriodicas(cobs: Cobranca[], passageiros: PassageiroCob[], 
     if (p.formaPagamento === "semanal") {
       const dia = SEMANA.indexOf(p.vencimento);
       if (dia < 0) continue;
-      for (let n = 0; n <= 7; n++) {
+      for (let n = 0; n <= frente; n++) {
         const d = somaDias(hoje, n);
         if (dataDe(d).getDay() === dia) add(p, "semana", d, refSemana(d));
       }
@@ -101,7 +101,7 @@ export function gerarPeriodicas(cobs: Cobranca[], passageiros: PassageiroCob[], 
       const este = `${hoje.slice(0, 8)}${p2(dia)}`;
       const h = dataDe(hoje); const prox = isoDe(new Date(h.getFullYear(), h.getMonth() + 1, dia));
       if (este <= hoje) add(p, "mes", este, refMes(este));
-      for (const d of [este, prox]) if (d > hoje && diasEntre(hoje, d) <= 7) add(p, "mes", d, refMes(d));
+      for (const d of [este, prox]) if (d > hoje && diasEntre(hoje, d) <= frente) add(p, "mes", d, refMes(d));
     }
   }
   return novas.length ? [...cobs, ...novas] : cobs;
@@ -109,8 +109,9 @@ export function gerarPeriodicas(cobs: Cobranca[], passageiros: PassageiroCob[], 
 
 export const recebidoNoMes = (cobs: Cobranca[], hoje: string) =>
   cobs.reduce((s, c) => s + c.pagamentos.filter((p) => p.data.slice(0, 7) === hoje.slice(0, 7)).reduce((t, p) => t + p.valor, 0), 0);
-export const venceEm7Dias = (cobs: Cobranca[], hoje: string) =>
-  cobs.filter((c) => aberto(c) > 0 && diasEntre(hoje, c.vencimento) >= 0 && diasEntre(hoje, c.vencimento) <= 7).reduce((s, c) => s + aberto(c), 0);
+/** Em aberto que vence nos próximos 7 dias + semanais/mensais que ainda vão ser cobradas nesse prazo. */
+export const venceEm7Dias = (cobs: Cobranca[], hoje: string, passageiros: PassageiroCob[] = []) =>
+  gerarPeriodicas(cobs, passageiros, hoje, 7).filter((c) => aberto(c) > 0 && diasEntre(hoje, c.vencimento) >= 0 && diasEntre(hoje, c.vencimento) <= 7).reduce((s, c) => s + aberto(c), 0);
 export const totalEmAberto = (cobs: Cobranca[]) => cobs.reduce((s, c) => s + aberto(c), 0);
 
 export const juntarRefs = (refs: string[]) => (refs.length <= 1 ? refs[0] ?? "" : `${refs.slice(0, -1).join(", ")} e ${refs[refs.length - 1]}`);
