@@ -53,3 +53,27 @@ describe("parada no caminho", () => {
     expect(r.paradas![0]!.ficaram.map((f) => f.pid)).toEqual(["b"]);
   });
 });
+
+import { novaVolta, pendentesVolta, rotaVolta, aindaNaVan, cobrancaSoVolta, totalCobrado } from "./viagens";
+describe("volta e entrega", () => {
+  const ida: Ida = { ordem: ["a", "b", "c"], fase: "chegou", marcas: [
+    { pid: "a", r: "embarcou", cobrou: 0 }, { pid: "b", r: "embarcou", cobrou: 30 }, { pid: "c", r: "ficou", cobrou: 0 }] };
+  it("chamada só libera com todos marcados Na van ou Não volta", () => {
+    const v = { ...novaVolta(0), status: { a: { r: "na_van" as const, via: "manual" as const } } };
+    expect(pendentesVolta(ida, v)).toEqual(["b"]);
+    expect(pendentesVolta(ida, { ...v, status: { ...v.status, b: { r: "nao", motivo: "Volta outro dia" } } })).toEqual([]);
+  });
+  it("rota de volta é a ordem contrária da ida, só com quem está na van", () => {
+    const v = { ...novaVolta(0), status: { a: { r: "na_van" as const, via: "manual" as const }, c: { r: "na_van" as const, via: "manual" as const }, b: { r: "nao" as const, motivo: "x" } } };
+    expect(rotaVolta(ida, v)).toEqual(["c", "a"]);
+  });
+  it("ainda na van conta quem não foi entregue", () => {
+    expect(aindaNaVan({ ...novaVolta(0), ordem: ["c", "a"], entregas: [{ pid: "c", r: "entregue" }] })).toEqual(["a"]);
+  });
+  it("cobra quem só volta e paga por viagem, uma vez só", () => {
+    expect(cobrancaSoVolta(ida, "x", "por_viagem", 25)).toBe(25);
+    expect(cobrancaSoVolta(ida, "b", "por_viagem", 30)).toBe(0);
+    expect(cobrancaSoVolta(ida, "x", "mensal", 25)).toBe(0);
+    expect(totalCobrado({ ...ida, volta: { ...novaVolta(0), extras: [{ pid: "x", cobrou: 25 }] } })).toBe(55);
+  });
+});

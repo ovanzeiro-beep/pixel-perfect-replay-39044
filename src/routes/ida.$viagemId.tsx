@@ -7,10 +7,11 @@ import { ArrowLeft, Check, Flag, GripVertical, MapPin, MessageCircle, Navigation
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { useFrota, useViagens, ajustarViagem, lancarCobranca, type Passageiro } from "@/data/store";
-import { ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
+import { encerrarParada, novaVolta, ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
 import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
+import { TelaVolta } from "@/components/app/VoltaViagem";
 
 export const Route = createFileRoute("/ida/$viagemId")({
   head: () => ({
@@ -38,7 +39,7 @@ function TelaIda() {
   useEffect(() => {
     if (!v || v.ajuste.ida || v.ajuste.cancelada || !linha) return;
     const cidade = (id: string) => passageiros.find((p) => p.id === id)?.cidade ?? "";
-    ajustarViagem(v.id, { ...v.ajuste, ida: { ordem: ordenarParadas(v.vao, cidade, linha.paradas), marcas: [], fase: "paradas" } });
+    ajustarViagem(v.id, { ...v.ajuste, ida: { ordem: ordenarParadas(v.vao, cidade, linha.paradas), marcas: [], fase: "paradas", inicio: Date.now() } });
     toast.success("Viagem iniciada");
   }, [v, linha, passageiros]);
 
@@ -89,6 +90,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
     const novaFaltam = arrayMove(faltam, de, para);
     salvar({ ...ida, ordem: [...ida.marcas.map((m) => m.pid), ...novaFaltam] });
   };
+  if (ida.volta || ida.encerrada) return <TelaVolta v={v} ida={ida} salvar={salvar} nomeLinha={nomeLinha} vanNome={van?.apelido ?? "Sem van"} passageiros={passageiros} />;
   const rotas = partesRota(faltam.map((id) => enderecoCompleto(pas(id)!)));
 
   return (
@@ -106,7 +108,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
         {ida.fase !== "paradas" && <p className="mt-1 text-center font-bold text-accent">{ida.fase === "a_caminho" ? `Em andamento — a caminho de ${destino}` : `Chegou em ${destino}`}</p>}
       </header>
 
-      {ida.parada ? <div className="px-4 pt-4"><ParadaAtual ida={ida} salvar={salvar} pas={pas} /></div> : (
+      {ida.parada ? <div className="px-4 pt-4"><ParadaAtual parada={ida.parada} bordo={ida.marcas.filter((m) => m.r === "embarcou" && pas(m.pid)).map((m) => pas(m.pid)!)} onMudar={(parada) => salvar({ ...ida, parada })} onSeguir={(mot) => salvar(encerrarParada(ida, mot, Date.now()))} /></div> : (
       <div className="space-y-4 px-4 pt-4">
         {ida.fase === "paradas" && prox && (
           <section className="rounded-3xl border-4 border-accent bg-card p-5 shadow-lg">
@@ -153,7 +155,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
             <ul className="mt-2 divide-y">
               {ida.marcas.filter((m) => m.r === "embarcou").map((m) => <li key={m.pid} className="py-3 text-lg font-semibold">{pas(m.pid)?.nome}</li>)}
             </ul>
-            <div className="mt-3"><BotaoGrande variante="destaque" onClick={() => setConstrucao("A volta chega em outra etapa.")}>Iniciar volta</BotaoGrande></div>
+            <div className="mt-3"><BotaoGrande variante="destaque" onClick={() => salvar({ ...ida, volta: novaVolta(Date.now()) })}>Iniciar volta</BotaoGrande></div>
           </section>
         )}
 

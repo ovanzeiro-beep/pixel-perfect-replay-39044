@@ -13,7 +13,19 @@ export type Marca = { pid: string; r: "embarcou" | "faltou" | "ficou"; cobrou: n
 export type Ficou = { pid: string; motivo: string; hora: string };
 export type ParadaFeita = { inicio: number; minutos: number; local: string; ficaram: Ficou[] };
 export type ParadaAtiva = { inicio: number; minutos: number; local: string; chamada: boolean; naVan: Record<string, "manual" | "app"> };
-export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[] };
+export type StatusVolta = { r: "na_van"; via: "manual" | "app" } | { r: "nao"; motivo: string };
+export type Entrega = { pid: string; r: "entregue" | "outro" | "ficou"; onde?: string };
+export type Volta = {
+  fase: "chamada" | "entrega"; inicio: number;
+  status: Record<string, StatusVolta>;
+  extras: { pid: string; cobrou: number }[];
+  ordem: string[]; entregas: Entrega[];
+  parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[];
+};
+export type Ida = {
+  ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[];
+  inicio?: number; volta?: Volta; encerrada?: number;
+};
 
 const hm = (ms: number) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
 export const horaDe = hm;
@@ -26,6 +38,38 @@ export function textoFaltam(nomes: string[]): string {
   const lista = nomes.length === 1 ? nomes[0]! : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
   return `Falta${nomes.length > 1 ? "m" : ""} ${nomes.length}: ${lista}`;
 }
+/** Abre a chamada da volta. */
+export const novaVolta = (agora: number): Volta => ({ fase: "chamada", inicio: agora, status: {}, extras: [], ordem: [], entregas: [] });
+/** Quem precisa estar marcado na chamada da volta (embarcou na ida + só volta). */
+export const chamadaVolta = (ida: Ida, volta: Volta) => [...ida.marcas.filter((m) => m.r === "embarcou").map((m) => m.pid), ...volta.extras.map((e) => e.pid)];
+/** Quem ainda falta marcar "Na van" ou "Não volta". */
+export const pendentesVolta = (ida: Ida, volta: Volta) => chamadaVolta(ida, volta).filter((id) => !volta.status[id]);
+/** Rota de entrega: ordem contrária da ida, só com quem está na van; quem só volta vai no fim. */
+export function rotaVolta(ida: Ida, volta: Volta): string[] {
+  const naVan = (id: string) => volta.status[id]?.r === "na_van";
+  const daIda = [...ida.ordem].reverse().filter(naVan);
+  return [...daIda, ...volta.extras.map((e) => e.pid).filter((id) => naVan(id) && !daIda.includes(id))];
+}
+/** Quem ainda não foi entregue. */
+export const aindaNaVan = (volta: Volta) => volta.ordem.filter((id) => !volta.entregas.some((e) => e.pid === id));
+/** Cobrança automática para quem só volta e paga por viagem (se ainda não foi cobrado nesta viagem). */
+export const cobrancaSoVolta = (ida: Ida, pid: string, formaPagamento: string, valor: number) =>
+  formaPagamento === "por_viagem" && !ida.marcas.some((m) => m.pid === pid && m.cobrou > 0) ? valor : 0;
+/** Total cobrado na viagem (ida + volta). */
+export const totalCobrado = (ida: Ida) => ida.marcas.reduce((s, m) => s + m.cobrou, 0) + (ida.volta?.extras.reduce((s, e) => s + e.cobrou, 0) ?? 0);
+/** Parada da volta: quem não foi marcado "Na van" fica registrado e sai da van. */
+export function encerrarParadaVolta(volta: Volta, motivo: string, agora: number): Volta {
+  const p = volta.parada;
+  if (!p) return volta;
+  const ficaram = aindaNaVan(volta).filter((id) => !p.naVan[id]);
+  const hora = hm(agora);
+  return {
+    ...volta, parada: undefined,
+    entregas: [...volta.entregas, ...ficaram.map((pid) => ({ pid, r: "ficou" as const, onde: motivo }))],
+    paradas: [...(volta.paradas ?? []), { inicio: p.inicio, minutos: p.minutos, local: p.local, ficaram: ficaram.map((pid) => ({ pid, motivo, hora })) }],
+  };
+}
+
 /** Encerra a parada: quem não foi marcado "Na van" passa a "Ficou na parada". */
 export function encerrarParada(ida: Ida, motivo: string, agora: number): Ida {
   const p = ida.parada;
@@ -117,8 +161,9 @@ export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: 
       const resp = (p: string) => ajuste.respostas[p] ?? "sem";
       const vao = Object.keys(ajuste.respostas).filter((p) => ids.includes(p) && resp(p) === "vai");
       const espera = ajuste.espera.filter((p) => ids.includes(p));
-      const passada = !ajuste.ida && (data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta));
+      const passada = ajuste.ida?.encerrada ? true : !ajuste.ida && (data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta));
       const situacao: Situacao = ajuste.cancelada ? "cancelada"
+        : ajuste.ida?.encerrada ? "concluida"
         : ajuste.ida ? "andamento"
         : passada ? "concluida"
         : data === hojeIso && !!l.saida && hhmm >= l.saida ? "andamento"

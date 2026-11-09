@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Check, Copy, MessageCircle, Phone, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import type { Passageiro } from "@/data/store";
-import { avisoParada, encerrarParada, saidaParada, textoFaltam, type Ida } from "@/data/viagens";
+import { avisoParada, saidaParada, textoFaltam, type ParadaAtiva } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande, campoClasse } from "@/components/app/Formulario";
 
@@ -32,8 +32,7 @@ export function IniciarParada({ onIniciar, onFechar }: { onIniciar: (min: number
 }
 
 /** Parada em andamento: contagem regressiva e chamada antes de sair. */
-export function ParadaAtual({ ida, salvar, pas }: { ida: Ida; salvar: (i: Ida) => void; pas: (id: string) => Passageiro | undefined }) {
-  const p = ida.parada!;
+export function ParadaAtual({ parada: p, bordo, onMudar, onSeguir }: { parada: ParadaAtiva; bordo: Passageiro[]; onMudar: (p: ParadaAtiva) => void; onSeguir: (motivo: string) => void }) {
   const [agora, setAgora] = useState(() => Date.now());
   const [conferir, setConferir] = useState(false);
   const [alerta, setAlerta] = useState(false);
@@ -45,9 +44,8 @@ export function ParadaAtual({ ida, salvar, pas }: { ida: Ida; salvar: (i: Ida) =
   const resta = Math.max(0, p.inicio + p.minutos * 60000 - agora);
   const mm = Math.floor(resta / 60000), ss = Math.floor((resta % 60000) / 1000);
   const aviso = avisoParada(p.minutos, saida);
-  const bordo = ida.marcas.filter((m) => m.r === "embarcou" && pas(m.pid)).map((m) => pas(m.pid)!);
   const faltando = bordo.filter((x) => !p.naVan[x.id]);
-  const mudar = (naVan: Record<string, "manual" | "app">) => salvar({ ...ida, parada: { ...p, naVan } });
+  const mudar = (naVan: Record<string, "manual" | "app">) => onMudar({ ...p, naVan });
 
   const alternar = (id: string) => { const n = { ...p.naVan }; if (n[id]) delete n[id]; else n[id] = "manual"; mudar(n); };
   const simular = () => {
@@ -57,7 +55,7 @@ export function ParadaAtual({ ida, salvar, pas }: { ida: Ida; salvar: (i: Ida) =
   };
   const copiar = async () => { try { await navigator.clipboard.writeText(aviso); toast.success("Aviso copiado. Cole no grupo do WhatsApp."); } catch { toast.error("Não deu para copiar"); } };
   const seguir = (mot: string) => {
-    salvar(encerrarParada(ida, mot, Date.now()));
+    onSeguir(mot);
     toast.success(faltando.length && mot ? `Viagem retomada · ${faltando.length} ficou na parada` : "Viagem retomada");
   };
 
@@ -71,7 +69,7 @@ export function ParadaAtual({ ida, salvar, pas }: { ida: Ida; salvar: (i: Ida) =
         {resta === 0 && <p className="rounded-2xl bg-destructive/15 p-3 text-xl font-extrabold text-destructive">Hora de sair!</p>}
         <BotaoGrande variante="contorno" onClick={copiar}><Copy className="h-5 w-5" /> Copiar aviso</BotaoGrande>
         <p className="text-sm text-muted-foreground">“{aviso}”</p>
-        <BotaoGrande variante="destaque" onClick={() => salvar({ ...ida, parada: { ...p, chamada: true } })}>Retomar viagem</BotaoGrande>
+        <BotaoGrande variante="destaque" onClick={() => onMudar({ ...p, chamada: true })}>Retomar viagem</BotaoGrande>
       </section>
     );
   }
