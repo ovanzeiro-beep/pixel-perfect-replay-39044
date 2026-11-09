@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PassageiroIndexRouteImport } from './routes/passageiro.index'
+import { Route as PassageiroPagamentosRouteImport } from './routes/passageiro.pagamentos'
+import { Route as PassageiroViagensRouteImport } from './routes/passageiro.viagens'
+import { Route as VanzeiroIndexRouteImport } from './routes/vanzeiro.index'
+import { Route as VanzeiroDinheiroRouteImport } from './routes/vanzeiro.dinheiro'
+import { Route as VanzeiroGastosRouteImport } from './routes/vanzeiro.gastos'
+import { Route as VanzeiroLinhasRouteImport } from './routes/vanzeiro.linhas'
+import { Route as VanzeiroMotoristasRouteImport } from './routes/vanzeiro.motoristas'
+import { Route as VanzeiroPassageirosRouteImport } from './routes/vanzeiro.passageiros'
+import { Route as VanzeiroVansRouteImport } from './routes/vanzeiro.vans'
+import { Route as VanzeiroViagensRouteImport } from './routes/vanzeiro.viagens'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PassageiroIndexRoute = PassageiroIndexRouteImport.update({
+  id: '/passageiro/',
+  path: '/passageiro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PassageiroPagamentosRoute = PassageiroPagamentosRouteImport.update({
+  id: '/passageiro/pagamentos',
+  path: '/passageiro/pagamentos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PassageiroViagensRoute = PassageiroViagensRouteImport.update({
+  id: '/passageiro/viagens',
+  path: '/passageiro/viagens',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroIndexRoute = VanzeiroIndexRouteImport.update({
+  id: '/vanzeiro/',
+  path: '/vanzeiro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroDinheiroRoute = VanzeiroDinheiroRouteImport.update({
+  id: '/vanzeiro/dinheiro',
+  path: '/vanzeiro/dinheiro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroGastosRoute = VanzeiroGastosRouteImport.update({
+  id: '/vanzeiro/gastos',
+  path: '/vanzeiro/gastos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroLinhasRoute = VanzeiroLinhasRouteImport.update({
+  id: '/vanzeiro/linhas',
+  path: '/vanzeiro/linhas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroMotoristasRoute = VanzeiroMotoristasRouteImport.update({
+  id: '/vanzeiro/motoristas',
+  path: '/vanzeiro/motoristas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroPassageirosRoute = VanzeiroPassageirosRouteImport.update({
+  id: '/vanzeiro/passageiros',
+  path: '/vanzeiro/passageiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroVansRoute = VanzeiroVansRouteImport.update({
+  id: '/vanzeiro/vans',
+  path: '/vanzeiro/vans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanzeiroViagensRoute = VanzeiroViagensRouteImport.update({
+  id: '/vanzeiro/viagens',
+  path: '/vanzeiro/viagens',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
+  '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
+  '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
+  '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
+  '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/vans': typeof VanzeiroVansRoute
+  '/vanzeiro/viagens': typeof VanzeiroViagensRoute
+  '/passageiro/': typeof PassageiroIndexRoute
+  '/vanzeiro/': typeof VanzeiroIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
+  '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
+  '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
+  '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
+  '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/vans': typeof VanzeiroVansRoute
+  '/vanzeiro/viagens': typeof VanzeiroViagensRoute
+  '/passageiro': typeof PassageiroIndexRoute
+  '/vanzeiro': typeof VanzeiroIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
+  '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
+  '/vanzeiro/gastos': typeof VanzeiroGastosRoute
+  '/vanzeiro/linhas': typeof VanzeiroLinhasRoute
+  '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
+  '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/vans': typeof VanzeiroVansRoute
+  '/vanzeiro/viagens': typeof VanzeiroViagensRoute
+  '/passageiro/': typeof PassageiroIndexRoute
+  '/vanzeiro/': typeof VanzeiroIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/passageiro/pagamentos'
+    | '/passageiro/viagens'
+    | '/vanzeiro/dinheiro'
+    | '/vanzeiro/gastos'
+    | '/vanzeiro/linhas'
+    | '/vanzeiro/motoristas'
+    | '/vanzeiro/passageiros'
+    | '/vanzeiro/vans'
+    | '/vanzeiro/viagens'
+    | '/passageiro/'
+    | '/vanzeiro/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/passageiro/pagamentos'
+    | '/passageiro/viagens'
+    | '/vanzeiro/dinheiro'
+    | '/vanzeiro/gastos'
+    | '/vanzeiro/linhas'
+    | '/vanzeiro/motoristas'
+    | '/vanzeiro/passageiros'
+    | '/vanzeiro/vans'
+    | '/vanzeiro/viagens'
+    | '/passageiro'
+    | '/vanzeiro'
+  id:
+    | '__root__'
+    | '/'
+    | '/passageiro/pagamentos'
+    | '/passageiro/viagens'
+    | '/vanzeiro/dinheiro'
+    | '/vanzeiro/gastos'
+    | '/vanzeiro/linhas'
+    | '/vanzeiro/motoristas'
+    | '/vanzeiro/passageiros'
+    | '/vanzeiro/vans'
+    | '/vanzeiro/viagens'
+    | '/passageiro/'
+    | '/vanzeiro/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PassageiroPagamentosRoute: typeof PassageiroPagamentosRoute
+  PassageiroViagensRoute: typeof PassageiroViagensRoute
+  VanzeiroDinheiroRoute: typeof VanzeiroDinheiroRoute
+  VanzeiroGastosRoute: typeof VanzeiroGastosRoute
+  VanzeiroLinhasRoute: typeof VanzeiroLinhasRoute
+  VanzeiroMotoristasRoute: typeof VanzeiroMotoristasRoute
+  VanzeiroPassageirosRoute: typeof VanzeiroPassageirosRoute
+  VanzeiroVansRoute: typeof VanzeiroVansRoute
+  VanzeiroViagensRoute: typeof VanzeiroViagensRoute
+  PassageiroIndexRoute: typeof PassageiroIndexRoute
+  VanzeiroIndexRoute: typeof VanzeiroIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/passageiro/': {
+      id: '/passageiro/'
+      path: '/passageiro'
+      fullPath: '/passageiro/'
+      preLoaderRoute: typeof PassageiroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/passageiro/pagamentos': {
+      id: '/passageiro/pagamentos'
+      path: '/passageiro/pagamentos'
+      fullPath: '/passageiro/pagamentos'
+      preLoaderRoute: typeof PassageiroPagamentosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/passageiro/viagens': {
+      id: '/passageiro/viagens'
+      path: '/passageiro/viagens'
+      fullPath: '/passageiro/viagens'
+      preLoaderRoute: typeof PassageiroViagensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/': {
+      id: '/vanzeiro/'
+      path: '/vanzeiro'
+      fullPath: '/vanzeiro/'
+      preLoaderRoute: typeof VanzeiroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/dinheiro': {
+      id: '/vanzeiro/dinheiro'
+      path: '/vanzeiro/dinheiro'
+      fullPath: '/vanzeiro/dinheiro'
+      preLoaderRoute: typeof VanzeiroDinheiroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/gastos': {
+      id: '/vanzeiro/gastos'
+      path: '/vanzeiro/gastos'
+      fullPath: '/vanzeiro/gastos'
+      preLoaderRoute: typeof VanzeiroGastosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/linhas': {
+      id: '/vanzeiro/linhas'
+      path: '/vanzeiro/linhas'
+      fullPath: '/vanzeiro/linhas'
+      preLoaderRoute: typeof VanzeiroLinhasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/motoristas': {
+      id: '/vanzeiro/motoristas'
+      path: '/vanzeiro/motoristas'
+      fullPath: '/vanzeiro/motoristas'
+      preLoaderRoute: typeof VanzeiroMotoristasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/passageiros': {
+      id: '/vanzeiro/passageiros'
+      path: '/vanzeiro/passageiros'
+      fullPath: '/vanzeiro/passageiros'
+      preLoaderRoute: typeof VanzeiroPassageirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/vans': {
+      id: '/vanzeiro/vans'
+      path: '/vanzeiro/vans'
+      fullPath: '/vanzeiro/vans'
+      preLoaderRoute: typeof VanzeiroVansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanzeiro/viagens': {
+      id: '/vanzeiro/viagens'
+      path: '/vanzeiro/viagens'
+      fullPath: '/vanzeiro/viagens'
+      preLoaderRoute: typeof VanzeiroViagensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PassageiroPagamentosRoute: PassageiroPagamentosRoute,
+  PassageiroViagensRoute: PassageiroViagensRoute,
+  VanzeiroDinheiroRoute: VanzeiroDinheiroRoute,
+  VanzeiroGastosRoute: VanzeiroGastosRoute,
+  VanzeiroLinhasRoute: VanzeiroLinhasRoute,
+  VanzeiroMotoristasRoute: VanzeiroMotoristasRoute,
+  VanzeiroPassageirosRoute: VanzeiroPassageirosRoute,
+  VanzeiroVansRoute: VanzeiroVansRoute,
+  VanzeiroViagensRoute: VanzeiroViagensRoute,
+  PassageiroIndexRoute: PassageiroIndexRoute,
+  VanzeiroIndexRoute: VanzeiroIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
