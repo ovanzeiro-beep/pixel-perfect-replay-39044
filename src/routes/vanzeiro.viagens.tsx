@@ -7,6 +7,7 @@ import { prazoConfirmacao } from "@/data/exemplo";
 import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/store";
 import { definirResposta, sobram, aplicarNovaVan, rotuloDia, horaDe, diaSemana, dataCurta, type Viagem, type Situacao, type Resposta, type Ajuste } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
+import { ResumoViagem } from "@/components/app/VoltaViagem";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar } from "@/components/app/Formulario";
 
 export const Route = createFileRoute("/vanzeiro/viagens")({
@@ -142,6 +143,8 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
       {(editavel || v.ajuste.ida) && !v.ajuste.cancelada && (
         <Link to="/ida/$viagemId" params={{ viagemId: v.id }} className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-xl font-extrabold text-accent-foreground"><Play className="h-6 w-6" /> {v.ajuste.ida ? "Abrir viagem" : "Iniciar viagem"}</Link>
       )}
+
+      {v.ajuste.ida?.encerrada && <ResumoViagem ida={v.ajuste.ida} passageiros={passageiros} />}
 
       {grupos.map((g) => g.ids.length > 0 && (
         <section key={g.titulo}>
