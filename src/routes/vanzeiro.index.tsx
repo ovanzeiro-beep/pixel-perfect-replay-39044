@@ -51,7 +51,7 @@ function Inicio() {
     .map((p) => ({ passageiroId: p.id, valor: p.emAberto, diasAtraso: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.diasAtraso ?? 0 }));
   const totalAberto = soma(devedores);
   const top3 = [...devedores].sort((a, b) => b.diasAtraso - a.diasAtraso || b.valor - a.valor).slice(0, 3);
-  const emAndamento = viagens.filter((v) => v.ajuste.ida);
+  const emAndamento = viagens.filter((v) => v.ajuste.ida && !v.ajuste.ida.encerrada);
   const recebido = soma(recebimentosMes);
   const gastos = soma(gastosMes);
   const lucro = recebido - gastos;
@@ -75,7 +75,7 @@ function Inicio() {
           <section key={v.id} className="rounded-3xl border-4 border-accent bg-card p-5 shadow-lg">
             <p className="text-sm font-bold uppercase tracking-wide text-accent-strong">Viagem em andamento</p>
             <h2 className="mt-1 text-2xl font-extrabold text-primary">{linha(v.linhaId).nome}</h2>
-            <p className="mt-2 text-3xl font-extrabold">Na van: {marcas.filter((m) => m.r === "embarcou").length} de {v.ajuste.ida!.ordem.length}</p>
+            {v.ajuste.ida!.volta?.fase === "entrega" ? <p className="mt-2 text-3xl font-extrabold">Ainda na van: {v.ajuste.ida!.volta.ordem.filter((id) => !v.ajuste.ida!.volta!.entregas.some((e) => e.pid === id)).length}</p> : <p className="mt-2 text-3xl font-extrabold">Na van: {marcas.filter((m) => m.r === "embarcou").length} de {v.ajuste.ida!.ordem.length}</p>}
             <Link to="/ida/$viagemId" params={{ viagemId: v.id }} className="mt-4 flex min-h-14 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground">Abrir viagem</Link>
           </section>
         );
