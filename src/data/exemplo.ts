@@ -13,13 +13,13 @@ export const vanzeiro = {
 };
 
 export const vans = [
-  { id: "van1", modelo: "Mercedes-Benz Sprinter 415", placa: "BRA-2E19", lugares: 15, ano: 2019 },
-  { id: "van2", modelo: "Renault Master L2H2", placa: "QJH-7C42", lugares: 12, ano: 2021 },
+  { id: "van1", apelido: "Van Branca", modelo: "Mercedes-Benz Sprinter 415", placa: "BRA2E19", lugares: 15, ano: 2019, cor: "Branca", motoristaId: "m1", situacao: "rodando", observacoes: "Ar-condicionado e bancos reclináveis." },
+  { id: "van2", apelido: "Van Prata", modelo: "Renault Master L2H2", placa: "QJH7C42", lugares: 12, ano: 2021, cor: "Prata", motoristaId: "m2", situacao: "rodando", observacoes: "" },
 ];
 
 export const motoristas = [
-  { id: "m1", nome: "João Batista", telefone: "(43) 99812-4471", cnh: "D", proprio: true },
-  { id: "m2", nome: "Carlos Henrique Souza", telefone: "(43) 99634-2208", cnh: "D", proprio: false },
+  { id: "m1", nome: "João Batista", telefone: "(43) 99812-4471", cnh: "D", cnhValidade: "2028-03-15", proprio: true },
+  { id: "m2", nome: "Carlos Henrique Souza", telefone: "(43) 99634-2208", cnh: "D", cnhValidade: "2027-07-22", proprio: false },
 ];
 
 export const linhas = [

@@ -2,9 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
-  vanzeiro, vans, motoristas, linhas, passageiros, viagensSemana, proximaViagemId,
+  vanzeiro, linhas, passageiros, viagensSemana, proximaViagemId,
   cobrancasEmAberto, recebimentosMes, gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
+import { useFrota } from "@/data/store";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -21,20 +22,21 @@ export const Route = createFileRoute("/vanzeiro/")({
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const soma = (l: { valor: number }[]) => l.reduce((t, x) => t + x.valor, 0);
 const linha = (id: string) => linhas.find((l) => l.id === id)!;
-const lugares = (vanId: string) => vans.find((v) => v.id === vanId)!.lugares;
 
 function saudacao(h: number) {
   return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 }
 
 function Inicio() {
+  const { vans, motoristas } = useFrota();
+  const lugares = (vanId: string) => vans.find((v) => v.id === vanId)?.lugares ?? 0;
   const [agora, setAgora] = useState<Date | null>(null);
   useEffect(() => setAgora(new Date()), []);
 
   const prox = viagensSemana.find((v) => v.id === proximaViagemId)!;
-  const proxVan = vans.find((v) => v.id === prox.vanId)!;
-  const proxMot = motoristas.find((m) => m.id === prox.motoristaId)!;
-  const pct = Math.round((prox.confirmados / proxVan.lugares) * 100);
+  const proxVan = vans.find((v) => v.id === prox.vanId) ?? { modelo: "Van não definida", apelido: "Van não definida", lugares: 0 };
+  const proxMot = motoristas.find((m) => m.id === prox.motoristaId) ?? { nome: "Sem motorista" };
+  const pct = proxVan.lugares ? Math.min(100, Math.round((prox.confirmados / proxVan.lugares) * 100)) : 0;
 
   const avisos = viagensSemana.flatMap((v) => {
     const a: string[] = [];
@@ -76,7 +78,7 @@ function Inicio() {
         <p className="text-sm font-bold uppercase tracking-wide text-accent">Próxima viagem</p>
         <h2 className="mt-1 text-2xl font-extrabold">{linha(prox.linhaId).nome}</h2>
         <p className="mt-1 flex items-center gap-2 text-lg"><Clock className="h-5 w-5" /> {prox.dia}, saída às {prox.saida}</p>
-        <p className="mt-1 flex items-center gap-2 opacity-90"><Bus className="h-5 w-5" /> {proxVan.modelo} · {proxMot.nome}</p>
+        <p className="mt-1 flex items-center gap-2 opacity-90"><Bus className="h-5 w-5" /> {proxVan.apelido} · {proxMot.nome}</p>
         <div className="mt-4">
           <div className="flex justify-between text-base font-bold">
             <span>Lugares confirmados</span><span>{prox.confirmados} de {proxVan.lugares}</span>
