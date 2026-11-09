@@ -32,3 +32,24 @@ describe("ida", () => {
     expect(partesRota(Array.from({ length: 10 }, (_, i) => `E${i}`))).toHaveLength(1);
   });
 });
+
+import { saidaParada, avisoParada, textoFaltam, encerrarParada, type Ida } from "./viagens";
+describe("parada no caminho", () => {
+  it("calcula saída e aviso", () => {
+    const inicio = new Date(2026, 0, 1, 10, 15).getTime();
+    expect(saidaParada(inicio, 20)).toBe("10:35");
+    expect(avisoParada(20, "10:35")).toBe("Parada de 20 minutos. Saída às 10:35. Não se atrase!");
+  });
+  it("lista quem falta", () => {
+    expect(textoFaltam(["Maria", "Joana"])).toBe("Faltam 2: Maria e Joana");
+    expect(textoFaltam(["Ana"])).toBe("Falta 1: Ana");
+  });
+  it("quem não voltou fica na parada e sai do Na van", () => {
+    const ida: Ida = { ordem: ["a", "b"], fase: "a_caminho", marcas: [{ pid: "a", r: "embarcou", cobrou: 0 }, { pid: "b", r: "embarcou", cobrou: 0 }],
+      parada: { inicio: 0, minutos: 10, local: "Posto", chamada: true, naVan: { a: "manual" } } };
+    const r = encerrarParada(ida, "Outro: foi de carona", 0);
+    expect(r.parada).toBeUndefined();
+    expect(r.marcas.filter((m) => m.r === "embarcou").map((m) => m.pid)).toEqual(["a"]);
+    expect(r.paradas![0]!.ficaram.map((f) => f.pid)).toEqual(["b"]);
+  });
+});
