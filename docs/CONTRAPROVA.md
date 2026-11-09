@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:58 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:15 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -12,15 +12,10 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:58 UTC.
 | 5 — Dinheiro e relatórios | concluida | 18/18 | OK |
 | 6 — Alertas e prazos | concluida | 19/19 | OK |
 | 7 — Área do passageiro completa | concluida | 24/24 | OK |
-| 8 — PWA lapidado | pendente | 0/3 | pendente |
+| 8 — PWA lapidado | concluida | 21/21 | OK |
 | 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
 
 ## O que falta
-
-**Etapa 8 — PWA lapidado**
-- Aviso de atualização
-- SW aceita atualizar sob comando
-- Roteiro de teste em aparelho
 
 **Etapa 9 — Qualidade final e congelamento do mock**
 - Página 404 em português

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { encerrarSessao } from "@/data/sessao";
+import { InstalarApp } from "@/components/app/InstalarApp";
 import type { ReactNode } from "react";
 import { ArrowLeft, Repeat } from "lucide-react";
 
@@ -24,6 +25,7 @@ export function PerfilTela({ nome, papel, voltar, children }: { nome: string; pa
         </div>
       </div>
       {children}
+      <div className="mt-6"><InstalarApp claro lembrar={false} /></div>
       <div className="mt-6 rounded-3xl border-2 border-dashed border-accent bg-accent/10 p-5">
         <p className="text-sm font-bold uppercase tracking-wide text-accent-strong">Modo de teste</p>
         <Link

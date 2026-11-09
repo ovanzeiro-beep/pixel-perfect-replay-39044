@@ -1068,13 +1068,30 @@
     {
       "id": 8,
       "titulo": "PWA lapidado",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Aviso de nova versão, funcionamento básico offline e roteiro de teste em aparelho real.",
       "checks": [
         {
-          "d": "Aviso de atualização",
+          "d": "Aviso de nova versão",
           "tipo": "arquivo",
           "arquivo": "src/components/app/AtualizacaoApp.tsx"
+        },
+        {
+          "d": "Aviso: Atualizar agora e Depois",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AtualizacaoApp.tsx",
+          "regex": "Atualizar agora[\\s\\S]*Depois"
+        },
+        {
+          "d": "Faixa de 'sem internet'",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/SemConexao.tsx"
+        },
+        {
+          "d": "Avisos montados no app inteiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "<AtualizacaoApp />[\\s\\S]*<SemConexao />"
         },
         {
           "d": "SW aceita atualizar sob comando",
@@ -1083,9 +1100,106 @@
           "regex": "SKIP_WAITING"
         },
         {
+          "d": "SW não se atualiza sozinho na instalação",
+          "tipo": "naoContem",
+          "arquivo": "public/sw.js",
+          "regex": "\\(event\\) => \\{\\s*(self\\.skipWaiting\\(\\)|event\\.waitUntil\\(self\\.skipWaiting)"
+        },
+        {
+          "d": "SW usa o carimbo do build",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "importScripts\\(\"/build-id.js\"\\)"
+        },
+        {
+          "d": "SW guarda todos os arquivos do app (offline)",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "/arquivos.json"
+        },
+        {
+          "d": "SW tem plano B offline em camadas",
+          "tipo": "contem",
+          "arquivo": "public/sw.js",
+          "regex": "OFFLINE_URL"
+        },
+        {
+          "d": "Build carimba a versão e lista os arquivos",
+          "tipo": "contem",
+          "arquivo": "vite.config.ts",
+          "regex": "servicoOffline[\\s\\S]*arquivos\\.json|arquivos\\.json[\\s\\S]*servicoOffline"
+        },
+        {
+          "d": "App checa versão nova sem cache do navegador",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "updateViaCache: \"none\""
+        },
+        {
+          "d": "App detecta versão esperando e recarrega ao atualizar",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "export function atualizarApp"
+        },
+        {
+          "d": "Instalação capturada no app inteiro",
+          "tipo": "contem",
+          "arquivo": "src/lib/pwa.ts",
+          "regex": "export function capturarInstalacao"
+        },
+        {
+          "d": "Cartão de instalar também no perfil",
+          "tipo": "contem",
+          "arquivo": "src/components/app/PerfilTela.tsx",
+          "regex": "<InstalarApp"
+        },
+        {
+          "d": "Manifest com capturas de tela",
+          "tipo": "contem",
+          "arquivo": "public/manifest.webmanifest",
+          "regex": "\"screenshots\""
+        },
+        {
+          "d": "Captura: entrada",
+          "tipo": "arquivo",
+          "arquivo": "public/screenshots/entrada.png"
+        },
+        {
           "d": "Roteiro de teste em aparelho",
           "tipo": "arquivo",
           "arquivo": "docs/teste-em-aparelho.md"
+        },
+        {
+          "d": "Roteiro cobre Android e iPhone",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "## Android[\\s\\S]*## iPhone"
+        },
+        {
+          "d": "Roteiro cobre sem internet e nova versão",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "Sem internet[\\s\\S]*Nova versão"
+        },
+        {
+          "d": "Testes da lógica do PWA",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/pwa.test.tsx"
+        },
+        {
+          "d": "Testes do manifest e do service worker",
+          "tipo": "arquivo",
+          "arquivo": "src/test/pwa-arquivos.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
         },
         {
           "d": "Build passa",
