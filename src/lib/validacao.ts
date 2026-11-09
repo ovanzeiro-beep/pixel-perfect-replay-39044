@@ -11,7 +11,7 @@ export function formatarPlaca(p: string) {
 }
 
 export function validarVan(v: { apelido: string; placa: string; lugares: string }) {
-  const e: Record<string, string> = {};
+  const e: Partial<Record<"apelido" | "placa" | "lugares", string>> = {};
   if (!v.apelido.trim()) e.apelido = "Escreva um apelido para a van.";
   if (!v.placa.trim()) e.placa = "Escreva a placa da van.";
   else if (!placaValida(v.placa)) e.placa = "Placa inválida. Use o jeito ABC-1234 ou ABC1D23.";
@@ -22,7 +22,7 @@ export function validarVan(v: { apelido: string; placa: string; lugares: string 
 }
 
 export function validarMotorista(m: { nome: string; telefone: string }) {
-  const e: Record<string, string> = {};
+  const e: Partial<Record<"nome" | "telefone", string>> = {};
   if (!m.nome.trim()) e.nome = "Escreva o nome do motorista.";
   const dig = m.telefone.replace(/\D/g, "");
   if (!dig) e.telefone = "Escreva o telefone do motorista.";

@@ -86,7 +86,7 @@ function Motoristas() {
 function FormMotorista({ mot, onFechar }: { mot: Motorista | null; onFechar: () => void }) {
   const { vans } = useFrota();
   const [f, setF] = useState({ nome: mot?.nome ?? "", telefone: mot?.telefone ?? "", cnh: mot?.cnh ?? "D", cnhValidade: mot?.cnhValidade ?? "", vanId: mot?.vanId ?? "" });
-  const [erros, setErros] = useState<Record<string, string>>({});
+  const [erros, setErros] = useState<ReturnType<typeof validarMotorista>>({});
   const muda = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
 
   const salvar = (e: React.FormEvent) => {

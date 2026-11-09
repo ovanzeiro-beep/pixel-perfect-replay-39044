@@ -111,7 +111,7 @@ function FormVan({ van, onFechar }: { van: Van | null; onFechar: () => void }) {
     placa: van ? formatarPlaca(van.placa) : "", lugares: van ? String(van.lugares) : "", motoristaId: van?.motoristaId ?? "",
     observacoes: van?.observacoes ?? "", situacao: van?.situacao ?? ("rodando" as Van["situacao"]),
   });
-  const [erros, setErros] = useState<Record<string, string>>({});
+  const [erros, setErros] = useState<ReturnType<typeof validarVan>>({});
   const muda = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
 
   const salvar = (e: React.FormEvent) => {
