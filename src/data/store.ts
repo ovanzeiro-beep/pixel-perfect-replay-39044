@@ -1,6 +1,6 @@
 // Guarda vans e motoristas na memória da tela (voltam ao original ao recarregar).
 import { useSyncExternalStore } from "react";
-import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais } from "./exemplo";
+import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento } from "./exemplo";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [
@@ -14,7 +14,11 @@ export type Linha = {
   saida: string; volta: string; paradas: string[]; destino: string; vanId: string; motoristaId: string;
   valorViagem: number | null; valorMensal: number | null; ativa: boolean; observacoes: string;
 };
-export type Passageiro = (typeof passageirosIniciais)[number];
+export type Passageiro = {
+  id: string; nome: string; telefone: string; endereco: string; cidade: string; linhaIds: string[];
+  formaPagamento: FormaPagamento; valor: number; emAberto: number; ativo: boolean;
+} & DetalhePassageiro;
+export const estaDevendo = (p: Passageiro) => p.emAberto > 0;
 
 export type Van = {
   id: string; apelido: string; modelo: string; placa: string; lugares: number; ano: number | null;
@@ -31,7 +35,10 @@ let estado: Estado = {
     saida: l.saida, volta: l.volta, paradas: [...l.paradas], destino: l.destino, vanId: l.vanId, motoristaId: l.motoristaId,
     valorViagem: l.valorPorViagem || null, valorMensal: l.valorMensal || null, ativa: true, observacoes: l.observacoes,
   })),
-  passageiros: passageirosIniciais.map((p) => ({ ...p })),
+  passageiros: passageirosIniciais.map(({ linhaId, situacao: _s, ...p }) => ({
+    ...p, ...detalhesPassageiros[p.id]!, linhaIds: linhaId ? [linhaId] : [], ativo: true,
+    emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
+  })),
 };
 const ouvintes = new Set<() => void>();
 const set = (e: Estado) => { estado = e; ouvintes.forEach((f) => f()); };
@@ -66,11 +73,23 @@ export function alternarLinha(id: string) {
   set({ ...estado, linhas: estado.linhas.map((l) => (l.id === id ? { ...l, ativa: !l.ativa } : l)) });
 }
 export function excluirLinha(id: string) {
-  set({ ...estado, linhas: estado.linhas.filter((l) => l.id !== id), passageiros: estado.passageiros.map((p) => (p.linhaId === id ? { ...p, linhaId: "" } : p)) });
+  set({ ...estado, linhas: estado.linhas.filter((l) => l.id !== id), passageiros: estado.passageiros.map((p) => ({ ...p, linhaIds: p.linhaIds.filter((x) => x !== id) })) });
 }
 export function colocarNaLinha(linhaId: string, ids: string[]) {
-  set({ ...estado, passageiros: estado.passageiros.map((p) => (ids.includes(p.id) ? { ...p, linhaId } : p)) });
+  set({ ...estado, passageiros: estado.passageiros.map((p) => (ids.includes(p.id) && !p.linhaIds.includes(linhaId) ? { ...p, linhaIds: [...p.linhaIds, linhaId], ativo: true } : p)) });
 }
-export function tirarDaLinha(passageiroId: string) {
-  set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === passageiroId ? { ...p, linhaId: "" } : p)) });
+export function tirarDaLinha(passageiroId: string, linhaId: string) {
+  set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === passageiroId ? { ...p, linhaIds: p.linhaIds.filter((x) => x !== linhaId) } : p)) });
+}
+export function salvarPassageiro(p: Omit<Passageiro, "id"> & { id?: string | undefined }): string {
+  const pas = { ...p, id: p.id || novoId("p") } as Passageiro;
+  set({ ...estado, passageiros: p.id ? estado.passageiros.map((x) => (x.id === p.id ? pas : x)) : [...estado.passageiros, pas] });
+  return pas.id;
+}
+export function atualizarPassageiro(id: string, mud: Partial<Passageiro>) {
+  set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === id ? { ...p, ...mud } : p)) });
+}
+export function desativarPassageiro(id: string) { atualizarPassageiro(id, { ativo: false, linhaIds: [] }); }
+export function excluirPassageiro(id: string) {
+  set({ ...estado, passageiros: estado.passageiros.filter((p) => p.id !== id) });
 }

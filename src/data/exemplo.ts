@@ -165,3 +165,29 @@ export const aReceberRestoMes = [
   { descricao: "Semanais que vencem no mês", valor: 735 },
   { descricao: "Viagens de fim de semana previstas", valor: 1200 },
 ];
+
+// ===== Etapa 5: detalhes dos passageiros =====
+export type DetalhePassageiro = {
+  numero: string; bairro: string; referencia: string; vencimento: string; // "sexta" (semanal) ou "10" (mensal)
+  emergenciaNome: string; emergenciaTelefone: string; observacoes: string;
+  convite: "nao_enviado" | "enviado" | "no_app"; ultimoPagamento: string;
+};
+export const detalhesPassageiros: Record<string, DetalhePassageiro> = {
+  p1: { numero: "412", bairro: "Centro", referencia: "Casa amarela, portão azul", vencimento: "", emergenciaNome: "José Lima (marido)", emergenciaTelefone: "(43) 99701-5566", observacoes: "Leva mala grande.", convite: "no_app", ultimoPagamento: "2026-11-07" },
+  p2: { numero: "1020", bairro: "Vila Nova", referencia: "Ao lado da farmácia", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-07" },
+  p3: { numero: "88", bairro: "Jardim América", referencia: "Esquina com a padaria", vencimento: "", emergenciaNome: "Paulo Ferreira (filho)", emergenciaTelefone: "(43) 99612-0099", observacoes: "", convite: "enviado", ultimoPagamento: "2026-10-24" },
+  p4: { numero: "230", bairro: "Centro", referencia: "Prédio verde, 2º andar", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "nao_enviado", ultimoPagamento: "2026-11-06" },
+  p5: { numero: "51", bairro: "Vila São Pedro", referencia: "Muro branco com grade preta", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-07" },
+  p6: { numero: "703", bairro: "Centro", referencia: "Em frente à praça", vencimento: "segunda", emergenciaNome: "Marta Prado (mãe)", emergenciaTelefone: "(43) 99177-0011", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-02" },
+  p7: { numero: "15", bairro: "Centro", referencia: "", vencimento: "5", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "enviado", ultimoPagamento: "2026-11-02" },
+  p8: { numero: "340", bairro: "Jardim Panorama", referencia: "Portão de madeira", vencimento: "segunda", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "nao_enviado", ultimoPagamento: "2026-10-26" },
+  p9: { numero: "98", bairro: "Centro", referencia: "", vencimento: "5", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-03" },
+  p10: { numero: "1201", bairro: "Vila Rica", referencia: "Casa azul de esquina", vencimento: "segunda", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "enviado", ultimoPagamento: "2026-10-26" },
+  p11: { numero: "67", bairro: "Vila São Pedro", referencia: "Casa com jardim na frente", vencimento: "5", emergenciaNome: "Patrícia Rodrigues (mãe)", emergenciaTelefone: "(43) 99744-1308", observacoes: "Criança de 7 anos.", convite: "no_app", ultimoPagamento: "2026-11-05" },
+  p12: { numero: "455", bairro: "Jardim Panorama", referencia: "", vencimento: "5", emergenciaNome: "Márcia Silva (mãe)", emergenciaTelefone: "(43) 99655-2271", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-05" },
+  p13: { numero: "190", bairro: "Centro", referencia: "Ao lado do mercado", vencimento: "1", emergenciaNome: "Rogério Mendes (pai)", emergenciaTelefone: "(43) 99511-7764", observacoes: "", convite: "enviado", ultimoPagamento: "2026-10-01" },
+  p14: { numero: "22", bairro: "Vila São Pedro", referencia: "", vencimento: "segunda", emergenciaNome: "Simone Pereira (mãe)", emergenciaTelefone: "(43) 99280-3345", observacoes: "", convite: "nao_enviado", ultimoPagamento: "2026-11-02" },
+  p15: { numero: "310", bairro: "Jardim América", referencia: "Portão cinza", vencimento: "5", emergenciaNome: "Fábio Barbosa (pai)", emergenciaTelefone: "(43) 99963-0198", observacoes: "", convite: "no_app", ultimoPagamento: "2026-11-05" },
+};
+
+export const linkConviteExemplo = (id: string) => `https://ovanzeiro.app/convite/${id}`;

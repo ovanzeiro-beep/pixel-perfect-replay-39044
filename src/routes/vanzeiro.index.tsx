@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
-  vanzeiro, passageiros, viagensSemana, proximaViagemId,
+  vanzeiro, viagensSemana, proximaViagemId,
   cobrancasEmAberto, recebimentosMes, gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
 import { useFrota } from "@/data/store";
@@ -27,7 +27,7 @@ function saudacao(h: number) {
 }
 
 function Inicio() {
-  const { vans, motoristas, linhas } = useFrota();
+  const { vans, motoristas, linhas, passageiros } = useFrota();
   const linha = (id: string) => linhas.find((l) => l.id === id) ?? { nome: "Linha excluída" };
   const lugares = (vanId: string) => vans.find((v) => v.id === vanId)?.lugares ?? 0;
   const [agora, setAgora] = useState<Date | null>(null);
@@ -113,7 +113,7 @@ function Inicio() {
         <p className="text-muted-foreground">{cobrancasEmAberto.length} pessoas com pagamento em aberto</p>
         <ul className="mt-3 divide-y">
           {top3.map((c) => {
-            const p = passageiros.find((x) => x.id === c.passageiroId)!;
+            const p = passageiros.find((x) => x.id === c.passageiroId) ?? { nome: "Passageiro excluído" };
             return (
               <li key={c.passageiroId} className="flex items-center justify-between py-3">
                 <div>

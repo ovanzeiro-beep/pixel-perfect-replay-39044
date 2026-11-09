@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import {
   useFrota, salvarLinha, alternarLinha, excluirLinha, colocarNaLinha, tirarDaLinha,
-  DIAS, TIPOS_LINHA, type Linha, type Passageiro,
+  DIAS, TIPOS_LINHA, estaDevendo, type Linha, type Passageiro,
 } from "@/data/store";
 import { validarLinha } from "@/lib/validacao";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar, Linha as Item } from "@/components/app/Formulario";
@@ -26,7 +26,7 @@ const brl = (v: number | null) => (v ? v.toLocaleString("pt-BR", { style: "curre
 const dataBR = (d: string) => (d ? d.split("-").reverse().join("/") : "");
 const diasTexto = (l: Linha) =>
   l.frequencia === "unica" ? `Viagem única · ${dataBR(l.data)}` : DIAS.filter((d) => l.dias.includes(d.id)).map((d) => d.curto).join(", ");
-const devendo = (p: Passageiro) => p.situacao === "atrasado_1_semana";
+const devendo = estaDevendo;
 
 function Etiqueta({ children, tom = "primario" }: { children: React.ReactNode; tom?: "primario" | "verde" | "cinza" }) {
   const c = { primario: "bg-primary/10 text-primary", verde: "bg-success/15 text-success", cinza: "bg-muted text-muted-foreground" }[tom];
@@ -43,7 +43,7 @@ function Linhas() {
 
   const van = (id: string) => vans.find((v) => v.id === id);
   const mot = (id: string) => motoristas.find((m) => m.id === id)?.nome ?? "";
-  const dela = (id: string) => passageiros.filter((p) => p.linhaId === id);
+  const dela = (id: string) => passageiros.filter((p) => p.linhaIds.includes(id));
   const aberta = linhas.find((l) => l.id === abertaId);
 
   const Ocupacao = ({ l }: { l: Linha }) => {
@@ -129,7 +129,7 @@ function Linhas() {
 
       {tirando && aberta && (
         <Confirmar titulo={`Tirar ${tirando.nome}?`} texto={`Ele(a) sai da linha "${aberta.nome}", mas continua cadastrado(a).`} onNao={() => setTirando(null)}
-          onSim={() => { tirarDaLinha(tirando.id); setTirando(null); toast.success("Passageiro tirado da linha"); }} />
+          onSim={() => { tirarDaLinha(tirando.id, aberta.id); setTirando(null); toast.success("Passageiro tirado da linha"); }} />
       )}
 
       {editando && <FormLinha linha={editando === "nova" ? null : editando} onFechar={() => setEditando(null)} />}
@@ -150,7 +150,7 @@ function Linhas() {
 
 function EscolherPassageiros({ linha, passageiros, nomeLinha, onFechar }: { linha: Linha; passageiros: Passageiro[]; nomeLinha: (id: string) => string; onFechar: () => void }) {
   const [sel, setSel] = useState<string[]>([]);
-  const fora = passageiros.filter((p) => p.linhaId !== linha.id);
+  const fora = passageiros.filter((p) => !p.linhaIds.includes(linha.id));
   const alterna = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   return (
     <Painel titulo="Escolher passageiros" onFechar={onFechar}>
@@ -161,7 +161,7 @@ function EscolherPassageiros({ linha, passageiros, nomeLinha, onFechar }: { linh
             <li key={p.id}>
               <button onClick={() => alterna(p.id)} className={`flex min-h-16 w-full items-center gap-3 rounded-2xl border-2 px-4 text-left ${ok ? "border-primary bg-primary/10" : "bg-card"}`}>
                 <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 ${ok ? "border-primary bg-primary text-primary-foreground" : ""}`}>{ok && "✓"}</span>
-                <span className="flex-1"><b className="block">{p.nome}</b><span className="text-sm text-muted-foreground">{p.cidade}{p.linhaId ? ` · hoje em: ${nomeLinha(p.linhaId)}` : " · sem linha"}</span></span>
+                <span className="flex-1"><b className="block">{p.nome}</b><span className="text-sm text-muted-foreground">{p.cidade}{p.linhaIds.length ? ` · também em: ${p.linhaIds.map(nomeLinha).join(", ")}` : " · sem linha"}</span></span>
               </button>
             </li>
           );

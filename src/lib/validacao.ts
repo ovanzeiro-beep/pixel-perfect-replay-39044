@@ -41,3 +41,16 @@ export function validarLinha(l: { nome: string; frequencia: "semanal" | "unica";
   if (l.frequencia === "unica" && !l.data) e.data = "Escolha a data da viagem.";
   return e;
 }
+
+export function validarPassageiro(p: { nome: string; telefone: string; valor: string }) {
+  const m = validarMotorista(p);
+  const e: Partial<Record<"nome" | "telefone" | "valor", string>> = {};
+  if (m.nome) e.nome = "Escreva o nome do passageiro.";
+  if (m.telefone) e.telefone = m.telefone.replace("do motorista", "do passageiro");
+  if (p.valor.trim() && !(Number(p.valor.replace(",", ".")) > 0)) e.valor = "Escreva um valor válido, ex.: 150.";
+  return e;
+}
+
+export function mensagemConvite(nome: string, vanzeiro: string, link: string) {
+  return `Olá, ${nome}! Aqui é o ${vanzeiro}, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: ${link}`;
+}
