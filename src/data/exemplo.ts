@@ -242,3 +242,34 @@ export const cobrancasExemplo: CobrancaExemplo[] = [
   { pid: "p13", tipo: "mes", venc: "2026-11-01", valor: 250 },
   { pid: "p15", tipo: "mes", venc: "2026-11-05", valor: 250, pago: [250, "2026-11-05", "pix"] },
 ];
+
+// ===== Etapa 11: gastos de exemplo dos últimos 6 meses (os de novembro estão em gastosMes) =====
+// [valor, data, categoria, vanId, linhaId, descrição, litros?, km?, repete todo mês?]
+export const gastosExemplo: [number, string, string, string, string, string, number?, number?, boolean?][] = [
+  [2890, "2026-06-10", "Outros", "van2", "", "Parcela da van", undefined, undefined, true],
+  [380, "2026-06-15", "Documentos e seguro", "van1", "", "Seguro da van", undefined, undefined, true],
+  [1800, "2026-06-30", "Pagamento de motorista", "", "", "Salário do Carlos (motorista)", undefined, undefined, true],
+  [720, "2026-06-04", "Diesel", "van1", "l1", "Posto Jacarezinho", 120, 184500],
+  [390, "2026-06-12", "Diesel", "van2", "l3", "", 65, 92010],
+  [96, "2026-06-20", "Pedágio", "van1", "l1", "Viagem para Londrina"],
+  [60, "2026-06-22", "Lavagem", "van1", "", "Lavagem completa"],
+  [690, "2026-07-03", "Diesel", "van1", "l1", "", 115, 186200],
+  [410, "2026-07-14", "Diesel", "van2", "l2", "", 68, 93400],
+  [1480, "2026-07-18", "Pneus", "van2", "", "2 pneus dianteiros"],
+  [96, "2026-07-24", "Pedágio", "van1", "l1", ""],
+  [75, "2026-07-24", "Alimentação", "van1", "l1", "Lanche na estrada"],
+  [735, "2026-08-05", "Diesel", "van1", "l1", "", 122, 188050],
+  [4650, "2026-08-16", "Manutenção", "van1", "l1", "Van quebrou na estrada: guincho e conserto do câmbio"],
+  [395, "2026-08-21", "Diesel", "van2", "l3", "", 66, 94800],
+  [96, "2026-08-29", "Pedágio", "van1", "l1", ""],
+  [700, "2026-09-04", "Diesel", "van1", "l1", "", 117, 190100],
+  [420, "2026-09-11", "Diesel", "van2", "l2", "", 70, 96100],
+  [310, "2026-09-19", "Documentos e seguro", "van2", "", "Licenciamento"],
+  [96, "2026-09-26", "Pedágio", "van1", "l1", ""],
+  [60, "2026-09-27", "Lavagem", "van2", "", ""],
+  [710, "2026-10-02", "Diesel", "van1", "l1", "", 118, 192000],
+  [405, "2026-10-09", "Diesel", "van2", "l3", "", 67, 97500],
+  [540, "2026-10-17", "Manutenção", "van2", "", "Revisão e freios"],
+  [96, "2026-10-24", "Pedágio", "van1", "l1", ""],
+  [80, "2026-10-24", "Alimentação", "van1", "l1", ""],
+];
