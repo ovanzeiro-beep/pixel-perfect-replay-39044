@@ -1,0 +1,152 @@
+{
+  "projeto": "O Vanzeiro",
+  "regras": [
+    "Tudo roda em dados de exemplo (mock). Nenhum banco de dados nesta fase.",
+    "Uma etapa só vira 'concluida' quando TODOS os seus checks passam em `node scripts/conferir.mjs`.",
+    "Depois de cada etapa: rodar a conferência, registrar com --registrar e commitar o resultado."
+  ],
+  "etapas": [
+    {
+      "id": 0,
+      "titulo": "Visual do login e PWA em tela cheia",
+      "status": "concluida",
+      "objetivo": "Login profissional com logo nova e app instalável, em tela cheia, com opção de instalar no navegador.",
+      "checks": [
+        { "d": "Manifest existe e pede fullscreen", "tipo": "contem", "arquivo": "public/manifest.webmanifest", "regex": "\"display\": \"fullscreen\"" },
+        { "d": "Service worker existe", "tipo": "arquivo", "arquivo": "public/sw.js" },
+        { "d": "Tela offline existe", "tipo": "arquivo", "arquivo": "public/offline.html" },
+        { "d": "Ícone 192", "tipo": "arquivo", "arquivo": "public/icons/icon-192.png" },
+        { "d": "Ícone 512", "tipo": "arquivo", "arquivo": "public/icons/icon-512.png" },
+        { "d": "Ícone maskable (Android)", "tipo": "arquivo", "arquivo": "public/icons/icon-maskable-512.png" },
+        { "d": "Ícone da tela inicial do iPhone", "tipo": "arquivo", "arquivo": "public/icons/apple-touch-icon.png" },
+        { "d": "Raiz do app liga o manifest", "tipo": "contem", "arquivo": "src/routes/__root.tsx", "regex": "rel: \"manifest\"" },
+        { "d": "Viewport cobre a tela toda (notch)", "tipo": "contem", "arquivo": "src/routes/__root.tsx", "regex": "viewport-fit=cover" },
+        { "d": "Captura o convite de instalação", "tipo": "contem", "arquivo": "src/lib/pwa.ts", "regex": "beforeinstallprompt" },
+        { "d": "Login mostra o convite de instalação", "tipo": "contem", "arquivo": "src/routes/index.tsx", "regex": "InstalarApp" },
+        { "d": "Menu inferior respeita a área segura", "tipo": "contem", "arquivo": "src/components/app/AppShell.tsx", "regex": "safe-area-inset-bottom" },
+        { "d": "Tipos sem erro", "tipo": "comando", "cmd": "npx tsc --noEmit" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" },
+        { "d": "Build de produção passa", "tipo": "comando", "cmd": "npx vite build" }
+      ]
+    },
+    {
+      "id": 1,
+      "titulo": "Fundação do mock: persistência e datas relativas",
+      "status": "pendente",
+      "objetivo": "Os dados sobrevivem ao recarregar a página (localStorage, versionado) e os exemplos acompanham a data de hoje.",
+      "checks": [
+        { "d": "Módulo de persistência", "tipo": "arquivo", "arquivo": "src/data/persistencia.ts" },
+        { "d": "Usa localStorage com versão de schema", "tipo": "contem", "arquivo": "src/data/persistencia.ts", "regex": "localStorage[\\s\\S]*versao|versao[\\s\\S]*localStorage" },
+        { "d": "Botão/função restaurar exemplo", "tipo": "contem", "arquivo": "src/data/store.ts", "regex": "restaurarExemplo" },
+        { "d": "Exemplo sem datas fixas de 2026", "tipo": "naoContem", "arquivo": "src/data/exemplo.ts", "regex": "2026-(0[6-9]|1[0-2])" },
+        { "d": "IDs sem colisão", "tipo": "contem", "arquivo": "src/data/store.ts", "regex": "crypto\\.randomUUID|contadorId" },
+        { "d": "Teste da persistência", "tipo": "arquivo", "arquivo": "src/data/persistencia.test.ts" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "Sessão e papéis (login simulado de verdade)",
+      "status": "pendente",
+      "objetivo": "Entrar guarda quem é você e seu papel (vanzeiro ou passageiro); rotas protegidas; botão Sair.",
+      "checks": [
+        { "d": "Módulo de sessão", "tipo": "arquivo", "arquivo": "src/data/sessao.ts" },
+        { "d": "Sessão tem encerrar", "tipo": "contem", "arquivo": "src/data/sessao.ts", "regex": "encerrarSessao" },
+        { "d": "Área do vanzeiro protegida", "tipo": "contem", "arquivo": "src/routes/vanzeiro.tsx", "regex": "beforeLoad" },
+        { "d": "Área do passageiro protegida", "tipo": "contem", "arquivo": "src/routes/passageiro.tsx", "regex": "beforeLoad" },
+        { "d": "Passageiro vem da sessão, não de variável global", "tipo": "naoContem", "arquivo": "src/data/exemplo.ts", "regex": "passageiroAtualId" },
+        { "d": "Teste da sessão", "tipo": "arquivo", "arquivo": "src/data/sessao.test.ts" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 3,
+      "titulo": "Integridade dos dados",
+      "status": "pendente",
+      "objetivo": "Excluir/desativar não deixa lixo; cobrança sempre tem vencimento; validações fechadas; store coberto por testes.",
+      "checks": [
+        { "d": "Testes do store", "tipo": "arquivo", "arquivo": "src/data/store.test.ts" },
+        { "d": "Teste de exclusão em cascata", "tipo": "contem", "arquivo": "src/data/store.test.ts", "regex": "excluirPassageiro" },
+        { "d": "Vencimento exigido para semanal/mensal", "tipo": "contem", "arquivo": "src/lib/validacao.ts", "regex": "vencimento" },
+        { "d": "Teste de cobrança negativa/desfazer", "tipo": "contem", "arquivo": "src/data/store.test.ts", "regex": "lancarCobranca" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 4,
+      "titulo": "Viagem de ponta a ponta",
+      "status": "pendente",
+      "objetivo": "Ciclo completo: preparar, ida, volta, encerrar, resumo e histórico. Atalhos de teste só no modo demonstração.",
+      "checks": [
+        { "d": "Resumo ao encerrar a viagem", "tipo": "arquivo", "arquivo": "src/components/app/ResumoViagem.tsx" },
+        { "d": "Histórico de viagens", "tipo": "arquivo", "arquivo": "src/routes/vanzeiro.historico.tsx" },
+        { "d": "Botão de encerrar viagem", "tipo": "contem", "arquivo": "src/routes/ida.$viagemId.tsx", "regex": "[Ee]ncerrar" },
+        { "d": "Atalhos simulados só em modo demo", "tipo": "contem", "arquivo": "src/components/app/VoltaViagem.tsx", "regex": "modoDemo" },
+        { "d": "Manifesto/lista da viagem para compartilhar", "tipo": "arquivo", "arquivo": "src/data/manifesto.ts" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 5,
+      "titulo": "Dinheiro e relatórios",
+      "status": "pendente",
+      "objetivo": "Lucro por van, linha e período; ocupação média; comprovante para compartilhar.",
+      "checks": [
+        { "d": "Cálculos de relatório", "tipo": "arquivo", "arquivo": "src/data/relatorios.ts" },
+        { "d": "Testes dos relatórios", "tipo": "arquivo", "arquivo": "src/data/relatorios.test.ts" },
+        { "d": "Tela de relatórios", "tipo": "arquivo", "arquivo": "src/routes/vanzeiro.relatorios.tsx" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 6,
+      "titulo": "Alertas e prazos",
+      "status": "pendente",
+      "objetivo": "Avisos dentro do app: CNH vencendo, cobranças em atraso, prazo de confirmação da viagem.",
+      "checks": [
+        { "d": "Regras de alerta", "tipo": "arquivo", "arquivo": "src/data/alertas.ts" },
+        { "d": "Testes dos alertas", "tipo": "arquivo", "arquivo": "src/data/alertas.test.ts" },
+        { "d": "Início do vanzeiro mostra alertas", "tipo": "contem", "arquivo": "src/routes/vanzeiro.index.tsx", "regex": "alertas" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 7,
+      "titulo": "Área do passageiro completa",
+      "status": "pendente",
+      "objetivo": "Passageiro confirma, vê parada/horário, débitos e recibos; aceite de convite sem atalhos falsos.",
+      "checks": [
+        { "d": "Teste do fluxo do passageiro", "tipo": "arquivo", "arquivo": "src/test/passageiro-fluxo.test.tsx" },
+        { "d": "Recibos visíveis ao passageiro", "tipo": "contem", "arquivo": "src/routes/passageiro.pagamentos.tsx", "regex": "[Rr]ecibo" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" }
+      ]
+    },
+    {
+      "id": 8,
+      "titulo": "PWA lapidado",
+      "status": "pendente",
+      "objetivo": "Aviso de nova versão, funcionamento básico offline e roteiro de teste em aparelho real.",
+      "checks": [
+        { "d": "Aviso de atualização", "tipo": "arquivo", "arquivo": "src/components/app/AtualizacaoApp.tsx" },
+        { "d": "SW aceita atualizar sob comando", "tipo": "contem", "arquivo": "public/sw.js", "regex": "SKIP_WAITING" },
+        { "d": "Roteiro de teste em aparelho", "tipo": "arquivo", "arquivo": "docs/teste-em-aparelho.md" },
+        { "d": "Build passa", "tipo": "comando", "cmd": "npx vite build" }
+      ]
+    },
+    {
+      "id": 9,
+      "titulo": "Qualidade final e congelamento do mock",
+      "status": "pendente",
+      "objetivo": "Textos em português, testes de tela, lint limpo e uma interface única de dados para trocar o mock pelo banco depois.",
+      "checks": [
+        { "d": "Página 404 em português", "tipo": "contem", "arquivo": "src/routes/__root.tsx", "regex": "Página não encontrada" },
+        { "d": "Interface de repositório (ponto de troca para o banco)", "tipo": "arquivo", "arquivo": "src/data/repositorio.ts" },
+        { "d": "Testes de rotas", "tipo": "arquivo", "arquivo": "src/test/rotas.test.tsx" },
+        { "d": "Lint limpo", "tipo": "comando", "cmd": "npx eslint ." },
+        { "d": "Tipos sem erro", "tipo": "comando", "cmd": "npx tsc --noEmit" },
+        { "d": "Testes passam", "tipo": "comando", "cmd": "npx vitest run" },
+        { "d": "Build passa", "tipo": "comando", "cmd": "npx vite build" }
+      ]
+    }
+  ]
+}
