@@ -156,6 +156,8 @@ function Passageiros() {
             <Item rotulo="Convite" valor={<Convite p={aberto} />} />
           </div>
 
+          <Link to="/vanzeiro/dinheiro" search={{ p: aberto.id }} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card text-lg font-bold text-primary">Ver histórico de pagamentos</Link>
+
           <div className="rounded-3xl bg-accent/15 p-4 space-y-3">
             <p className="text-lg font-extrabold">Convite para o app</p>
             <BotaoGrande variante="destaque" onClick={() => enviarConvite(aberto)}><Send className="h-5 w-5" /> Enviar convite</BotaoGrande>
