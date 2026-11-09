@@ -19,9 +19,11 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 ## O contrato (operações)
 
-**Leitura:** `useFrota`, `useViagens`, `useDadosProntos`, `obterEstado`.
+**Leitura:** `useFrota`, `useViagens`, `useDadosProntos`, `useVanzeiro`, `obterEstado`.
 
-**Ciclo de vida:** `iniciarPersistencia`, `restaurarExemplo`, `substituirTodosOsDados` (restaurar backup; com banco vira importação em lote).
+**Ciclo de vida:** `iniciarPersistencia`, `restaurarExemplo`, `comecarDoZero`, `substituirTodosOsDados` (restaurar backup; com banco vira importação em lote).
+
+**Perfil do vanzeiro:** `salvarPerfil` (conclui o primeiro acesso e cria/atualiza o motorista "próprio").
 
 **Vans e motoristas:** `salvarVan`, `excluirVan`, `salvarMotorista`, `excluirMotorista`.
 
@@ -55,7 +57,7 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 | Convite | Link `/convite/:idDoPassageiro` (só funciona no aparelho do vanzeiro) | Token de convite aleatório e com validade, guardado no banco. A tela `/convite/$passageiroId` passa a validar o token. |
 | Dinheiro | Número com 2 casas | Guardar em centavos (inteiro) ou `numeric(12,2)`; nunca ponto flutuante. |
 | Datas | Texto `AAAA-MM-DD` e `HH:MM` (sem fuso) | Manter como data e hora locais do vanzeiro (`date` e `time`), **sem fuso**: a van roda no horário local. |
-| Perfil do vanzeiro | Constante `vanzeiro` em `src/data/exemplo.ts` | Registro do usuário logado (nome, cidade, telefone, e-mail). |
+| Perfil do vanzeiro | `Estado.perfil` (preenchido no primeiro acesso, salvo no aparelho) | Registro do usuário logado (nome, cidade, telefone, e-mail). |
 | Prazo e limites | Constantes em `src/data/alertas.ts` (`PRAZO`, CNH 15/60 dias, atraso 15 dias) | Podem virar configuração por vanzeiro. |
 | Avisos fora do app | Só dentro do app | Notificação push e lembretes por WhatsApp exigem servidor/agendador. |
 

@@ -26,7 +26,7 @@ export const Route = createFileRoute("/vanzeiro")({
     if (destino) throw redirect({ to: destino });
   },
   component: () => (
-    <ProtegeArea papel="vanzeiro">
+    <ProtegeArea papel="vanzeiro" perfil="exigido">
       <MenuVanzeiro />
     </ProtegeArea>
   ),

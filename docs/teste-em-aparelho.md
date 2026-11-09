@@ -49,6 +49,18 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 4. **Nova versão**
    - [ ] Repetir o item "Nova versão" (no iPhone pode precisar fechar o app por completo e abrir de novo).
 
+## Primeiro acesso (conta nova)
+
+- [ ] Instale o app e entre ("Entrar com Google" → "Sou vanzeiro"): abre a tela **"Bem-vindo ao O Vanzeiro"** (conta vazia, sem passageiros de exemplo).
+- [ ] "Começar" sem preencher mostra o que falta, em português. Preencha nome, celular com DDD, cidade e estado e toque em **Começar**.
+- [ ] O Início mostra **"Boa tarde, [seu nome]"** e o guia **Primeiros passos** (van, linha, passageiros, convites, Pix, backup). Cada passo leva à tela certa e é marcado quando feito. O guia some quando van, linha e passageiros estão cadastrados, ou em "Esconder este guia".
+- [ ] Meu perfil → **Seus dados**: mudar o nome ou a cidade atualiza o cabeçalho.
+- [ ] Fechar o app e abrir de novo **não volta** às boas-vindas.
+- [ ] Nas boas-vindas, **"Prefiro ver o app com dados de exemplo"** abre o app com a demonstração.
+- [ ] Meu perfil → **Começar do zero**: pede confirmação, apaga tudo e volta às boas-vindas, onde aparece **"Desfazer e voltar aos dados de antes"**.
+- [ ] **Quem já usava o app** (com dados): ao atualizar o app, abre direto como antes, com todos os dados e sem passar pelas boas-vindas.
+- [ ] **Celular novo:** nas boas-vindas use **"Restaurar de um backup"** com o arquivo salvo: entra com tudo.
+
 ## Backup
 
 - [ ] Em Mais → Meu perfil → **Backup dos dados** → "Salvar backup": no celular abre o **compartilhar** (WhatsApp, Drive, "Salvar em Arquivos" no iPhone). Guarde o arquivo `vanzeiro-backup-AAAA-MM-DD.json` fora do celular.

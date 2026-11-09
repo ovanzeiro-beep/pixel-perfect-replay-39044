@@ -1,7 +1,7 @@
 // Guarda todos os dados do app. Ficam salvos no aparelho (localStorage) e "Restaurar exemplo" volta ao início.
 import { useMemo, useSyncExternalStore } from "react";
 import { novoId } from "./ids";
-import { armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
+import { CHAVE, armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
 import { registrarAlteracao, salvarMeta } from "./backup";
 import {
   vans as vansIniciais,
@@ -17,6 +17,7 @@ import {
   cobrancasExemplo,
   gastosMes,
   gastosExemplo,
+  vanzeiro as vanzeiroExemplo,
 } from "./exemplo";
 import type { Categoria, Gasto } from "./financeiro";
 import {
@@ -117,7 +118,18 @@ export type Motorista = {
   vanId?: string;
 };
 
+/** Dados do próprio vanzeiro (quem usa o app). `configurado` fica falso até o primeiro acesso ser concluído. */
+export type PerfilVanzeiro = {
+  nome: string;
+  cidade: string;
+  estado: string;
+  telefone: string;
+  email: string;
+  configurado: boolean;
+};
+
 export type Estado = {
+  perfil: PerfilVanzeiro;
   vans: Van[];
   motoristas: Motorista[];
   linhas: Linha[];
@@ -130,8 +142,35 @@ export type Estado = {
   alertasDispensados: Record<string, string>;
 };
 
+const perfilDoExemplo = (): PerfilVanzeiro => ({
+  nome: vanzeiroExemplo.nome,
+  cidade: vanzeiroExemplo.cidade,
+  estado: vanzeiroExemplo.estado,
+  telefone: vanzeiroExemplo.telefone,
+  email: vanzeiroExemplo.email,
+  configurado: true,
+});
+
+/** Conta nova: sem vans, linhas nem passageiros, e com o perfil ainda por preencher. */
+export function criarEstadoVazio(): Estado {
+  return {
+    perfil: { nome: "", cidade: "", estado: "", telefone: "", email: "", configurado: false },
+    vans: [],
+    motoristas: [],
+    linhas: [],
+    passageiros: [],
+    ajustes: {},
+    cobrancas: [],
+    recibos: [],
+    chavePix: "",
+    gastos: [],
+    alertasDispensados: {},
+  };
+}
+
 export function criarEstadoExemplo(): Estado {
   const base: Estado = {
+    perfil: perfilDoExemplo(),
     vans: vansIniciais.map((v) => ({ ...v, situacao: v.situacao as Van["situacao"] })),
     motoristas: motoristasIniciais.map((m) => ({
       ...m,
@@ -322,11 +361,56 @@ export function ehEstado(x: unknown): x is Estado {
 function normalizarEstado(lido: Estado): Estado {
   // Dados salvos antes da Etapa 2 traziam "passageiroAtualId"; agora quem é o passageiro vem da sessão.
   const { passageiroAtualId: _antigo, ...resto } = lido as Estado & { passageiroAtualId?: string };
-  const base: Estado = { ...resto, alertasDispensados: resto.alertasDispensados ?? {} };
+  // Dados salvos antes do perfil existir (versões de demonstração) mantêm o vanzeiro de exemplo, já configurado.
+  const base: Estado = {
+    ...resto,
+    alertasDispensados: resto.alertasDispensados ?? {},
+    perfil: resto.perfil ?? perfilDoExemplo(),
+  };
   return comAberto({
     ...base,
     cobrancas: gerarPeriodicas(base.cobrancas, base.passageiros, isoDe(new Date())),
   });
+}
+
+export const useVanzeiro = (): PerfilVanzeiro => useFrota().perfil;
+
+/**
+ * Salva os dados do vanzeiro e conclui o primeiro acesso. O vanzeiro também é um motorista (o "próprio"),
+ * então esse cadastro é criado ou atualizado junto, para a CNH e as viagens já terem de onde partir.
+ */
+export function salvarPerfil(p: Omit<PerfilVanzeiro, "configurado">) {
+  const perfil: PerfilVanzeiro = {
+    nome: p.nome.trim(),
+    cidade: p.cidade.trim(),
+    estado: p.estado.trim().toUpperCase(),
+    telefone: p.telefone.trim(),
+    email: p.email.trim(),
+    configurado: true,
+  };
+  const temProprio = estado.motoristas.some((m) => m.proprio);
+  const motoristas = temProprio
+    ? estado.motoristas.map((m) =>
+        m.proprio ? { ...m, nome: perfil.nome, telefone: perfil.telefone } : m,
+      )
+    : [
+        ...estado.motoristas,
+        {
+          id: novoId("m"),
+          nome: perfil.nome,
+          telefone: perfil.telefone,
+          cnh: "D",
+          cnhValidade: "",
+          proprio: true,
+          vanId: "",
+        },
+      ];
+  set({ ...estado, perfil, motoristas });
+}
+
+/** Apaga tudo e volta ao primeiro acesso (conta vazia). Quem chama deve guardar antes uma cópia de segurança. */
+export function comecarDoZero() {
+  set(criarEstadoVazio());
 }
 
 /** Troca todos os dados de uma vez (restaurar um backup ou desfazer uma restauração). */
@@ -340,12 +424,24 @@ export function iniciarPersistencia(): () => void {
   if (persistenciaAtiva) return () => {};
   const armazem = armazenamentoLocal();
   if (!armazem) {
+    set(criarEstadoVazio());
     marcarProntos();
     return () => {};
   }
   persistenciaAtiva = true;
   const lido = ler(armazem, ehEstado);
-  if (lido) set(normalizarEstado(lido));
+  if (lido) {
+    set(normalizarEstado(lido));
+  } else {
+    // Primeiro acesso (nada salvo): a conta começa vazia. Se havia algo ilegível, guarda uma cópia antes que seja sobrescrito.
+    try {
+      const bruto = armazem.getItem(CHAVE);
+      if (bruto) armazem.setItem("vanzeiro:dados-ilegiveis", bruto);
+    } catch {
+      /* sem espaço: segue sem a cópia */
+    }
+    set(criarEstadoVazio());
+  }
   marcarProntos();
   let timer: ReturnType<typeof setTimeout> | undefined;
   const gravarAgora = () => {

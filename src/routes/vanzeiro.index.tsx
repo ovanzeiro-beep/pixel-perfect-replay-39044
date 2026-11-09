@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
-import { vanzeiro } from "@/data/exemplo";
-import { useFrota, useViagens } from "@/data/repositorio";
+import { useFrota, useViagens, useVanzeiro } from "@/data/repositorio";
 import { diaSemana, rotuloDia } from "@/data/viagens";
 import { isoDe, resumoPassageiro } from "@/data/cobrancas";
 import { mesDe, resumoMes } from "@/data/financeiro";
 import { Alertas } from "@/components/app/Alertas";
+import { PrimeirosPassos } from "@/components/app/PrimeirosPassos";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -34,6 +34,7 @@ function saudacao(h: number) {
 }
 
 function Inicio() {
+  const vanzeiro = useVanzeiro();
   const { vans, motoristas, linhas, passageiros, cobrancas, gastos: listaGastos } = useFrota();
   const hojeIso = isoDe(new Date());
   const viagens = useViagens();
@@ -113,6 +114,7 @@ function Inicio() {
         );
       })}
 
+      <PrimeirosPassos />
       <Alertas />
 
       {prox ? (

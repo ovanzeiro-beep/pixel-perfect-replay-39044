@@ -4,11 +4,11 @@ import { Check, Edit3, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { encerrarSessao, usePassageiroId } from "@/data/sessao";
-import { useFrota, atualizarPassageiro } from "@/data/repositorio";
-import { vanzeiro } from "@/data/exemplo";
+import { useFrota, atualizarPassageiro, useVanzeiro } from "@/data/repositorio";
 import { linkWhatsApp } from "@/lib/validacao";
 
 function MeuPerfil() {
+  const vanzeiro = useVanzeiro();
   const { passageiros } = useFrota();
   const passageiroId = usePassageiroId();
   const navigate = useNavigate();

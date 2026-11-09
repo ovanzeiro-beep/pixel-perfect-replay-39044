@@ -67,7 +67,7 @@ export const Route = createFileRoute("/ida/$viagemId")({
     if (destino) throw redirect({ to: destino });
   },
   component: () => (
-    <ProtegeArea papel="vanzeiro">
+    <ProtegeArea papel="vanzeiro" perfil="exigido">
       <TelaIda />
     </ProtegeArea>
   ),

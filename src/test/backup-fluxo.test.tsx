@@ -2,13 +2,14 @@ import { QueryClient } from "@tanstack/react-query";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { semearExemploNoAparelho } from "./apoio";
 
 /** Arquivos "baixados" pela tela durante o teste (nome e conteúdo). */
 const baixados: { nome: string; arquivo: File }[] = [];
 
 async function abrir(caminho = "/vanzeiro/perfil") {
-  localStorage.clear();
   vi.resetModules();
+  await semearExemploNoAparelho();
   const { routeTree } = await import("@/routeTree.gen");
   (routeTree.options as { shellComponent?: unknown }).shellComponent = undefined;
   const sessao = await import("@/data/sessao");
@@ -21,6 +22,8 @@ async function abrir(caminho = "/vanzeiro/perfil") {
     history: createMemoryHistory({ initialEntries: [caminho] }),
   });
   render(<RouterProvider router={router} />);
+  // O app só mostra o menu depois de carregar os dados salvos: espere isso antes de mexer nos dados.
+  if (caminho.startsWith("/vanzeiro")) await screen.findByRole("navigation");
   return { router, store, backup };
 }
 

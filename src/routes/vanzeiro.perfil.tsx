@@ -4,9 +4,16 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { PerfilTela } from "@/components/app/PerfilTela";
 import { Campo, BotaoGrande, campoClasse } from "@/components/app/Formulario";
-import { vanzeiro } from "@/data/exemplo";
-import { useFrota, salvarChavePix, restaurarExemplo, obterEstado } from "@/data/repositorio";
+import {
+  useFrota,
+  salvarChavePix,
+  restaurarExemplo,
+  comecarDoZero,
+  obterEstado,
+  useVanzeiro,
+} from "@/data/repositorio";
 import { BackupDados } from "@/components/app/BackupDados";
+import { DadosDoVanzeiro } from "@/components/app/DadosDoVanzeiro";
 import { guardarCopiaDeSeguranca, zerarAlteracoes } from "@/data/backup";
 import { definirModoDemo, useModoDemo } from "@/lib/modoDemo";
 
@@ -23,9 +30,10 @@ export const Route = createFileRoute("/vanzeiro/perfil")({
 });
 
 function PerfilVanzeiro() {
+  const vanzeiro = useVanzeiro();
   const { chavePix } = useFrota();
   const [pix, setPix] = useState(chavePix);
-  const [confirmando, setConfirmando] = useState(false);
+  const [acao, setAcao] = useState<null | "exemplo" | "zero">(null);
   const modoDemo = useModoDemo();
   useEffect(() => setPix(chavePix), [chavePix]);
   return (
@@ -35,6 +43,7 @@ function PerfilVanzeiro() {
       voltar
     >
       <Toaster position="top-center" />
+      <DadosDoVanzeiro />
       <div className="mt-6 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
         <Campo label="Chave Pix">
           <input
@@ -56,10 +65,11 @@ function PerfilVanzeiro() {
       </div>
       <BackupDados />
       <div className="mt-4 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
-        <h2 className="text-lg font-extrabold text-primary">Dados de teste</h2>
+        <h2 className="text-lg font-extrabold text-primary">Dados de teste e recomeço</h2>
         <p className="text-sm text-muted-foreground">
-          Tudo o que você cadastra fica salvo neste aparelho. Se quiser recomeçar, volte aos dados
-          de exemplo.
+          Tudo o que você cadastra fica salvo neste aparelho. Para recomeçar, volte aos dados de
+          exemplo ou comece do zero. Nos dois casos, os dados de agora ficam guardados e dá para
+          desfazer em "Backup dos dados".
         </p>
         <label className="flex min-h-14 items-center justify-between gap-3 rounded-2xl border-2 px-4">
           <span>
@@ -76,10 +86,10 @@ function PerfilVanzeiro() {
             className="h-6 w-6 shrink-0 accent-[var(--color-primary)]"
           />
         </label>
-        {confirmando ? (
+        {acao === "exemplo" && (
           <>
             <p className="text-base font-bold text-destructive">
-              Isso apaga o que você cadastrou neste aparelho. Continuar?
+              Isso troca o que você cadastrou pelos dados de exemplo. Continuar?
             </p>
             <BotaoGrande
               variante="perigo"
@@ -88,20 +98,48 @@ function PerfilVanzeiro() {
                 restaurarExemplo();
                 zerarAlteracoes();
                 setPix("");
-                setConfirmando(false);
+                setAcao(null);
                 toast.success("Dados de exemplo restaurados");
               }}
             >
               Sim, restaurar exemplo
             </BotaoGrande>
-            <BotaoGrande variante="contorno" onClick={() => setConfirmando(false)}>
+            <BotaoGrande variante="contorno" onClick={() => setAcao(null)}>
               Cancelar
             </BotaoGrande>
           </>
-        ) : (
-          <BotaoGrande variante="contorno" onClick={() => setConfirmando(true)}>
-            Restaurar dados de exemplo
-          </BotaoGrande>
+        )}
+        {acao === "zero" && (
+          <>
+            <p className="text-base font-bold text-destructive">
+              Isso apaga todos os passageiros, linhas, vans, cobranças e viagens deste aparelho e
+              volta ao primeiro acesso. Continuar?
+            </p>
+            <BotaoGrande
+              variante="perigo"
+              onClick={() => {
+                guardarCopiaDeSeguranca(obterEstado(), "decisão de começar do zero");
+                comecarDoZero();
+                zerarAlteracoes();
+                setAcao(null);
+              }}
+            >
+              Sim, apagar tudo e começar do zero
+            </BotaoGrande>
+            <BotaoGrande variante="contorno" onClick={() => setAcao(null)}>
+              Cancelar
+            </BotaoGrande>
+          </>
+        )}
+        {acao === null && (
+          <>
+            <BotaoGrande variante="contorno" onClick={() => setAcao("exemplo")}>
+              Restaurar dados de exemplo
+            </BotaoGrande>
+            <BotaoGrande variante="perigo" onClick={() => setAcao("zero")}>
+              Começar do zero
+            </BotaoGrande>
+          </>
         )}
       </div>
     </PerfilTela>

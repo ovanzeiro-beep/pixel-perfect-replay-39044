@@ -18,8 +18,7 @@ import {
   type Periodo,
   type PresetPeriodo,
 } from "@/data/relatorios";
-import { useFrota } from "@/data/repositorio";
-import { vanzeiro } from "@/data/exemplo";
+import { useFrota, useVanzeiro } from "@/data/repositorio";
 import { campoClasse } from "@/components/app/Formulario";
 import { compartilharTexto } from "@/lib/compartilhar";
 
@@ -68,6 +67,7 @@ function Tres({ l }: { l: Linha3 }) {
 }
 
 function Relatorios() {
+  const vanzeiro = useVanzeiro();
   const { cobrancas, gastos, linhas, vans, passageiros, ajustes } = useFrota();
   const hoje = isoDe(new Date());
   const [preset, setPreset] = useState<PresetPeriodo | "outro">("mes");

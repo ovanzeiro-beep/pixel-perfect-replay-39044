@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BoasVindasRouteImport } from './routes/boas-vindas'
 import { Route as PassageiroRouteImport } from './routes/passageiro'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as VanzeiroRouteImport } from './routes/vanzeiro'
@@ -36,6 +37,11 @@ import { Route as VanzeiroViagensRouteImport } from './routes/vanzeiro.viagens'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoasVindasRoute = BoasVindasRouteImport.update({
+  id: '/boas-vindas',
+  path: '/boas-vindas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassageiroRoute = PassageiroRouteImport.update({
@@ -151,6 +157,7 @@ const VanzeiroViagensRoute = VanzeiroViagensRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/boas-vindas': typeof BoasVindasRoute
   '/passageiro': typeof PassageiroRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/boas-vindas': typeof BoasVindasRoute
   '/perfil': typeof PerfilRoute
   '/convite/$passageiroId': typeof ConvitePassageiroIdRoute
   '/ida/$viagemId': typeof IdaViagemIdRoute
@@ -200,6 +208,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/boas-vindas': typeof BoasVindasRoute
   '/passageiro': typeof PassageiroRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/boas-vindas'
     | '/passageiro'
     | '/perfil'
     | '/vanzeiro'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/boas-vindas'
     | '/perfil'
     | '/convite/$passageiroId'
     | '/ida/$viagemId'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/boas-vindas'
     | '/passageiro'
     | '/perfil'
     | '/vanzeiro'
@@ -301,6 +313,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BoasVindasRoute: typeof BoasVindasRoute
   PassageiroRoute: typeof PassageiroRouteWithChildren
   PerfilRoute: typeof PerfilRoute
   VanzeiroRoute: typeof VanzeiroRouteWithChildren
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boas-vindas': {
+      id: '/boas-vindas'
+      path: '/boas-vindas'
+      fullPath: '/boas-vindas'
+      preLoaderRoute: typeof BoasVindasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passageiro': {
@@ -530,6 +550,7 @@ const VanzeiroRouteWithChildren = VanzeiroRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BoasVindasRoute: BoasVindasRoute,
   PassageiroRoute: PassageiroRouteWithChildren,
   PerfilRoute: PerfilRoute,
   VanzeiroRoute: VanzeiroRouteWithChildren,

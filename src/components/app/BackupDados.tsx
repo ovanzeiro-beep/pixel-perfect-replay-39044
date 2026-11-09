@@ -71,7 +71,7 @@ function Comparacao({
 }
 
 /** Backup em arquivo: salvar, restaurar (com prévia e confirmação) e desfazer a última substituição. */
-export function BackupDados() {
+export function BackupDados({ soRestaurar = false }: { soRestaurar?: boolean } = {}) {
   const meta = useBackupMeta();
   const copia = useCopiaDeSeguranca();
   const [erro, setErro] = useState<string | null>(null);
@@ -129,33 +129,39 @@ export function BackupDados() {
       className="mt-4 space-y-3 rounded-3xl bg-card p-5 shadow-sm"
     >
       <h2 className="flex items-center gap-2 text-lg font-extrabold text-primary">
-        <ShieldCheck className="h-5 w-5 text-accent-strong" /> Backup dos dados
+        <ShieldCheck className="h-5 w-5 text-accent-strong" />{" "}
+        {soRestaurar ? "Já usa o app? Restaure seu backup" : "Backup dos dados"}
       </h2>
       <p className="text-sm text-muted-foreground">
-        Seus dados ficam só neste aparelho. Salve um backup de vez em quando: se trocar de celular
-        ou os dados do app forem apagados, você restaura tudo.
+        {soRestaurar
+          ? "Trocou de celular ou limpou os dados? Escolha o arquivo de backup (vanzeiro-backup-….json) e tudo volta: passageiros, cobranças, recibos e viagens."
+          : "Seus dados ficam só neste aparelho. Salve um backup de vez em quando: se trocar de celular ou os dados do app forem apagados, você restaura tudo."}
       </p>
-      <p className="rounded-2xl bg-muted px-4 py-3 text-base font-semibold">
-        {meta.ultimoBackup
-          ? `Último backup: ${quando(meta.ultimoBackup)}`
-          : "Você ainda não fez backup."}
-        {meta.alteracoes > 0 && (
-          <span className="block text-sm font-normal text-muted-foreground">
-            {meta.alteracoes} {meta.alteracoes === 1 ? "alteração" : "alterações"}{" "}
-            {meta.ultimoBackup ? "desde então" : "feitas só neste aparelho"}
-          </span>
-        )}
-      </p>
+      {!soRestaurar && (
+        <>
+          <p className="rounded-2xl bg-muted px-4 py-3 text-base font-semibold">
+            {meta.ultimoBackup
+              ? `Último backup: ${quando(meta.ultimoBackup)}`
+              : "Você ainda não fez backup."}
+            {meta.alteracoes > 0 && (
+              <span className="block text-sm font-normal text-muted-foreground">
+                {meta.alteracoes} {meta.alteracoes === 1 ? "alteração" : "alterações"}{" "}
+                {meta.ultimoBackup ? "desde então" : "feitas só neste aparelho"}
+              </span>
+            )}
+          </p>
 
-      <BotaoGrande variante="destaque" onClick={() => void salvar(false)}>
-        <Download className="h-5 w-5" /> Salvar backup
-      </BotaoGrande>
-      <button
-        onClick={() => void salvar(true)}
-        className="min-h-11 w-full text-center text-sm font-semibold text-muted-foreground underline"
-      >
-        Só baixar o arquivo
-      </button>
+          <BotaoGrande variante="destaque" onClick={() => void salvar(false)}>
+            <Download className="h-5 w-5" /> Salvar backup
+          </BotaoGrande>
+          <button
+            onClick={() => void salvar(true)}
+            className="min-h-11 w-full text-center text-sm font-semibold text-muted-foreground underline"
+          >
+            Só baixar o arquivo
+          </button>
+        </>
+      )}
 
       <input
         ref={entrada}

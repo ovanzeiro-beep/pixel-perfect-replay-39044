@@ -140,6 +140,17 @@ export function erroNosDados(d: unknown): string | null {
       }
     }
   }
+  if (d["perfil"] !== undefined) {
+    const pf = d["perfil"];
+    if (
+      !ehObjeto(pf) ||
+      !ehTexto(pf["nome"]) ||
+      !ehTexto(pf["cidade"]) ||
+      !ehTexto(pf["telefone"]) ||
+      typeof pf["configurado"] !== "boolean"
+    )
+      return "Os dados do vanzeiro no backup estão inválidos.";
+  }
   if (!ehObjeto(d["ajustes"])) return "Faltam dados no backup (viagens ajustadas).";
   if (!ehTexto(d["chavePix"])) return "Faltam dados no backup (chave Pix).";
   if (d["alertasDispensados"] !== undefined && !ehObjeto(d["alertasDispensados"]))

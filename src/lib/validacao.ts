@@ -93,3 +93,51 @@ export function enderecoCompleto(p: {
 }) {
   return `${p.endereco}${p.numero ? `, ${p.numero}` : ""}${p.bairro ? ` - ${p.bairro}` : ""}, ${p.cidade} - PR`;
 }
+
+export const ESTADOS_BR = [
+  "AC",
+  "AL",
+  "AP",
+  "AM",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MT",
+  "MS",
+  "MG",
+  "PA",
+  "PB",
+  "PR",
+  "PE",
+  "PI",
+  "RJ",
+  "RN",
+  "RS",
+  "RO",
+  "RR",
+  "SC",
+  "SP",
+  "SE",
+  "TO",
+] as const;
+
+/** Dados do próprio vanzeiro no primeiro acesso. */
+export function validarPerfil(p: {
+  nome: string;
+  telefone: string;
+  cidade: string;
+  estado: string;
+}) {
+  const e: Partial<Record<"nome" | "telefone" | "cidade" | "estado", string>> = {};
+  if (p.nome.trim().length < 2) e.nome = "Escreva seu nome.";
+  if (!p.telefone.trim()) e.telefone = "Escreva seu celular, com DDD.";
+  else if (!telefoneValido(p.telefone))
+    e.telefone = "Telefone incompleto. Coloque o DDD, ex.: (43) 99999-9999.";
+  if (p.cidade.trim().length < 2) e.cidade = "Escreva a sua cidade.";
+  if (!(ESTADOS_BR as readonly string[]).includes(p.estado.trim().toUpperCase()))
+    e.estado = "Escolha o estado.";
+  return e;
+}
