@@ -1,0 +1,153 @@
+// Regras das viagens: geração a partir das linhas, lotação e lista de espera.
+import type { Linha, Passageiro, Van } from "./store";
+
+export type Resposta = "vai" | "nao" | "sem" | "espera";
+export type Ajuste = {
+  vanId?: string; motoristaId?: string; cancelada?: boolean;
+  respostas: Record<string, Resposta>; // ordem das chaves = ordem de confirmação
+  espera: string[]; // ordem de chegada
+  extras: string[]; // só nesta viagem
+};
+export type Situacao = "agendada" | "lotada" | "andamento" | "concluida" | "cancelada";
+export type Viagem = {
+  id: string; linhaId: string; data: string; saida: string; volta: string; vanId: string; motoristaId: string;
+  lugares: number; passageiroIds: string[]; ajuste: Ajuste; situacao: Situacao; passada: boolean;
+  vao: string[]; sem: string[]; nao: string[]; espera: string[];
+};
+
+const COD = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
+export const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export const doIso = (s: string) => { const [a, m, d] = s.split("-").map(Number); return new Date(a!, m! - 1, d!); };
+export const vazio = (): Ajuste => ({ respostas: {}, espera: [], extras: [] });
+export const idViagem = (linhaId: string, data: string) => `${linhaId}_${data}`;
+
+/** Dias (de -7 a +13 a partir de hoje) em que cada linha ativa tem viagem. */
+export function datasDaLinha(l: Linha, hoje: Date): string[] {
+  if (!l.ativa) return [];
+  const out: string[] = [];
+  for (let i = -7; i <= 13; i++) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + i);
+    const s = iso(d);
+    if (l.frequencia === "unica" ? l.data === s : l.dias.includes(COD[d.getDay()]!)) out.push(s);
+  }
+  return out;
+}
+
+const qtd = (aj: Ajuste, r: Resposta) => Object.values(aj.respostas).filter((x) => x === r).length;
+
+/** Muda a resposta de um passageiro respeitando os lugares. Retorna quem subiu da lista de espera, se alguém. */
+export function definirResposta(aj: Ajuste, pid: string, r: Exclude<Resposta, "espera">, lugares: number): { ajuste: Ajuste; foiParaEspera: boolean; subiu?: string } {
+  const anterior = aj.respostas[pid] ?? "sem";
+  const respostas = { ...aj.respostas };
+  let espera = aj.espera.filter((x) => x !== pid);
+  delete respostas[pid];
+  if (r === "vai") {
+    if (anterior === "vai") return { ajuste: aj, foiParaEspera: false };
+    if (qtd({ ...aj, respostas }, "vai") >= lugares) {
+      respostas[pid] = "espera"; espera = [...espera, pid];
+      return { ajuste: { ...aj, respostas, espera }, foiParaEspera: true };
+    }
+    respostas[pid] = "vai";
+    return { ajuste: { ...aj, respostas, espera }, foiParaEspera: false };
+  }
+  respostas[pid] = r;
+  let subiu: string | undefined;
+  if (anterior === "vai" && espera.length > 0 && qtd({ ...aj, respostas }, "vai") < lugares) {
+    subiu = espera[0]!; espera = espera.slice(1);
+    delete respostas[subiu]; respostas[subiu] = "vai";
+  }
+  return { ajuste: { ...aj, respostas, espera }, foiParaEspera: false, ...(subiu ? { subiu } : {}) };
+}
+
+/** Quantas pessoas confirmadas sobram se a viagem passar a ter `lugares`. */
+export const sobram = (aj: Ajuste, lugares: number) => Math.max(0, qtd(aj, "vai") - lugares);
+
+/** Troca a van: quem sobrar (os últimos a confirmar) vai para o começo da lista de espera. */
+export function aplicarNovaVan(aj: Ajuste, vanId: string, lugares: number): Ajuste {
+  const vao = Object.keys(aj.respostas).filter((k) => aj.respostas[k] === "vai");
+  const excedentes = vao.slice(lugares);
+  const respostas = { ...aj.respostas };
+  excedentes.forEach((p) => (respostas[p] = "espera"));
+  return { ...aj, vanId, respostas, espera: [...excedentes, ...aj.espera] };
+}
+
+export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: Van[], ajustes: Record<string, Ajuste>, agora: Date): Viagem[] {
+  const hojeIso = iso(agora);
+  const hhmm = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
+  const out: Viagem[] = [];
+  for (const l of linhas) {
+    const daLinha = passageiros.filter((p) => p.ativo && p.linhaIds.includes(l.id)).map((p) => p.id);
+    for (const data of datasDaLinha(l, agora)) {
+      const id = idViagem(l.id, data);
+      const ajuste = ajustes[id] ?? vazio();
+      const vanId = ajuste.vanId ?? l.vanId;
+      const lugares = vans.find((v) => v.id === vanId)?.lugares ?? 0;
+      const existe = new Set(passageiros.map((p) => p.id));
+      const ids = [...new Set([...daLinha, ...ajuste.extras])].filter((p) => existe.has(p));
+      const resp = (p: string) => ajuste.respostas[p] ?? "sem";
+      const vao = Object.keys(ajuste.respostas).filter((p) => ids.includes(p) && resp(p) === "vai");
+      const espera = ajuste.espera.filter((p) => ids.includes(p));
+      const passada = data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta);
+      const situacao: Situacao = ajuste.cancelada ? "cancelada"
+        : passada ? "concluida"
+        : data === hojeIso && !!l.saida && hhmm >= l.saida ? "andamento"
+        : lugares > 0 && vao.length >= lugares ? "lotada" : "agendada";
+      out.push({
+        id, linhaId: l.id, data, saida: l.saida, volta: l.volta, vanId, motoristaId: ajuste.motoristaId ?? l.motoristaId, lugares,
+        passageiroIds: ids, ajuste, situacao, passada: passada || !!ajuste.cancelada,
+        vao, espera, sem: ids.filter((p) => resp(p) === "sem"), nao: ids.filter((p) => resp(p) === "nao"),
+      });
+    }
+  }
+  return out.sort((a, b) => (a.data + a.saida).localeCompare(b.data + b.saida));
+}
+
+/** Respostas de exemplo: variadas, mas sempre iguais para o mesmo passageiro e dia. */
+export function semearAjustes(linhas: Linha[], passageiros: Passageiro[], vans: Van[], agora: Date,
+  especial: { lotada: { linhaId: string; diaSemana: string; extras: string[] }; canceladaLinhaId: string }): Record<string, Ajuste> {
+  const hojeIso = iso(agora);
+  const aj: Record<string, Ajuste> = {};
+  const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
+  let lotadaFeita = false;
+  let ultimaPassadaCancel = "";
+  for (const l of linhas) {
+    const lugares = vans.find((v) => v.id === l.vanId)?.lugares ?? 0;
+    const daLinha = passageiros.filter((p) => p.ativo && p.linhaIds.includes(l.id)).map((p) => p.id);
+    for (const data of datasDaLinha(l, agora)) {
+      const id = idViagem(l.id, data);
+      let a = vazio();
+      const passada = data < hojeIso;
+      const ehLotada = !lotadaFeita && !passada && l.id === especial.lotada.linhaId && COD[doIso(data).getDay()] === especial.lotada.diaSemana;
+      if (ehLotada) {
+        lotadaFeita = true;
+        a.extras = especial.lotada.extras;
+        for (const p of [...daLinha, ...a.extras]) a = definirResposta(a, p, "vai", lugares).ajuste;
+      } else {
+        for (const p of daLinha) {
+          const n = hash(p + data) % 10;
+          const r = n < 6 ? "vai" : n < 8 ? (passada ? "vai" : "sem") : "nao";
+          a = definirResposta(a, p, r, lugares).ajuste;
+        }
+      }
+      aj[id] = a;
+      if (passada && l.id === especial.canceladaLinhaId) ultimaPassadaCancel = id;
+    }
+  }
+  if (ultimaPassadaCancel) aj[ultimaPassadaCancel] = { ...aj[ultimaPassadaCancel]!, cancelada: true };
+  return aj;
+}
+
+const SEM = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+export function rotuloDia(data: string, agora: Date) {
+  const hoje = iso(agora);
+  const amanha = iso(new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1));
+  const ontem = iso(new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - 1));
+  const d = doIso(data);
+  const dm = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+  if (data === hoje) return `Hoje, ${dm}`;
+  if (data === amanha) return `Amanhã, ${dm}`;
+  if (data === ontem) return `Ontem, ${dm}`;
+  return `${SEM[d.getDay()]}, ${dm}`;
+}
+export const diaSemana = (data: string) => SEM[doIso(data).getDay()]!;
+export const dataCurta = (data: string) => { const d = doIso(data); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`; };
