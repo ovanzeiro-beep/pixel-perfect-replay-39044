@@ -31,7 +31,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-export type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[]; passageiroAtualId: string };
+export type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[] };
 
 export function criarEstadoExemplo(): Estado {
   const base: Estado = {
@@ -46,7 +46,7 @@ export function criarEstadoExemplo(): Estado {
       ...p, endereco: p.endereco.split(",")[0]!, ...(detalhesPassageiros[p.id] ?? detalheVazio), linhaIds: linhaId ? [linhaId] : [], ativo: true,
       emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
     })),
-    ajustes: {}, cobrancas: [], recibos: [], chavePix: "", passageiroAtualId: "p1",
+    ajustes: {}, cobrancas: [], recibos: [], chavePix: "",
     gastos: [
       ...gastosMes.map((g) => ({ id: g.id, valor: g.valor, data: g.data, categoria: (g.descricao === "Diesel" ? "Diesel" : g.descricao === "Pedágio" ? "Pedágio" : "Manutenção") as Categoria,
         vanId: g.vanId, linhaId: g.descricao === "Pedágio" ? "l1" : "", descricao: g.descricao === "Diesel" || g.descricao === "Pedágio" ? "" : g.descricao, litros: null, km: null, mensal: false })),
@@ -93,22 +93,31 @@ const assinar = (f: () => void) => { ouvintes.add(f); return () => ouvintes.dele
 export const useFrota = () => useSyncExternalStore(assinar, () => estado, () => estadoServidor);
 export const obterEstado = () => estado;
 
+// Fica true depois que os dados salvos no aparelho foram carregados (ou se não há como carregar).
+let dadosProntos = false;
+export const useDadosProntos = () => useSyncExternalStore(assinar, () => dadosProntos, () => false);
+const marcarProntos = () => { dadosProntos = true; ouvintes.forEach((f) => f()); };
+
 const ehLista = (x: unknown) => Array.isArray(x);
 export function ehEstado(x: unknown): x is Estado {
   if (!x || typeof x !== "object") return false;
   const e = x as Record<string, unknown>;
   return ["vans", "motoristas", "linhas", "passageiros", "cobrancas", "recibos", "gastos"].every((k) => ehLista(e[k]))
-    && !!e["ajustes"] && typeof e["ajustes"] === "object" && typeof e["chavePix"] === "string" && typeof e["passageiroAtualId"] === "string";
+    && !!e["ajustes"] && typeof e["ajustes"] === "object" && typeof e["chavePix"] === "string";
 }
 
 /** Carrega os dados salvos no aparelho e passa a salvar a cada mudança. Chamar uma vez, no navegador. */
 let persistenciaAtiva = false;
 export function iniciarPersistencia(): () => void {
+  if (persistenciaAtiva) return () => {};
   const armazem = armazenamentoLocal();
-  if (!armazem || persistenciaAtiva) return () => {};
+  if (!armazem) { marcarProntos(); return () => {}; }
   persistenciaAtiva = true;
-  const salvo = ler(armazem, ehEstado);
+  const lido = ler(armazem, ehEstado);
+  // Dados salvos antes da Etapa 2 traziam "passageiroAtualId"; agora quem é o passageiro vem da sessão.
+  const salvo = lido ? (({ passageiroAtualId: _antigo, ...resto }) => resto as Estado)(lido as Estado & { passageiroAtualId?: string }) : null;
   if (salvo) set(comAberto({ ...salvo, cobrancas: gerarPeriodicas(salvo.cobrancas, salvo.passageiros, isoDe(new Date())) }));
+  marcarProntos();
   let timer: ReturnType<typeof setTimeout> | undefined;
   const gravarAgora = () => { clearTimeout(timer); timer = undefined; gravar(armazem, estado); };
   const aoOcultar = () => { if (document.visibilityState === "hidden") gravarAgora(); };
@@ -220,8 +229,6 @@ export function salvarGasto(g: Omit<Gasto, "id"> & { id?: string | undefined }) 
 }
 export function excluirGasto(id: string) { set({ ...estado, gastos: estado.gastos.filter((g) => g.id !== id) }); }
 
-export const usePassageiroAtual = () => useSyncExternalStore(assinar, () => estado.passageiroAtualId, () => estadoServidor.passageiroAtualId);
-export function setPassageiroAtual(id: string) { set({ ...estado, passageiroAtualId: id }); }
 export function aceitarConvite(pid: string) {
   set({ ...estado, passageiros: estado.passageiros.map((p) => p.id === pid ? { ...p, convite: "no_app" as const } : p) });
 }

@@ -1,12 +1,12 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:05 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:14 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
 | 0 — Visual do login e PWA em tela cheia | concluida | 12/12 | OK |
 | 1 — Fundação do mock: persistência e datas relativas | concluida | 14/14 | OK |
-| 2 — Sessão e papéis (login simulado de verdade) | pendente | 1/6 | pendente |
+| 2 — Sessão e papéis (login simulado de verdade) | concluida | 22/22 | OK |
 | 3 — Integridade dos dados | pendente | 0/4 | pendente |
 | 4 — Viagem de ponta a ponta | pendente | 1/5 | pendente |
 | 5 — Dinheiro e relatórios | pendente | 0/3 | pendente |
@@ -16,13 +16,6 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:05 UTC.
 | 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
 
 ## O que falta
-
-**Etapa 2 — Sessão e papéis (login simulado de verdade)**
-- Módulo de sessão
-- Sessão tem encerrar
-- Área do vanzeiro protegida
-- Área do passageiro protegida
-- Teste da sessão
 
 **Etapa 3 — Integridade dos dados**
 - Testes do store

@@ -3,14 +3,16 @@ import { useState } from "react";
 import { Check, Edit3, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { encerrarSessao, usePassageiroId } from "@/data/sessao";
 import { useFrota, atualizarPassageiro } from "@/data/store";
 import { vanzeiro } from "@/data/exemplo";
 import { linkWhatsApp } from "@/lib/validacao";
 
 function MeuPerfil() {
-  const { passageiros, passageiroAtualId } = useFrota();
+  const { passageiros } = useFrota();
+  const passageiroId = usePassageiroId();
   const navigate = useNavigate();
-  const p = passageiros.find((x) => x.id === passageiroAtualId);
+  const p = passageiros.find((x) => x.id === passageiroId);
 
   const [editEmergencia, setEditEmergencia] = useState(false);
   const [emergNome, setEmergNome] = useState("");
@@ -36,7 +38,7 @@ function MeuPerfil() {
     window.open(url, "_blank");
   };
 
-  const sair = () => void navigate({ to: "/perfil" });
+  const sair = () => { encerrarSessao(); void navigate({ to: "/", replace: true }); };
 
   return (
     <div className="px-5 pb-6 pt-6 space-y-5">

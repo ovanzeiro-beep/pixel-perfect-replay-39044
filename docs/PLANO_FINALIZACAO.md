@@ -14,7 +14,7 @@
 |---|---|---|---|
 | 0 | Login bonito + PWA em tela cheia | Logo profissional, tela de entrada refeita, app instalável (Android/iPhone), tela cheia | **Concluída** |
 | 1 | Fundação do mock | Dados persistem ao recarregar (localStorage versionado), "restaurar exemplo", datas relativas a hoje, IDs sem colisão | **Concluída** |
-| 2 | Sessão e papéis | Entrar guarda quem é e o papel; rotas `/vanzeiro` e `/passageiro` protegidas; botão Sair; passageiro vem da sessão | Pendente |
+| 2 | Sessão e papéis | Entrar guarda quem é e o papel; rotas `/vanzeiro` e `/passageiro` protegidas; botão Sair; passageiro vem da sessão | **Concluída** |
 | 3 | Integridade dos dados | Excluir passageiro limpa cobranças/recibos/respostas; vencimento obrigatório em cobrança semanal/mensal; testes do `store.ts` | Pendente |
 | 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | Pendente |
 | 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | Pendente |
@@ -34,3 +34,11 @@ Banco de dados, login Google real, envio real de WhatsApp/notificação push, pa
 - **Android (Chrome):** `display: fullscreen` esconde as barras do sistema. O convite de instalação aparece sozinho no login.
 - **iPhone (Safari):** a Apple não oferece convite automático nem tela cheia total. O app abre sem a barra do Safari (modo standalone); o login mostra o passo a passo "Compartilhar → Adicionar à Tela de Início".
 - O service worker só é registrado no build de produção (não no `vite dev`).
+
+## Como funciona o login simulado (Etapa 2)
+
+1. "Entrar com Google" leva à escolha de perfil (ainda sem conta real).
+2. Escolher "Sou vanzeiro" ou um passageiro cria a sessão, salva no aparelho (`vanzeiro:sessao`).
+3. `/vanzeiro/*`, `/ida/*` só abrem para o vanzeiro e `/passageiro/*` só para o passageiro; quem não pode é redirecionado.
+4. Abrir o app já logado (inclusive pelo ícone instalado) vai direto para a área; "Sair" apaga a sessão.
+5. Ao trocar o login simulado por login real, só `src/data/sessao.ts` muda.

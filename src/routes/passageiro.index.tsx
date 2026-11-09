@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Check, Clock, MessageCircle, Phone, SmilePlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { usePassageiroId } from "@/data/sessao";
 import { useFrota, useViagens, responderViagemApp, confirmarParadaApp, responderVoltaApp } from "@/data/store";
 import { vanzeiro } from "@/data/exemplo";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
@@ -221,9 +222,10 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
 }
 
 function InicioPassageiro() {
-  const { passageiros, passageiroAtualId, cobrancas, linhas, chavePix } = useFrota();
+  const { passageiros, cobrancas, linhas, chavePix } = useFrota();
+  const passageiroId = usePassageiroId();
   const todasViagens = useViagens();
-  const p = passageiros.find((x) => x.id === passageiroAtualId);
+  const p = passageiros.find((x) => x.id === passageiroId);
   const hoje = isoDe(new Date());
 
   if (!p) return null;

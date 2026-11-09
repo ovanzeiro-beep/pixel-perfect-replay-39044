@@ -1,10 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { CalendarCheck, Route as RouteIcon, ShieldCheck, Wallet } from "lucide-react";
 import { LogoIcon } from "@/components/app/Logo";
 import { InstalarApp } from "@/components/app/InstalarApp";
+import { caminhoInicial, sessaoAtual, useSessao } from "@/data/sessao";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "O Vanzeiro — Sua van organizada, sem caderno" }, { name: "description", content: "Passageiros, viagens, rotas e cobranças da sua van em um só lugar." }, { property: "og:title", content: "O Vanzeiro — Sua van organizada, sem caderno" }, { property: "og:description", content: "Passageiros, viagens, rotas e cobranças da sua van em um só lugar." }] }),
+  beforeLoad: () => {
+    const s = sessaoAtual();
+    if (s) throw redirect({ to: caminhoInicial(s) });
+  },
   component: Index,
 });
 
@@ -15,6 +21,12 @@ const beneficios = [
 ];
 
 function Index() {
+  const sessao = useSessao();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (sessao) void navigate({ to: caminhoInicial(sessao), replace: true });
+  }, [sessao, navigate]);
+  if (sessao) return <div className="login-fundo min-h-[100dvh]" />;
   return (
     <div className="login-fundo relative isolate flex min-h-[100dvh] flex-col overflow-hidden text-white">
       <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-sky-300/15 blur-3xl" />

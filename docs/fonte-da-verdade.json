@@ -200,7 +200,7 @@
     {
       "id": 2,
       "titulo": "Sessão e papéis (login simulado de verdade)",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Entrar guarda quem é você e seu papel (vanzeiro ou passageiro); rotas protegidas; botão Sair.",
       "checks": [
         {
@@ -209,27 +209,122 @@
           "arquivo": "src/data/sessao.ts"
         },
         {
-          "d": "Sessão tem encerrar",
+          "d": "Sessão tem entrar e encerrar",
           "tipo": "contem",
           "arquivo": "src/data/sessao.ts",
-          "regex": "encerrarSessao"
+          "regex": "entrarComoPassageiro[\\s\\S]*encerrarSessao"
         },
         {
-          "d": "Área do vanzeiro protegida",
+          "d": "Sessão fica salva no aparelho",
+          "tipo": "contem",
+          "arquivo": "src/data/sessao.ts",
+          "regex": "armazenamentoLocal"
+        },
+        {
+          "d": "Guard de tela reutilizável",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ProtegeArea.tsx"
+        },
+        {
+          "d": "Área do vanzeiro protegida (rota)",
           "tipo": "contem",
           "arquivo": "src/routes/vanzeiro.tsx",
           "regex": "beforeLoad"
         },
         {
-          "d": "Área do passageiro protegida",
+          "d": "Área do vanzeiro protegida (tela)",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "ProtegeArea"
+        },
+        {
+          "d": "Área do passageiro protegida (rota)",
           "tipo": "contem",
           "arquivo": "src/routes/passageiro.tsx",
           "regex": "beforeLoad"
         },
         {
-          "d": "Passageiro vem da sessão, não de variável global",
+          "d": "Área do passageiro protegida (tela)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.tsx",
+          "regex": "ProtegeArea"
+        },
+        {
+          "d": "Viagem em andamento (/ida) protegida",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "ProtegeArea[\\s\\S]*beforeLoad|beforeLoad[\\s\\S]*ProtegeArea"
+        },
+        {
+          "d": "Login manda quem já entrou para sua área",
+          "tipo": "contem",
+          "arquivo": "src/routes/index.tsx",
+          "regex": "caminhoInicial"
+        },
+        {
+          "d": "Escolha de perfil cria a sessão (vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/perfil.tsx",
+          "regex": "entrarComoVanzeiro"
+        },
+        {
+          "d": "Escolha de perfil cria a sessão (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/perfil.tsx",
+          "regex": "entrarComoPassageiro"
+        },
+        {
+          "d": "Botão Sair encerra a sessão (vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/components/app/PerfilTela.tsx",
+          "regex": "encerrarSessao"
+        },
+        {
+          "d": "Botão Sair encerra a sessão (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "encerrarSessao"
+        },
+        {
+          "d": "Sem passageiro global no exemplo",
           "tipo": "naoContem",
           "arquivo": "src/data/exemplo.ts",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Sem passageiro global no store",
+          "tipo": "naoContem",
+          "arquivo": "src/data/store.ts",
+          "regex": "setPassageiroAtual|usePassageiroAtual"
+        },
+        {
+          "d": "Tela index lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela viagens lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela pagamentos lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela perfil lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "passageiroAtualId"
+        },
+        {
+          "d": "Tela convite lê o passageiro da sessão",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.convite.tsx",
           "regex": "passageiroAtualId"
         },
         {
@@ -238,9 +333,19 @@
           "arquivo": "src/data/sessao.test.ts"
         },
         {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

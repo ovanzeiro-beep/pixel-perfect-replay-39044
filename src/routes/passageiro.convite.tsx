@@ -2,12 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { useFrota, aceitarConvite } from "@/data/store";
+import { usePassageiroId } from "@/data/sessao";
 import { vanzeiro } from "@/data/exemplo";
 
 function TelaConvite() {
-  const { passageiros, passageiroAtualId } = useFrota();
+  const { passageiros } = useFrota();
+  const passageiroId = usePassageiroId();
   const navigate = useNavigate();
-  const p = passageiros.find((x) => x.id === passageiroAtualId);
+  const p = passageiros.find((x) => x.id === passageiroId);
   const [step, setStep] = useState<"convite" | "verificar" | "confirmado">("convite");
 
   useEffect(() => {

@@ -18,7 +18,7 @@ function PerfilVanzeiro() {
   const [confirmando, setConfirmando] = useState(false);
   useEffect(() => setPix(chavePix), [chavePix]);
   return (
-    <PerfilTela nome={vanzeiro.nome} papel={`Vanzeiro · ${vanzeiro.cidade} - ${vanzeiro.estado}`} trocarPara="passageiro" voltar>
+    <PerfilTela nome={vanzeiro.nome} papel={`Vanzeiro · ${vanzeiro.cidade} - ${vanzeiro.estado}`} voltar>
       <Toaster position="top-center" />
       <div className="mt-6 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
         <Campo label="Chave Pix"><input className={campoClasse} placeholder="CPF, telefone, e-mail ou chave aleatória" value={pix} onChange={(e) => setPix(e.target.value)} /></Campo>

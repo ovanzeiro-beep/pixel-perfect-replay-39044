@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Bus, ChevronRight, User } from "lucide-react";
 import { Logo } from "@/components/app/Logo";
-import { useFrota, setPassageiroAtual, type Passageiro } from "@/data/store";
+import { useFrota, type Passageiro } from "@/data/store";
+import { entrarComoPassageiro, entrarComoVanzeiro } from "@/data/sessao";
 
 function PickerPassageiro({ candidatos, onEscolher, onVoltar }: { candidatos: Passageiro[]; onEscolher: (p: Passageiro) => void; onVoltar: () => void }) {
   return (
@@ -43,7 +44,7 @@ function PerfilPage() {
   const candidatos = passageiros.filter((p) => p.ativo && p.convite !== "nao_enviado");
 
   const escolher = (p: Passageiro) => {
-    setPassageiroAtual(p.id);
+    entrarComoPassageiro(p.id);
     void navigate({ to: p.convite === "enviado" ? "/passageiro/convite" : "/passageiro" });
   };
 
@@ -57,7 +58,7 @@ function PerfilPage() {
       <h1 className="mt-10 text-3xl font-extrabold text-primary">Como você vai usar?</h1>
       <p className="mt-2 text-lg text-muted-foreground">Escolha uma opção para continuar.</p>
       <div className="mt-8 space-y-4">
-        <Link to="/vanzeiro" className="flex items-center gap-4 rounded-3xl bg-primary p-6 text-primary-foreground shadow-lg">
+        <button onClick={() => { entrarComoVanzeiro(); void navigate({ to: "/vanzeiro" }); }} className="flex w-full items-center gap-4 rounded-3xl bg-primary p-6 text-left text-primary-foreground shadow-lg">
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
             <Bus className="h-8 w-8" />
           </span>
@@ -65,7 +66,7 @@ function PerfilPage() {
             <span className="block text-2xl font-extrabold">Sou vanzeiro</span>
             <span className="opacity-80">Tenho van e levo passageiros</span>
           </span>
-        </Link>
+        </button>
         <button
           onClick={() => setVerPassageiros(true)}
           className="flex w-full items-center gap-4 rounded-3xl border-2 border-primary bg-card p-6 text-primary"

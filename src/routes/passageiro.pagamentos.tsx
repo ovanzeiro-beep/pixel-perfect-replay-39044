@@ -3,6 +3,7 @@ import { Check, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { useFrota } from "@/data/store";
+import { usePassageiroId } from "@/data/sessao";
 import { vanzeiro } from "@/data/exemplo";
 import { brl, dataBR, estadoCob, nomeEstado, aberto, isoDe } from "@/data/cobrancas";
 import { linkWhatsApp } from "@/lib/validacao";
@@ -16,8 +17,9 @@ const COR_STATUS: Record<string, string> = {
 };
 
 function Pagamentos() {
-  const { passageiros, passageiroAtualId, cobrancas, chavePix } = useFrota();
-  const p = passageiros.find((x) => x.id === passageiroAtualId);
+  const { passageiros, cobrancas, chavePix } = useFrota();
+  const passageiroId = usePassageiroId();
+  const p = passageiros.find((x) => x.id === passageiroId);
   const hoje = isoDe(new Date());
   if (!p) return null;
 
