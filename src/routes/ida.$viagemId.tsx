@@ -90,7 +90,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
   const desfazer = () => {
     const ult = ida.marcas[ida.marcas.length - 1];
     if (!ult) return;
-    if (ult.cobrou) lancarCobranca(ult.pid, -ult.cobrou);
+    if (ult.cobrou && !lancarCobranca(ult.pid, -ult.cobrou)) toast.warning("Não achei a cobrança dessa viagem. Confira em Dinheiro.");
     salvar({ ...ida, marcas: ida.marcas.slice(0, -1), fase: "paradas" });
     toast.success("Última marcação desfeita");
   };

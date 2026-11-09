@@ -32,11 +32,48 @@ describe("validação de linha", () => {
 import { validarPassageiro, mensagemConvite } from "./validacao";
 describe("passageiro", () => {
   it("nome e telefone com DDD obrigatórios", () => {
-    expect(Object.keys(validarPassageiro({ nome: "", telefone: "", valor: "" })).sort()).toEqual(["nome", "telefone"]);
-    expect(validarPassageiro({ nome: "A", telefone: "99999-9999", valor: "" }).telefone).toBeDefined();
-    expect(validarPassageiro({ nome: "A", telefone: "(43) 99999-9999", valor: "" })).toEqual({});
+    expect(Object.keys(validarPassageiro({ nome: "", telefone: "", valor: "" })).sort()).toEqual(["nome", "telefone", "valor"]);
+    expect(validarPassageiro({ nome: "A", telefone: "99999-9999", valor: "150" }).telefone).toBeDefined();
+    expect(validarPassageiro({ nome: "A", telefone: "(43) 99999-9999", valor: "150" })).toEqual({});
   });
   it("mensagem do convite", () => {
     expect(mensagemConvite("Maria", "João Batista", "L")).toBe("Olá, Maria! Aqui é o João Batista, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: L");
+  });
+});
+
+import { telefoneValido } from "./validacao";
+describe("telefone", () => {
+  it("aceita celular e fixo com DDD", () => {
+    expect(telefoneValido("(43) 99812-4471")).toBe(true);
+    expect(telefoneValido("4333221100")).toBe(true);
+  });
+  it("recusa DDD inválido, celular sem 9 e tamanhos errados", () => {
+    expect(telefoneValido("(03) 99812-4471")).toBe(false);
+    expect(telefoneValido("(43) 89812-4471")).toBe(false);
+    expect(telefoneValido("99812-4471")).toBe(false);
+    expect(telefoneValido("(43) 99812-44711")).toBe(false);
+    expect(telefoneValido("")).toBe(false);
+  });
+});
+
+describe("passageiro: valor e vencimento", () => {
+  const base = { nome: "A", telefone: "(43) 99999-9999", valor: "150" };
+  it("valor é obrigatório e precisa ser positivo", () => {
+    expect(validarPassageiro({ ...base, valor: "" }).valor).toBeDefined();
+    expect(validarPassageiro({ ...base, valor: "0" }).valor).toBeDefined();
+    expect(validarPassageiro({ ...base, valor: "abc" }).valor).toBeDefined();
+    expect(validarPassageiro({ ...base, valor: "150,50" }).valor).toBeUndefined();
+  });
+  it("semanal e mensal exigem vencimento; por viagem não", () => {
+    expect(validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "" }).vencimento).toBeDefined();
+    expect(validarPassageiro({ ...base, formaPagamento: "mensal", vencimento: "" }).vencimento).toBeDefined();
+    expect(validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "sexta" })).toEqual({});
+    expect(validarPassageiro({ ...base, formaPagamento: "mensal", vencimento: "5" })).toEqual({});
+    expect(validarPassageiro({ ...base, formaPagamento: "por_viagem", vencimento: "" })).toEqual({});
+  });
+  it("telefone de emergência é opcional, mas se vier precisa estar completo", () => {
+    expect(validarPassageiro({ ...base, emergenciaTelefone: "" })).toEqual({});
+    expect(validarPassageiro({ ...base, emergenciaTelefone: "1234" }).emergenciaTelefone).toBeDefined();
+    expect(validarPassageiro({ ...base, emergenciaTelefone: "(43) 99701-5566" })).toEqual({});
   });
 });

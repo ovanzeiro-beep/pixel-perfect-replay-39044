@@ -1,13 +1,13 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:14 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:23 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
 | 0 — Visual do login e PWA em tela cheia | concluida | 12/12 | OK |
 | 1 — Fundação do mock: persistência e datas relativas | concluida | 14/14 | OK |
 | 2 — Sessão e papéis (login simulado de verdade) | concluida | 22/22 | OK |
-| 3 — Integridade dos dados | pendente | 0/4 | pendente |
+| 3 — Integridade dos dados | concluida | 19/19 | OK |
 | 4 — Viagem de ponta a ponta | pendente | 1/5 | pendente |
 | 5 — Dinheiro e relatórios | pendente | 0/3 | pendente |
 | 6 — Alertas e prazos | pendente | 0/3 | pendente |
@@ -16,12 +16,6 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:14 UTC.
 | 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
 
 ## O que falta
-
-**Etapa 3 — Integridade dos dados**
-- Testes do store
-- Teste de exclusão em cascata
-- Vencimento exigido para semanal/mensal
-- Teste de cobrança negativa/desfazer
 
 **Etapa 4 — Viagem de ponta a ponta**
 - Resumo ao encerrar a viagem

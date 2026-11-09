@@ -352,9 +352,87 @@
     {
       "id": 3,
       "titulo": "Integridade dos dados",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Excluir/desativar não deixa lixo; cobrança sempre tem vencimento; validações fechadas; store coberto por testes.",
       "checks": [
+        {
+          "d": "Excluir passageiro apaga as cobranças dele",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?cobrancas: estado\\.cobrancas\\.filter"
+        },
+        {
+          "d": "Excluir passageiro apaga os recibos dele",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?recibos: estado\\.recibos\\.filter"
+        },
+        {
+          "d": "Excluir passageiro limpa as viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirPassageiro[\\s\\S]*?semPassageiro"
+        },
+        {
+          "d": "Helper que tira o passageiro de uma viagem",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "export function semPassageiro"
+        },
+        {
+          "d": "Excluir linha limpa viagens, gastos e cobranças",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirLinha[\\s\\S]*?gastos:[\\s\\S]*?cobrancas:"
+        },
+        {
+          "d": "Excluir van limpa gastos e viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirVan[\\s\\S]*?gastos:[\\s\\S]*?ajustes:"
+        },
+        {
+          "d": "Excluir motorista limpa viagens",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function excluirMotorista[\\s\\S]*?ajustes:"
+        },
+        {
+          "d": "Cobrança de viagem devolve se deu certo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function lancarCobranca\\([^)]*\\): boolean"
+        },
+        {
+          "d": "Desfazer marcação avisa se não achou a cobrança",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Não achei a cobrança"
+        },
+        {
+          "d": "Vencimento exigido para semanal/mensal",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "formaPagamento === \"semanal\" && !p\\.vencimento"
+        },
+        {
+          "d": "Telefone brasileiro validado",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "export function telefoneValido"
+        },
+        {
+          "d": "Valor do passageiro obrigatório",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.ts",
+          "regex": "Escreva o valor combinado"
+        },
+        {
+          "d": "Formulário mostra o erro de vencimento",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "erros\\.vencimento"
+        },
         {
           "d": "Testes do store",
           "tipo": "arquivo",
@@ -367,21 +445,43 @@
           "regex": "excluirPassageiro"
         },
         {
-          "d": "Vencimento exigido para semanal/mensal",
-          "tipo": "contem",
-          "arquivo": "src/lib/validacao.ts",
-          "regex": "vencimento"
-        },
-        {
           "d": "Teste de cobrança negativa/desfazer",
           "tipo": "contem",
           "arquivo": "src/data/store.test.ts",
           "regex": "lancarCobranca"
         },
         {
+          "d": "Teste de exclusão de linha/van/motorista",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "excluirLinha[\\s\\S]*excluirVan|excluirVan[\\s\\S]*excluirLinha"
+        },
+        {
+          "d": "Teste de coerência dos dados de exemplo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "dados de exemplo são coerentes"
+        },
+        {
+          "d": "Testes de vencimento e telefone",
+          "tipo": "contem",
+          "arquivo": "src/lib/validacao.test.ts",
+          "regex": "telefoneValido"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

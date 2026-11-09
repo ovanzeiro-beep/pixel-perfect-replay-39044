@@ -5,7 +5,7 @@ import { armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
 import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens, cobrancasExemplo, gastosMes, gastosExemplo } from "./exemplo";
 import type { Categoria, Gasto } from "./financeiro";
 import { aberto, cancelarCobranca, desfazerPagamento, gerarPeriodicas, idCobranca, isoDe, pagar, refMes, refSemana, refViagem, type Cobranca, type Forma, type Recibo } from "./cobrancas";
-import { definirResposta, semearAjustes, montarViagens, type Ajuste } from "./viagens";
+import { definirResposta, semearAjustes, montarViagens, semPassageiro, type Ajuste } from "./viagens";
 
 export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
 export const DIAS = [
@@ -86,6 +86,9 @@ function comAberto(e: Estado): Estado {
 }
 estado = criarEstadoExemplo();
 estadoServidor = estado;
+/** Aplica `f` a cada ajuste de viagem; devolve o mapa novo. */
+const mapAjustes = (a: Record<string, Ajuste>, f: (aj: Ajuste, id: string) => Ajuste | null) =>
+  Object.fromEntries(Object.entries(a).flatMap(([id, aj]) => { const n = f(aj, id); return n ? [[id, n] as const] : []; }));
 const ouvintes = new Set<() => void>();
 const set = (e: Estado) => { estado = e; ouvintes.forEach((f) => f()); };
 const assinar = (f: () => void) => { ouvintes.add(f); return () => ouvintes.delete(f); };
@@ -145,7 +148,14 @@ export function salvarVan(v: Omit<Van, "id"> & { id?: string | undefined }) {
   set({ ...estado, vans: v.id ? estado.vans.map((x) => (x.id === v.id ? van : x)) : [...estado.vans, van] });
 }
 export function excluirVan(id: string) {
-  set({ ...estado, linhas: estado.linhas.map((l) => (l.vanId === id ? { ...l, vanId: "" } : l)), vans: estado.vans.filter((v) => v.id !== id), motoristas: estado.motoristas.map((m) => (m.vanId === id ? { ...m, vanId: "" } : m)) });
+  set({
+    ...estado,
+    linhas: estado.linhas.map((l) => (l.vanId === id ? { ...l, vanId: "" } : l)),
+    vans: estado.vans.filter((v) => v.id !== id),
+    motoristas: estado.motoristas.map((m) => (m.vanId === id ? { ...m, vanId: "" } : m)),
+    gastos: estado.gastos.map((g) => (g.vanId === id ? { ...g, vanId: "" } : g)),
+    ajustes: mapAjustes(estado.ajustes, (aj) => { if (aj.vanId !== id) return aj; const { vanId: _v, ...resto } = aj; return resto; }),
+  });
 }
 export function salvarMotorista(m: Omit<Motorista, "id" | "proprio"> & { id?: string | undefined }) {
   const atual = estado.motoristas.find((x) => x.id === m.id);
@@ -154,7 +164,13 @@ export function salvarMotorista(m: Omit<Motorista, "id" | "proprio"> & { id?: st
 }
 export function excluirMotorista(id: string) {
   if (estado.motoristas.find((m) => m.id === id)?.proprio) return;
-  set({ ...estado, linhas: estado.linhas.map((l) => (l.motoristaId === id ? { ...l, motoristaId: "" } : l)), motoristas: estado.motoristas.filter((m) => m.id !== id), vans: estado.vans.map((v) => (v.motoristaId === id ? { ...v, motoristaId: "" } : v)) });
+  set({
+    ...estado,
+    linhas: estado.linhas.map((l) => (l.motoristaId === id ? { ...l, motoristaId: "" } : l)),
+    motoristas: estado.motoristas.filter((m) => m.id !== id),
+    vans: estado.vans.map((v) => (v.motoristaId === id ? { ...v, motoristaId: "" } : v)),
+    ajustes: mapAjustes(estado.ajustes, (aj) => { if (aj.motoristaId !== id) return aj; const { motoristaId: _m, ...resto } = aj; return resto; }),
+  });
 }
 
 export function salvarLinha(l: Omit<Linha, "id"> & { id?: string | undefined }) {
@@ -164,8 +180,16 @@ export function salvarLinha(l: Omit<Linha, "id"> & { id?: string | undefined }) 
 export function alternarLinha(id: string) {
   set({ ...estado, linhas: estado.linhas.map((l) => (l.id === id ? { ...l, ativa: !l.ativa } : l)) });
 }
+/** As viagens da linha somem; o dinheiro já movimentado fica, só que sem linha. */
 export function excluirLinha(id: string) {
-  set({ ...estado, linhas: estado.linhas.filter((l) => l.id !== id), passageiros: estado.passageiros.map((p) => ({ ...p, linhaIds: p.linhaIds.filter((x) => x !== id) })) });
+  set(comAberto({
+    ...estado,
+    linhas: estado.linhas.filter((l) => l.id !== id),
+    passageiros: estado.passageiros.map((p) => ({ ...p, linhaIds: p.linhaIds.filter((x) => x !== id) })),
+    ajustes: mapAjustes(estado.ajustes, (aj, chave) => (chave.split("_")[0] === id ? null : aj)),
+    gastos: estado.gastos.map((g) => (g.linhaId === id ? { ...g, linhaId: "" } : g)),
+    cobrancas: estado.cobrancas.map((c) => { if (c.linhaId !== id) return c; const { linhaId: _l, ...resto } = c; return resto; }),
+  }));
 }
 export function colocarNaLinha(linhaId: string, ids: string[]) {
   set({ ...estado, passageiros: estado.passageiros.map((p) => (ids.includes(p.id) && !p.linhaIds.includes(linhaId) ? { ...p, linhaIds: [...p.linhaIds, linhaId], ativo: true } : p)) });
@@ -182,8 +206,15 @@ export function atualizarPassageiro(id: string, mud: Partial<Passageiro>) {
   set({ ...estado, passageiros: estado.passageiros.map((p) => (p.id === id ? { ...p, ...mud } : p)) });
 }
 export function desativarPassageiro(id: string) { atualizarPassageiro(id, { ativo: false, linhaIds: [] }); }
+/** Apaga o passageiro e tudo dele: cobranças, recibos e marcações em viagens. (Para guardar o histórico, use desativar.) */
 export function excluirPassageiro(id: string) {
-  set({ ...estado, passageiros: estado.passageiros.filter((p) => p.id !== id) });
+  set(comAberto({
+    ...estado,
+    passageiros: estado.passageiros.filter((p) => p.id !== id),
+    cobrancas: estado.cobrancas.filter((c) => c.pid !== id),
+    recibos: estado.recibos.filter((r) => r.pid !== id),
+    ajustes: mapAjustes(estado.ajustes, (aj) => semPassageiro(aj, id)),
+  }));
 }
 
 export function useViagens() {
@@ -194,17 +225,25 @@ export function ajustarViagem(id: string, aj: Ajuste) {
   set({ ...estado, ajustes: { ...estado.ajustes, [id]: aj } });
 }
 
-/** Soma (ou tira, com valor negativo) uma cobrança no que o passageiro deve. */
-export function lancarCobranca(passageiroId: string, valor: number, linhaId?: string) {
+/**
+ * Soma (ou tira, com valor negativo) uma cobrança de viagem no que o passageiro deve.
+ * Ao tirar: remove a mais recente ainda sem pagamento; se já foi paga, cancela a cobrança (o recibo fica, pois o dinheiro entrou).
+ * Devolve false se não achou cobrança para tirar.
+ */
+export function lancarCobranca(passageiroId: string, valor: number, linhaId?: string): boolean {
   const hoje = isoDe(new Date());
   let cobrancas = estado.cobrancas;
   if (valor > 0) {
     cobrancas = [...cobrancas, { id: novoId(`${passageiroId}_viagem_`), pid: passageiroId, tipo: "viagem", ref: refViagem(hoje), vencimento: hoje, valor, pagamentos: [], ...(linhaId ? { linhaId } : {}) }];
   } else if (valor < 0) {
-    const alvo = [...cobrancas].reverse().find((c) => c.pid === passageiroId && c.tipo === "viagem" && c.valor === -valor && c.pagamentos.length === 0);
-    if (alvo) cobrancas = cobrancas.filter((c) => c !== alvo);
+    const iguais = [...cobrancas].reverse().filter((c) => c.pid === passageiroId && c.tipo === "viagem" && !c.cancelada && c.valor === -valor);
+    const livre = iguais.find((c) => c.pagamentos.length === 0);
+    const alvo = livre ?? iguais[0];
+    if (!alvo) return false;
+    cobrancas = livre ? cobrancas.filter((c) => c !== alvo) : cobrancas.map((c) => (c === alvo ? { ...c, cancelada: "Marcação da viagem desfeita" } : c));
   }
   set(comAberto({ ...estado, cobrancas }));
+  return true;
 }
 
 /** Marca pagamento (quita as mais antigas primeiro) e devolve o recibo. */

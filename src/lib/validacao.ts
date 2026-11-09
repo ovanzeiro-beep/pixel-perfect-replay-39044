@@ -21,12 +21,19 @@ export function validarVan(v: { apelido: string; placa: string; lugares: string 
   return e;
 }
 
+/** Telefone brasileiro com DDD: 10 dígitos (fixo) ou 11 (celular, começa com 9 depois do DDD). */
+export function telefoneValido(t: string) {
+  const d = t.replace(/\D/g, "");
+  if (!/^[1-9][1-9]/.test(d)) return false;
+  return d.length === 10 || (d.length === 11 && d[2] === "9");
+}
+
 export function validarMotorista(m: { nome: string; telefone: string }) {
   const e: Partial<Record<"nome" | "telefone", string>> = {};
   if (!m.nome.trim()) e.nome = "Escreva o nome do motorista.";
   const dig = m.telefone.replace(/\D/g, "");
   if (!dig) e.telefone = "Escreva o telefone do motorista.";
-  else if (dig.length < 10 || dig.length > 11) e.telefone = "Telefone incompleto. Coloque o DDD, ex.: (43) 99999-9999.";
+  else if (!telefoneValido(m.telefone)) e.telefone = "Telefone incompleto. Coloque o DDD, ex.: (43) 99999-9999.";
   return e;
 }
 
@@ -42,12 +49,17 @@ export function validarLinha(l: { nome: string; frequencia: "semanal" | "unica";
   return e;
 }
 
-export function validarPassageiro(p: { nome: string; telefone: string; valor: string }) {
+type CamposPassageiro = "nome" | "telefone" | "valor" | "vencimento" | "emergenciaTelefone";
+export function validarPassageiro(p: { nome: string; telefone: string; valor: string; formaPagamento?: string; vencimento?: string; emergenciaTelefone?: string }) {
   const m = validarMotorista(p);
-  const e: Partial<Record<"nome" | "telefone" | "valor", string>> = {};
+  const e: Partial<Record<CamposPassageiro, string>> = {};
   if (m.nome) e.nome = "Escreva o nome do passageiro.";
   if (m.telefone) e.telefone = m.telefone.replace("do motorista", "do passageiro");
-  if (p.valor.trim() && !(Number(p.valor.replace(",", ".")) > 0)) e.valor = "Escreva um valor válido, ex.: 150.";
+  if (!p.valor.trim()) e.valor = "Escreva o valor combinado, ex.: 150.";
+  else if (!(Number(p.valor.replace(",", ".")) > 0)) e.valor = "Escreva um valor válido, ex.: 150.";
+  if (p.formaPagamento === "semanal" && !p.vencimento) e.vencimento = "Escolha o dia da semana em que vence.";
+  if (p.formaPagamento === "mensal" && !p.vencimento) e.vencimento = "Escolha o dia do mês em que vence.";
+  if (p.emergenciaTelefone?.trim() && !telefoneValido(p.emergenciaTelefone)) e.emergenciaTelefone = "Telefone incompleto. Coloque o DDD.";
   return e;
 }
 
