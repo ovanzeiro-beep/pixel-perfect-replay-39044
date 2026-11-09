@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
-  vanzeiro, linhas, passageiros, viagensSemana, proximaViagemId,
+  vanzeiro, passageiros, viagensSemana, proximaViagemId,
   cobrancasEmAberto, recebimentosMes, gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
 import { useFrota } from "@/data/store";
@@ -21,14 +21,14 @@ export const Route = createFileRoute("/vanzeiro/")({
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const soma = (l: { valor: number }[]) => l.reduce((t, x) => t + x.valor, 0);
-const linha = (id: string) => linhas.find((l) => l.id === id)!;
 
 function saudacao(h: number) {
   return h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
 }
 
 function Inicio() {
-  const { vans, motoristas } = useFrota();
+  const { vans, motoristas, linhas } = useFrota();
+  const linha = (id: string) => linhas.find((l) => l.id === id) ?? { nome: "Linha excluída" };
   const lugares = (vanId: string) => vans.find((v) => v.id === vanId)?.lugares ?? 0;
   const [agora, setAgora] = useState<Date | null>(null);
   useEffect(() => setAgora(new Date()), []);

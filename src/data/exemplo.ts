@@ -31,6 +31,12 @@ export const linhas = [
     vanId: "van1",
     motoristaId: "m1",
     valorPorViagem: 150,
+    valorMensal: 0,
+    tipo: "Visita",
+    saida: "17:30",
+    volta: "20:30",
+    destino: "Londrina - Centro",
+    observacoes: "Saída de sexta à tarde; volta no domingo à noite.",
   },
   {
     id: "l2",
@@ -41,6 +47,12 @@ export const linhas = [
     motoristaId: "m2",
     valorSemanal: 90,
     valorMensal: 320,
+    valorPorViagem: 25,
+    tipo: "Faculdade",
+    saida: "18:15",
+    volta: "23:30",
+    destino: "Ourinhos - Campus universitário",
+    observacoes: "",
   },
   {
     id: "l3",
@@ -50,6 +62,12 @@ export const linhas = [
     vanId: "van2",
     motoristaId: "m1",
     valorMensal: 250,
+    valorPorViagem: 0,
+    tipo: "Escolar",
+    saida: "06:40",
+    volta: "12:30",
+    destino: "Colégio Estadual de Jacarezinho",
+    observacoes: "Buscar as crianças na porta de casa.",
   },
 ];
 
