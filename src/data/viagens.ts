@@ -7,7 +7,10 @@ export type Ajuste = {
   respostas: Record<string, Resposta>; // ordem das chaves = ordem de confirmação
   espera: string[]; // ordem de chegada
   extras: string[]; // só nesta viagem
+  ida?: Ida;
 };
+export type Marca = { pid: string; r: "embarcou" | "faltou"; cobrou: number };
+export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou" };
 export type Situacao = "agendada" | "lotada" | "andamento" | "concluida" | "cancelada";
 export type Viagem = {
   id: string; linhaId: string; data: string; saida: string; volta: string; vanId: string; motoristaId: string;
@@ -87,8 +90,9 @@ export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: 
       const resp = (p: string) => ajuste.respostas[p] ?? "sem";
       const vao = Object.keys(ajuste.respostas).filter((p) => ids.includes(p) && resp(p) === "vai");
       const espera = ajuste.espera.filter((p) => ids.includes(p));
-      const passada = data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta);
+      const passada = !ajuste.ida && (data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta));
       const situacao: Situacao = ajuste.cancelada ? "cancelada"
+        : ajuste.ida ? "andamento"
         : passada ? "concluida"
         : data === hojeIso && !!l.saida && hhmm >= l.saida ? "andamento"
         : lugares > 0 && vao.length >= lugares ? "lotada" : "agendada";
@@ -151,3 +155,25 @@ export function rotuloDia(data: string, agora: Date) {
 }
 export const diaSemana = (data: string) => SEM[doIso(data).getDay()]!;
 export const dataCurta = (data: string) => { const d = doIso(data); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`; };
+
+/** Ordena os confirmados seguindo as cidades do trajeto da linha (cidades fora do trajeto vão para o fim). */
+export function ordenarParadas(ids: string[], cidadeDe: (id: string) => string, trajeto: string[]): string[] {
+  const pos = (id: string) => { const i = trajeto.findIndex((c) => c.toLowerCase().startsWith(cidadeDe(id).toLowerCase())); return i < 0 ? 999 : i; };
+  return [...ids].sort((a, b) => pos(a) - pos(b));
+}
+
+/** Divide as paradas em partes que o Google Maps consegue abrir de uma vez (até `max` paradas por parte). */
+export function partesRota(enderecos: string[], max = 10): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < enderecos.length; i += max) {
+    const parte = enderecos.slice(i, i + max);
+    const origem = i > 0 ? enderecos[i - 1] : undefined;
+    const destino = parte[parte.length - 1]!;
+    const meio = parte.slice(0, -1);
+    const q = new URLSearchParams({ api: "1", destination: destino, travelmode: "driving" });
+    if (origem) q.set("origin", origem);
+    if (meio.length) q.set("waypoints", meio.join("|"));
+    out.push(`https://www.google.com/maps/dir/?${q.toString()}`);
+  }
+  return out;
+}

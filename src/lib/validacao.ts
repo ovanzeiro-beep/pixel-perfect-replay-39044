@@ -54,3 +54,7 @@ export function validarPassageiro(p: { nome: string; telefone: string; valor: st
 export function mensagemConvite(nome: string, vanzeiro: string, link: string) {
   return `Olá, ${nome}! Aqui é o ${vanzeiro}, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: ${link}`;
 }
+
+export function enderecoCompleto(p: { endereco: string; numero: string; bairro: string; cidade: string }) {
+  return `${p.endereco}${p.numero ? `, ${p.numero}` : ""}${p.bairro ? ` - ${p.bairro}` : ""}, ${p.cidade} - PR`;
+}

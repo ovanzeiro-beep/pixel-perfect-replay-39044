@@ -47,8 +47,11 @@ function Inicio() {
     .map((v) => `${v.sem.length} ${v.sem.length === 1 ? "passageiro ainda não confirmou" : "passageiros ainda não confirmaram"} a viagem de ${diaSemana(v.data).toLowerCase()} (${linha(v.linhaId).nome})`);
   const avisos = [...semResposta, ...lotadas];
 
-  const totalAberto = soma(cobrancasEmAberto);
-  const top3 = [...cobrancasEmAberto].sort((a, b) => b.diasAtraso - a.diasAtraso).slice(0, 3);
+  const devedores = passageiros.filter((p) => p.emAberto > 0)
+    .map((p) => ({ passageiroId: p.id, valor: p.emAberto, diasAtraso: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.diasAtraso ?? 0 }));
+  const totalAberto = soma(devedores);
+  const top3 = [...devedores].sort((a, b) => b.diasAtraso - a.diasAtraso || b.valor - a.valor).slice(0, 3);
+  const emAndamento = viagens.filter((v) => v.ajuste.ida);
   const recebido = soma(recebimentosMes);
   const gastos = soma(gastosMes);
   const lucro = recebido - gastos;
@@ -65,6 +68,18 @@ function Inicio() {
           {agora?.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" }) ?? "\u00a0"}
         </p>
       </div>
+
+      {emAndamento.map((v) => {
+        const marcas = v.ajuste.ida!.marcas;
+        return (
+          <section key={v.id} className="rounded-3xl border-4 border-accent bg-card p-5 shadow-lg">
+            <p className="text-sm font-bold uppercase tracking-wide text-accent-strong">Viagem em andamento</p>
+            <h2 className="mt-1 text-2xl font-extrabold text-primary">{linha(v.linhaId).nome}</h2>
+            <p className="mt-2 text-3xl font-extrabold">Na van: {marcas.filter((m) => m.r === "embarcou").length} de {v.ajuste.ida!.ordem.length}</p>
+            <Link to="/ida/$viagemId" params={{ viagemId: v.id }} className="mt-4 flex min-h-14 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground">Abrir viagem</Link>
+          </section>
+        );
+      })}
 
       {avisos.length > 0 && (
         <div className="space-y-2">
@@ -116,7 +131,7 @@ function Inicio() {
       <section className="rounded-3xl bg-card p-5 shadow-sm">
         <h2 className="text-xl font-extrabold text-primary">Quem está devendo</h2>
         <p className="mt-2 text-3xl font-extrabold text-destructive">{brl(totalAberto)}</p>
-        <p className="text-muted-foreground">{cobrancasEmAberto.length} pessoas com pagamento em aberto</p>
+        <p className="text-muted-foreground">{devedores.length} pessoas com pagamento em aberto</p>
         <ul className="mt-3 divide-y">
           {top3.map((c) => {
             const p = passageiros.find((x) => x.id === c.passageiroId) ?? { nome: "Passageiro excluído" };
@@ -124,7 +139,7 @@ function Inicio() {
               <li key={c.passageiroId} className="flex items-center justify-between py-3">
                 <div>
                   <p className="font-bold">{p.nome}</p>
-                  <p className="text-sm text-destructive">há {c.diasAtraso} dias</p>
+                  <p className="text-sm text-destructive">{c.diasAtraso ? `há ${c.diasAtraso} dias` : "hoje"}</p>
                 </div>
                 <span className="font-bold">{brl(c.valor)}</span>
               </li>

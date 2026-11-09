@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PassageiroRouteImport } from './routes/passageiro'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as VanzeiroRouteImport } from './routes/vanzeiro'
+import { Route as IdaViagemIdRouteImport } from './routes/ida.$viagemId'
 import { Route as PassageiroIndexRouteImport } from './routes/passageiro.index'
 import { Route as PassageiroPagamentosRouteImport } from './routes/passageiro.pagamentos'
 import { Route as PassageiroPerfilRouteImport } from './routes/passageiro.perfil'
@@ -46,6 +47,11 @@ const PerfilRoute = PerfilRouteImport.update({
 const VanzeiroRoute = VanzeiroRouteImport.update({
   id: '/vanzeiro',
   path: '/vanzeiro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdaViagemIdRoute = IdaViagemIdRouteImport.update({
+  id: '/ida/$viagemId',
+  path: '/ida/$viagemId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassageiroIndexRoute = PassageiroIndexRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/passageiro': typeof PassageiroRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
+  '/ida/$viagemId': typeof IdaViagemIdRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/perfil': typeof PerfilRoute
+  '/ida/$viagemId': typeof IdaViagemIdRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/passageiro': typeof PassageiroRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/vanzeiro': typeof VanzeiroRouteWithChildren
+  '/ida/$viagemId': typeof IdaViagemIdRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/passageiro'
     | '/perfil'
     | '/vanzeiro'
+    | '/ida/$viagemId'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/perfil'
+    | '/ida/$viagemId'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/passageiro'
     | '/perfil'
     | '/vanzeiro'
+    | '/ida/$viagemId'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   PassageiroRoute: typeof PassageiroRouteWithChildren
   PerfilRoute: typeof PerfilRoute
   VanzeiroRoute: typeof VanzeiroRouteWithChildren
+  IdaViagemIdRoute: typeof IdaViagemIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/vanzeiro'
       fullPath: '/vanzeiro'
       preLoaderRoute: typeof VanzeiroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ida/$viagemId': {
+      id: '/ida/$viagemId'
+      path: '/ida/$viagemId'
+      fullPath: '/ida/$viagemId'
+      preLoaderRoute: typeof IdaViagemIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passageiro/': {
@@ -430,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassageiroRoute: PassageiroRouteWithChildren,
   PerfilRoute: PerfilRoute,
   VanzeiroRoute: VanzeiroRouteWithChildren,
+  IdaViagemIdRoute: IdaViagemIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
