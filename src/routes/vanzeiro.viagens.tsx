@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { prazoConfirmacao } from "@/data/exemplo";
 import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/store";
-import { definirResposta, sobram, aplicarNovaVan, rotuloDia, diaSemana, dataCurta, type Viagem, type Situacao, type Resposta, type Ajuste } from "@/data/viagens";
+import { definirResposta, sobram, aplicarNovaVan, rotuloDia, horaDe, diaSemana, dataCurta, type Viagem, type Situacao, type Resposta, type Ajuste } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
 import { Painel, Campo, campoClasse, BotaoGrande, Confirmar } from "@/components/app/Formulario";
 
@@ -170,7 +170,7 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
               <li key={i} className="rounded-2xl bg-card p-4 shadow-sm">
                 <p className="font-bold">{horaDe(pa.inicio)} · {pa.local || "Sem local"} · {pa.minutos} min</p>
                 {pa.ficaram.length === 0 ? <p className="text-sm text-success">Todos voltaram para a van</p>
-                  : pa.ficaram.map((f) => <p key={f.pid} className="text-sm text-destructive">{pas(f.pid)?.nome ?? "Passageiro"} ficou na parada às {f.hora} — {f.motivo}</p>)}
+                  : pa.ficaram.map((f) => <p key={f.pid} className="text-sm text-destructive">{passageiros.find((x) => x.id === f.pid)?.nome ?? "Passageiro"} ficou na parada às {f.hora} — {f.motivo}</p>)}
               </li>
             ))}
           </ul>
