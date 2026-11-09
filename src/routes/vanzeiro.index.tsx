@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
   vanzeiro,
-  gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
 import { useFrota, useViagens } from "@/data/store";
 import { diaSemana, rotuloDia } from "@/data/viagens";
-import { isoDe, recebidoNoMes, resumoPassageiro } from "@/data/cobrancas";
+import { isoDe, resumoPassageiro } from "@/data/cobrancas";
+import { mesDe, resumoMes } from "@/data/financeiro";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -29,7 +29,7 @@ function saudacao(h: number) {
 }
 
 function Inicio() {
-  const { vans, motoristas, linhas, passageiros, cobrancas } = useFrota();
+  const { vans, motoristas, linhas, passageiros, cobrancas, gastos: listaGastos } = useFrota();
   const hojeIso = isoDe(new Date());
   const viagens = useViagens();
   const linha = (id: string) => linhas.find((l) => l.id === id) ?? { nome: "Linha excluída" };
@@ -54,10 +54,11 @@ function Inicio() {
   const totalAberto = soma(devedores);
   const top3 = [...devedores].sort((a, b) => b.diasAtraso - a.diasAtraso || b.valor - a.valor).slice(0, 3);
   const emAndamento = viagens.filter((v) => v.ajuste.ida && !v.ajuste.ida.encerrada);
-  const recebido = recebidoNoMes(cobrancas, hojeIso);
-  const gastos = soma(gastosMes);
+  const mesAtual = resumoMes(cobrancas, listaGastos, mesDe(hojeIso), hojeIso);
+  const recebido = mesAtual.recebido;
+  const gastos = mesAtual.gastos;
   const lucro = recebido - gastos;
-  const faltaReceber = soma(aReceberRestoMes);
+  const faltaReceber = mesAtual.aReceber;
   const primeiroNome = vanzeiro.nome.split(" ")[0];
 
   return (
