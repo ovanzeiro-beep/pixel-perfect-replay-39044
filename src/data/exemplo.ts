@@ -97,6 +97,14 @@ export const passageiros: {
   { id: "p13", nome: "Isabela Mendes (resp. Rogério)", telefone: "(43) 99511-7764", endereco: "Rua Minas Gerais, 190", cidade: "Jacarezinho", linhaId: "l3", formaPagamento: "mensal", valor: 250, situacao: "atrasado_1_semana" },
   { id: "p14", nome: "Davi Lucca Pereira (resp. Simone)", telefone: "(43) 99280-3345", endereco: "Rua Santa Catarina, 22", cidade: "Jacarezinho", linhaId: "l3", formaPagamento: "semanal", valor: 65, situacao: "em_dia" },
   { id: "p15", nome: "Helena Barbosa (resp. Fábio)", telefone: "(43) 99963-0198", endereco: "Rua Pernambuco, 310", cidade: "Jacarezinho", linhaId: "l3", formaPagamento: "mensal", valor: 250, situacao: "em_dia" },
+  // Etapa 6: mais passageiros na linha de fim de semana (que é a mais procurada)
+  { id: "p16", nome: "Valdir Rocha", telefone: "(43) 99412-3301", endereco: "Rua Paraíba, 77", cidade: "Jacarezinho", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "pago_na_hora" },
+  { id: "p17", nome: "Neide Aparecida Campos", telefone: "(43) 99523-8812", endereco: "Rua Amazonas, 140", cidade: "Cambará", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "pago_na_hora" },
+  { id: "p18", nome: "Edson Luiz Batista", telefone: "(43) 99634-1290", endereco: "Rua Ceará, 320", cidade: "Andirá", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "em_dia" },
+  { id: "p19", nome: "Terezinha Souza", telefone: "(43) 99745-6603", endereco: "Rua Alagoas, 58", cidade: "Bandeirantes", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "pago_na_hora" },
+  { id: "p20", nome: "Marcos Vinícius Dias", telefone: "(43) 99856-2244", endereco: "Rua Sergipe, 905", cidade: "Jacarezinho", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "em_dia" },
+  { id: "p21", nome: "Lourdes Teixeira", telefone: "(43) 99967-4415", endereco: "Rua Piauí, 12", cidade: "Cambará", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "pago_na_hora" },
+  { id: "p22", nome: "Reginaldo Pires", telefone: "(43) 99178-5536", endereco: "Rua Maranhão, 266", cidade: "Andirá", linhaId: "l1", formaPagamento: "por_viagem", valor: 150, situacao: "em_dia" },
 ];
 
 // Passageiro usado nos testes da área do passageiro
@@ -191,3 +199,16 @@ export const detalhesPassageiros: Record<string, DetalhePassageiro> = {
 };
 
 export const linkConviteExemplo = (id: string) => `https://ovanzeiro.app/convite/${id}`;
+
+export const detalheVazio: DetalhePassageiro = { numero: "", bairro: "", referencia: "", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "nao_enviado", ultimoPagamento: "" };
+
+// ===== Etapa 6: viagens =====
+// As viagens são geradas sozinhas a partir das linhas ativas (2 semanas para frente, 1 para trás).
+// Para os exemplos, as respostas são sorteadas de um jeito fixo; abaixo, os casos especiais:
+export const prazoConfirmacao = "Confirmações até a véspera, às 20h";
+export const exemploViagens = {
+  // A primeira viagem de sábado da linha de fim de semana fica lotada, com estes passageiros a mais:
+  lotada: { linhaId: "l1", diaSemana: "sab", extras: ["p6", "p7", "p8", "p9", "p10"] },
+  // A viagem mais recente desta linha nas "Anteriores" aparece cancelada:
+  canceladaLinhaId: "l1",
+};
