@@ -129,3 +129,50 @@ export const filtrarDispensados = (alertas: Alerta[], dispensados: Record<string
 
 /** Quantos alertas pedem atenção (os informativos não contam no selo). */
 export const contarAtencao = (alertas: Alerta[]) => alertas.filter((a) => a.nivel !== "info").length;
+
+// ===== Avisos para o passageiro =====
+export type AvisoPassageiro = {
+  id: string; nivel: Nivel; titulo: string; detalhe: string;
+  destino?: "/passageiro/pagamentos" | "/passageiro/viagens"; acao?: string;
+};
+
+/** Avisos do próprio passageiro: pagamento atrasado, prazo para responder e viagem cancelada. */
+export function gerarAvisosPassageiro({ pid, cobrancas, viagens, agora }: { pid: string; cobrancas: Cobranca[]; viagens: Viagem[]; agora: Date }): AvisoPassageiro[] {
+  const hoje = isoDe(agora);
+  const out: AvisoPassageiro[] = [];
+
+  const atrasadas = cobrancas.filter((c) => c.pid === pid && estadoCob(c, hoje) === "atrasada");
+  if (atrasadas.length) {
+    const dias = Math.max(...atrasadas.map((c) => diasEntre(c.vencimento, hoje)));
+    const total = Math.round(atrasadas.reduce((s, c) => s + aberto(c), 0) * 100) / 100;
+    out.push({
+      id: "atraso", nivel: dias >= COBRANCA_URGENTE_DIAS ? "urgente" : "atencao", destino: "/passageiro/pagamentos", acao: "Ver pagamentos",
+      titulo: `Pagamento atrasado há ${dias} ${dias === 1 ? "dia" : "dias"}`,
+      detalhe: `Você deve ${brl(total)}. Pague pelo Pix e avise o vanzeiro.`,
+    });
+  }
+
+  const minhas = viagens.filter((v) => v.passageiroIds.includes(pid) && !v.ajuste.cancelada && !v.passada && !v.ajuste.ida);
+  for (const v of minhas) {
+    if ((v.ajuste.respostas[pid] ?? "sem") !== "sem") continue;
+    if (inicioDaViagem(v.data, v.saida).getTime() <= agora.getTime()) continue;
+    const { limite, encerrado } = prazoViagem(v.data, agora);
+    if (limite.getTime() - agora.getTime() > 24 * 3600000) continue;
+    const quando = `${diaSemana(v.data).toLowerCase()}, ${dataCurta(v.data)}`;
+    out.push({
+      id: `responder_${v.id}`, nivel: "atencao", destino: "/passageiro/viagens", acao: encerrado ? "Ver viagem" : "Responder",
+      titulo: encerrado ? `Prazo encerrado: viagem de ${quando}` : `Responda a viagem de ${quando}`,
+      detalhe: encerrado ? "O prazo para confirmar já passou. Fale com o vanzeiro se ainda quiser ir." : `Faltam ${tempoRestante(limite.getTime() - agora.getTime())} para o prazo (${PRAZO.hora}h).`,
+    });
+  }
+
+  const canceladas = viagens.filter((v) => v.passageiroIds.includes(pid) && v.ajuste.cancelada && v.data >= hoje && diasEntre(hoje, v.data) <= 7);
+  for (const v of canceladas) {
+    out.push({
+      id: `cancelada_${v.id}`, nivel: "info", destino: "/passageiro/viagens", acao: "Ver viagens",
+      titulo: `A viagem de ${diaSemana(v.data).toLowerCase()}, ${dataCurta(v.data)} foi cancelada`, detalhe: "O vanzeiro cancelou esta viagem. Você não precisa fazer nada.",
+    });
+  }
+
+  return out.sort((a, b) => ORDEM_NIVEL[a.nivel] - ORDEM_NIVEL[b.nivel] || a.id.localeCompare(b.id));
+}

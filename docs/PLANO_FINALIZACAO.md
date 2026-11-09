@@ -19,7 +19,7 @@
 | 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | **Concluída** |
 | 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | **Concluída** |
 | 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | **Concluída** |
-| 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | Pendente |
+| 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | **Concluída** |
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | Pendente |
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | Pendente |
 
@@ -78,3 +78,12 @@ Aparecem no topo do Início do vanzeiro, com um selo vermelho no menu "Início" 
 - O prazo (véspera, 20h) está em `PRAZO` (`src/data/alertas.ts`) e aparece na ficha da viagem e na tela do passageiro, calculado de verdade.
 - "Dispensar" esconde o alerta; ele **volta sozinho** se a situação mudar (mais gente atrasada, CNH vencendo de vez). "Mostrar de novo" traz todos de volta.
 - Os alertas se atualizam a cada minuto. São avisos dentro do app; notificações no celular (push) ficam para a fase com servidor.
+
+## Área do passageiro (Etapa 7)
+
+- **Recibos:** Pagamentos → "Meus recibos" lista só os recibos do próprio passageiro; dá para abrir, compartilhar e copiar.
+- **Avisos:** no Início, em Pagamentos e em Minhas viagens aparecem pagamento atrasado, prazo para responder a viagem (véspera, 20h) e viagem cancelada.
+- **Minhas viagens:** mostra o prazo e o horário aproximado na parada do passageiro (saída + 20 min por cidade do trajeto; é estimativa).
+- **Convite de verdade:** o link `/convite/:id` abre o app, valida (convite enviado e passageiro ativo), cria a sessão e leva à confirmação dos dados. O botão "Simular aceite" do vanzeiro só aparece no modo demonstração.
+- **Limite do mock:** os dados ficam no aparelho do vanzeiro. O link de convite só funciona nesse mesmo aparelho; em outro celular aparece "Convite não encontrado". Isso só se resolve com banco de dados (fase futura).
+- **Testes de tela:** `src/test/passageiro-fluxo.test.tsx` renderiza as telas reais do passageiro (recibos, confirmar presença, convite, acesso).

@@ -907,24 +907,161 @@
     {
       "id": 7,
       "titulo": "Área do passageiro completa",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Passageiro confirma, vê parada/horário, débitos e recibos; aceite de convite sem atalhos falsos.",
       "checks": [
         {
-          "d": "Teste do fluxo do passageiro",
+          "d": "Lista de recibos do passageiro",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ListaRecibos.tsx"
+        },
+        {
+          "d": "Recibos visíveis ao passageiro (só os dele)",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "recibos\\.filter\\(\\(r\\) => r\\.pid === p\\.id\\)"
+        },
+        {
+          "d": "Recibo: compartilhar",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ListaRecibos.tsx",
+          "regex": "compartilharTexto"
+        },
+        {
+          "d": "Recibo: copiar",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ListaRecibos.tsx",
+          "regex": "Recibo copiado"
+        },
+        {
+          "d": "Avisos do passageiro (regras)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "export function gerarAvisosPassageiro"
+        },
+        {
+          "d": "Avisos do passageiro (tela)",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/AvisosPassageiro.tsx"
+        },
+        {
+          "d": "Avisos no início do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Avisos em pagamentos",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Avisos em minhas viagens",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "<AvisosPassageiro />"
+        },
+        {
+          "d": "Minhas viagens mostra o prazo",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Minhas viagens mostra o horário na parada",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "Na sua parada"
+        },
+        {
+          "d": "Horário na parada em função própria e testada",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "export function horarioNaParada"
+        },
+        {
+          "d": "Link de convite real",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/convite.ts"
+        },
+        {
+          "d": "Link de convite falso removido",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "ovanzeiro\\.app|linkConviteExemplo"
+        },
+        {
+          "d": "Rota do convite (/convite/:id)",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/convite.$passageiroId.tsx"
+        },
+        {
+          "d": "Convite só vale se enviado e ativo",
+          "tipo": "contem",
+          "arquivo": "src/lib/convite.ts",
+          "regex": "export function conviteValido"
+        },
+        {
+          "d": "Tela de convite sem aviso técnico de banco",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/passageiro.convite.tsx",
+          "regex": "Sem banco de dados"
+        },
+        {
+          "d": "Aceite simulado do vanzeiro só no modo demo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "modoDemo && aberto\\.convite"
+        },
+        {
+          "d": "Teste do fluxo do passageiro (telas reais)",
           "tipo": "arquivo",
           "arquivo": "src/test/passageiro-fluxo.test.tsx"
         },
         {
-          "d": "Recibos visíveis ao passageiro",
+          "d": "Teste: recibos só do próprio passageiro",
           "tipo": "contem",
-          "arquivo": "src/routes/passageiro.pagamentos.tsx",
-          "regex": "[Rr]ecibo"
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "nunca de outro passageiro"
+        },
+        {
+          "d": "Teste: convite pelo link até entrar",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "convite enviado: abre a tela do convite"
+        },
+        {
+          "d": "Teste: responder 'Vou' grava na viagem",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "responder 'Vou' grava"
+        },
+        {
+          "d": "Teste: passageiro não entra na área do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "não entra na área do vanzeiro"
+        },
+        {
+          "d": "Teste do link de convite",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/convite.test.ts"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
         },
         {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

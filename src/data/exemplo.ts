@@ -161,8 +161,6 @@ export const detalhesPassageiros: Record<string, DetalhePassageiro> = Object.fro
   Object.entries(detalhesBase).map(([id, d]) => [id, { ...d, ultimoPagamento: d.ultimoPagamento ? deslocarSemanas(d.ultimoPagamento, HOJE) : "" }]),
 );
 
-export const linkConviteExemplo = (id: string) => `https://ovanzeiro.app/convite/${id}`;
-
 export const detalheVazio: DetalhePassageiro = { numero: "", bairro: "", referencia: "", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "nao_enviado", ultimoPagamento: "" };
 
 // ===== Etapa 6: viagens =====

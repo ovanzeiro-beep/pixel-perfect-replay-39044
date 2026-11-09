@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { useFrota } from "@/data/store";
 import { usePassageiroId } from "@/data/sessao";
+import { ListaRecibos } from "@/components/app/ListaRecibos";
+import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 import { vanzeiro } from "@/data/exemplo";
 import { brl, dataBR, estadoCob, nomeEstado, aberto, isoDe } from "@/data/cobrancas";
 import { linkWhatsApp } from "@/lib/validacao";
@@ -17,7 +19,7 @@ const COR_STATUS: Record<string, string> = {
 };
 
 function Pagamentos() {
-  const { passageiros, cobrancas, chavePix } = useFrota();
+  const { passageiros, cobrancas, recibos, chavePix } = useFrota();
   const passageiroId = usePassageiroId();
   const p = passageiros.find((x) => x.id === passageiroId);
   const hoje = isoDe(new Date());
@@ -50,6 +52,7 @@ function Pagamentos() {
     <div className="px-5 pb-6 pt-6 space-y-5">
       <Toaster position="top-center" />
       <h1 className="text-3xl font-extrabold text-primary">Pagamentos</h1>
+      <AvisosPassageiro />
 
       <div className="rounded-3xl bg-card p-5 shadow-sm space-y-4">
         {totalAberto > 0 ? (
@@ -103,6 +106,8 @@ function Pagamentos() {
 
         <p className="text-xs text-muted-foreground">Chave Pix: <span className="font-mono">{pix}</span></p>
       </div>
+
+      <ListaRecibos recibos={recibos.filter((r) => r.pid === p.id)} vanzeiro={vanzeiro.nome} passageiro={p.nome} />
 
       <section>
         <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Histórico</h2>

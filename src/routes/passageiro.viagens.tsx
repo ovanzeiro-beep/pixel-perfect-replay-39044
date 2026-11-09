@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
 import { useFrota, useViagens, responderViagemApp } from "@/data/store";
-import { diaSemana, dataCurta } from "@/data/viagens";
+import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
+import { prazoViagem } from "@/data/alertas";
+import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 
 function MinhasViagens() {
   const { passageiros, linhas } = useFrota();
@@ -28,6 +30,7 @@ function MinhasViagens() {
     <div className="px-5 pb-6 pt-6">
       <Toaster position="top-center" />
       <h1 className="text-3xl font-extrabold text-primary">Minhas viagens</h1>
+      <div className="mt-3"><AvisosPassageiro /></div>
 
       <div className="mt-5 flex gap-2 rounded-2xl bg-muted p-1">
         <button
@@ -57,8 +60,12 @@ function MinhasViagens() {
                 <div>
                   <p className="font-extrabold text-primary">{linha?.nome ?? v.linhaId}</p>
                   <p className="text-sm text-muted-foreground">
-                    {diaSemana(v.data)}, {dataCurta(v.data)} · {v.saida}
+                    {diaSemana(v.data)}, {dataCurta(v.data)} · saída {v.saida}
                   </p>
+                  {linha && horarioNaParada(v.saida, p.cidade, linha.paradas) !== v.saida && (
+                    <p className="text-sm font-semibold">Na sua parada: ~{horarioNaParada(v.saida, p.cidade, linha.paradas)}</p>
+                  )}
+                  {resposta === "sem" && <p className="mt-1 text-sm font-semibold text-accent-strong">{prazoViagem(v.data, new Date()).rotulo}</p>}
                 </div>
                 {resposta === "vai" && (
                   <div className="flex items-center gap-2 text-success">
