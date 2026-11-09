@@ -57,7 +57,7 @@ function Inicio() {
   const mesAtual = resumoMes(cobrancas, listaGastos, mesDe(hojeIso), hojeIso);
   const recebido = mesAtual.recebido;
   const gastos = mesAtual.gastos;
-  const lucro = recebido - gastos;
+  const lucro = mesAtual.lucro;
   const faltaReceber = mesAtual.aReceber;
   const primeiroNome = vanzeiro.nome.split(" ")[0];
 
@@ -175,7 +175,7 @@ function Inicio() {
             { to: "/vanzeiro/dinheiro", label: "Marcar pagamento", icon: Wallet },
             { to: "/vanzeiro/gastos", label: "Lançar gasto", icon: Fuel },
           ] as const).map((a) => (
-            <Link key={a.label} to={a.to} className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm">
+            <Link key={a.label} to={a.to} search={(a.to === "/vanzeiro/gastos" ? { novo: true } : {}) as never} className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm">
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground"><a.icon className="h-7 w-7" /></span>
               <span className="text-sm leading-tight">{a.label}</span>
             </Link>
