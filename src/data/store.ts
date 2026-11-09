@@ -36,7 +36,7 @@ let estado: Estado = {
     valorViagem: l.valorPorViagem || null, valorMensal: l.valorMensal || null, ativa: true, observacoes: l.observacoes,
   })),
   passageiros: passageirosIniciais.map(({ linhaId, situacao: _s, ...p }) => ({
-    ...p, ...detalhesPassageiros[p.id]!, linhaIds: linhaId ? [linhaId] : [], ativo: true,
+    ...p, endereco: p.endereco.split(",")[0]!, ...detalhesPassageiros[p.id]!, linhaIds: linhaId ? [linhaId] : [], ativo: true,
     emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
   })),
 };
