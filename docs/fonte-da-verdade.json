@@ -774,7 +774,7 @@
     {
       "id": 6,
       "titulo": "Alertas e prazos",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Avisos dentro do app: CNH vencendo, cobranças em atraso, prazo de confirmação da viagem.",
       "checks": [
         {
@@ -783,20 +783,124 @@
           "arquivo": "src/data/alertas.ts"
         },
         {
-          "d": "Testes dos alertas",
+          "d": "Alerta de CNH vencendo/vencida",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"cnh\""
+        },
+        {
+          "d": "Alerta de pagamentos atrasados",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"cobranca\""
+        },
+        {
+          "d": "Alerta de prazo de confirmação",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"confirmacao\""
+        },
+        {
+          "d": "Prazo de confirmação calculado (véspera, 20h)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "PRAZO = \\{ diasAntes: 1, hora: 20 \\}"
+        },
+        {
+          "d": "Dispensar volta se a situação mudar (assinatura)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "export const filtrarDispensados"
+        },
+        {
+          "d": "Prazo não é mais texto fixo no exemplo",
+          "tipo": "naoContem",
+          "arquivo": "src/data/exemplo.ts",
+          "regex": "prazoConfirmacao"
+        },
+        {
+          "d": "Dispensados ficam salvos",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function dispensarAlerta"
+        },
+        {
+          "d": "Hook dos alertas (atualiza a cada minuto)",
           "tipo": "arquivo",
-          "arquivo": "src/data/alertas.test.ts"
+          "arquivo": "src/data/useAlertas.ts"
+        },
+        {
+          "d": "Cartões de alerta na tela",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/Alertas.tsx"
         },
         {
           "d": "Início do vanzeiro mostra alertas",
           "tipo": "contem",
           "arquivo": "src/routes/vanzeiro.index.tsx",
-          "regex": "alertas"
+          "regex": "<Alertas />"
+        },
+        {
+          "d": "Selo de alertas no menu Início",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.tsx",
+          "regex": "badge: atencao"
+        },
+        {
+          "d": "Menu mostra o selo",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AppShell.tsx",
+          "regex": "badge"
+        },
+        {
+          "d": "Ficha da viagem usa o prazo calculado",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Passageiro vê o prazo para responder",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "prazoViagem"
+        },
+        {
+          "d": "Testes dos alertas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/alertas.test.ts"
+        },
+        {
+          "d": "Teste: prazo muda no minuto certo (20h)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "encerra exatamente às 20h"
+        },
+        {
+          "d": "Teste: dispensar volta quando a situação muda",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "dispensar esconde, e volta se a situação mudar"
+        },
+        {
+          "d": "Teste: demonstração mostra alertas",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "alertas com os dados de exemplo"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
         },
         {
           "d": "Testes passam",
           "tipo": "comando",
           "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
         }
       ]
     },

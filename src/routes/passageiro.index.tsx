@@ -10,6 +10,7 @@ import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
 import { diaSemana, dataCurta, type Viagem } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
+import { prazoViagem } from "@/data/alertas";
 
 const MOTIVOS_VOLTA = ["Voltei com a família", "Volto outro dia", "Já estou em casa", "Outro"] as const;
 
@@ -295,6 +296,10 @@ function InicioPassageiro() {
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">Você será avisado se abrir uma vaga.</p>
                   </div>
+                )}
+
+                {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
+                  <p className="text-sm font-semibold text-muted-foreground">{prazoViagem(proxima.data, new Date()).rotulo}</p>
                 )}
 
                 {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (

@@ -3,6 +3,22 @@ import { Home, Route as RouteIcon, Users, Wallet, Menu } from "lucide-react";
 import { AppShell } from "@/components/app/AppShell";
 import { ProtegeArea } from "@/components/app/ProtegeArea";
 import { destinoSeNegado, sessaoAtual } from "@/data/sessao";
+import { useAlertas } from "@/data/useAlertas";
+
+function MenuVanzeiro() {
+  const { atencao } = useAlertas();
+  return (
+    <AppShell
+      items={[
+        { to: "/vanzeiro", label: "Início", icon: Home, exact: true, badge: atencao },
+        { to: "/vanzeiro/viagens", label: "Viagens", icon: RouteIcon },
+        { to: "/vanzeiro/passageiros", label: "Passageiros", icon: Users },
+        { to: "/vanzeiro/dinheiro", label: "Dinheiro", icon: Wallet },
+        { to: "/vanzeiro/mais", label: "Mais", icon: Menu },
+      ]}
+    />
+  );
+}
 
 export const Route = createFileRoute("/vanzeiro")({
   beforeLoad: () => {
@@ -11,15 +27,7 @@ export const Route = createFileRoute("/vanzeiro")({
   },
   component: () => (
     <ProtegeArea papel="vanzeiro">
-    <AppShell
-      items={[
-        { to: "/vanzeiro", label: "Início", icon: Home, exact: true },
-        { to: "/vanzeiro/viagens", label: "Viagens", icon: RouteIcon },
-        { to: "/vanzeiro/passageiros", label: "Passageiros", icon: Users },
-        { to: "/vanzeiro/dinheiro", label: "Dinheiro", icon: Wallet },
-        { to: "/vanzeiro/mais", label: "Mais", icon: Menu },
-      ]}
-    />
+      <MenuVanzeiro />
     </ProtegeArea>
   ),
 });

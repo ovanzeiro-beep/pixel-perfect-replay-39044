@@ -1,6 +1,6 @@
 // Todos os dados de exemplo do app ficam aqui. Depois trocamos por banco de dados sem mexer nas telas.
 
-import { deslocarMeses, deslocarSemanas } from "./datasRelativas";
+import { deslocarMeses, deslocarSemanas, somarDias } from "./datasRelativas";
 
 // As datas escritas aqui usam "hoje" = 09/11/2026 como referência; no fim do arquivo elas são
 // empurradas para perto do dia real (semanas ou meses inteiros), então os exemplos nunca ficam velhos.
@@ -25,7 +25,7 @@ export const vans = [
 
 export const motoristas = [
   { id: "m1", nome: "João Batista", telefone: "(43) 99812-4471", cnh: "D", cnhValidade: "2028-03-15", proprio: true },
-  { id: "m2", nome: "Carlos Henrique Souza", telefone: "(43) 99634-2208", cnh: "D", cnhValidade: "2027-07-22", proprio: false },
+  { id: "m2", nome: "Carlos Henrique Souza", telefone: "(43) 99634-2208", cnh: "D", cnhValidade: somarDias(HOJE, 34), proprio: false },
 ];
 
 export const linhas = [
@@ -168,7 +168,6 @@ export const detalheVazio: DetalhePassageiro = { numero: "", bairro: "", referen
 // ===== Etapa 6: viagens =====
 // As viagens são geradas sozinhas a partir das linhas ativas (2 semanas para frente, 1 para trás).
 // Para os exemplos, as respostas são sorteadas de um jeito fixo; abaixo, os casos especiais:
-export const prazoConfirmacao = "Confirmações até a véspera, às 20h";
 export const exemploViagens = {
   // A primeira viagem de sábado da linha de fim de semana fica lotada, com estes passageiros a mais:
   lotada: { linhaId: "l1", diaSemana: "sab", extras: ["p6", "p7", "p8", "p9", "p10"] },

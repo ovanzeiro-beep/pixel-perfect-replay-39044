@@ -18,7 +18,7 @@
 | 3 | Integridade dos dados | Excluir passageiro limpa cobranças/recibos/respostas; vencimento obrigatório em cobrança semanal/mensal; testes do `store.ts` | **Concluída** |
 | 4 | Viagem de ponta a ponta | Encerrar viagem com resumo, histórico de viagens, lista/manifesto para compartilhar; atalhos "simulados" só em modo demonstração | **Concluída** |
 | 5 | Dinheiro e relatórios | Lucro por van/linha/período, ocupação média, comprovante compartilhável | **Concluída** |
-| 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | Pendente |
+| 6 | Alertas e prazos | CNH vencendo, cobrança atrasada, prazo de confirmação da viagem (avisos dentro do app) | **Concluída** |
 | 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | Pendente |
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | Pendente |
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | Pendente |
@@ -63,3 +63,18 @@ Em **Mais → Relatórios** (ou pelo botão no Financeiro):
 - **Combustível:** litros, preço por litro, consumo (km/L, método do tanque cheio) e custo por km. O consumo só aparece com 2 ou mais leituras de km.
 - **Compartilhar:** relatório em texto pelo celular ou WhatsApp; recibos também podem ser compartilhados ou copiados.
 - **Conferência:** um mês fechado nos relatórios dá exatamente o mesmo recebido, gastos e lucro do Financeiro (há teste para isso).
+
+## Alertas (Etapa 6)
+
+Aparecem no topo do Início do vanzeiro, com um selo vermelho no menu "Início" quando algo pede atenção:
+
+| Alerta | Quando aparece | Nível |
+| --- | --- | --- |
+| CNH | vence em até 60 dias (até 15 dias ou vencida = urgente) | atenção / urgente |
+| Pagamentos atrasados | qualquer cobrança vencida e em aberto (15 dias ou mais = urgente) | atenção / urgente |
+| Prazo de confirmação | faltam menos de 24h para fechar (véspera, 20h) e há quem não respondeu; depois do prazo vira urgente | atenção / urgente |
+| Viagem lotada | tem lista de espera | informação |
+
+- O prazo (véspera, 20h) está em `PRAZO` (`src/data/alertas.ts`) e aparece na ficha da viagem e na tela do passageiro, calculado de verdade.
+- "Dispensar" esconde o alerta; ele **volta sozinho** se a situação mudar (mais gente atrasada, CNH vencendo de vez). "Mostrar de novo" traz todos de volta.
+- Os alertas se atualizam a cada minuto. São avisos dentro do app; notificações no celular (push) ficam para a fase com servidor.

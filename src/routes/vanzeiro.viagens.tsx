@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Bell, Bus, Clock, MessageCircle, Play, Repeat, Share2, UserPlus, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { prazoConfirmacao } from "@/data/exemplo";
+import { prazoViagem } from "@/data/alertas";
 import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/store";
 import { definirResposta, sobram, aplicarNovaVan, rotuloDia, horaDe, diaSemana, dataCurta, type Viagem, type Situacao, type Resposta, type Ajuste } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
@@ -138,7 +138,7 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
         <span className={`rounded-full px-3 py-1 text-sm font-bold ${v.situacao === "andamento" ? "bg-accent text-accent-foreground" : "bg-primary-foreground text-primary"}`}>{SITUACAO[v.situacao].nome}</span>
         <p className="mt-3 text-xl font-extrabold">{rotuloDia(v.data, new Date())} · {v.saida}</p>
         <p className="mt-1 opacity-90">{van?.apelido ?? "Sem van"} ({v.lugares} lugares) · {motoristas.find((m) => m.id === v.motoristaId)?.nome ?? "Sem motorista"}</p>
-        <p className="mt-2 text-sm font-semibold text-accent">{prazoConfirmacao}</p>
+        <p className="mt-2 text-sm font-semibold text-accent">{prazoViagem(v.data, new Date()).rotulo}</p>
       </div>
       <Barra v={v} />
 
