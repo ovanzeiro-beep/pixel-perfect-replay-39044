@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { definirResposta, aplicarNovaVan, sobram, vazio, type Ajuste } from "./viagens";
 
-const com = (ids: string[], lugares: number) => ids.reduce<Ajuste>((a, p) => definirResposta(a, p, "vai", lugares).ajuste, vazio());
+const com = (ids: string[], lugares: number) =>
+  ids.reduce<Ajuste>((a, p) => definirResposta(a, p, "vai", lugares).ajuste, vazio());
 
 describe("lotação e lista de espera", () => {
   it("quem confirma depois de lotar vai para a lista de espera, em ordem", () => {
@@ -25,7 +26,14 @@ import { ordenarParadas, partesRota } from "./viagens";
 describe("ida", () => {
   it("ordena paradas pelas cidades do trajeto", () => {
     const cid: Record<string, string> = { a: "Londrina", b: "Jacarezinho", c: "Andirá" };
-    expect(ordenarParadas(["a", "b", "c"], (i) => cid[i]!, ["Jacarezinho", "Cambará", "Andirá", "Londrina"])).toEqual(["b", "c", "a"]);
+    expect(
+      ordenarParadas(["a", "b", "c"], (i) => cid[i]!, [
+        "Jacarezinho",
+        "Cambará",
+        "Andirá",
+        "Londrina",
+      ]),
+    ).toEqual(["b", "c", "a"]);
   });
   it("divide rota com muitas paradas em partes de até 10", () => {
     expect(partesRota(Array.from({ length: 12 }, (_, i) => `E${i}`))).toHaveLength(2);
@@ -45,8 +53,15 @@ describe("parada no caminho", () => {
     expect(textoFaltam(["Ana"])).toBe("Falta 1: Ana");
   });
   it("quem não voltou fica na parada e sai do Na van", () => {
-    const ida: Ida = { ordem: ["a", "b"], fase: "a_caminho", marcas: [{ pid: "a", r: "embarcou", cobrou: 0 }, { pid: "b", r: "embarcou", cobrou: 0 }],
-      parada: { inicio: 0, minutos: 10, local: "Posto", chamada: true, naVan: { a: "manual" } } };
+    const ida: Ida = {
+      ordem: ["a", "b"],
+      fase: "a_caminho",
+      marcas: [
+        { pid: "a", r: "embarcou", cobrou: 0 },
+        { pid: "b", r: "embarcou", cobrou: 0 },
+      ],
+      parada: { inicio: 0, minutos: 10, local: "Posto", chamada: true, naVan: { a: "manual" } },
+    };
     const r = encerrarParada(ida, "Outro: foi de carona", 0);
     expect(r.parada).toBeUndefined();
     expect(r.marcas.filter((m) => m.r === "embarcou").map((m) => m.pid)).toEqual(["a"]);
@@ -54,27 +69,57 @@ describe("parada no caminho", () => {
   });
 });
 
-import { novaVolta, pendentesVolta, rotaVolta, aindaNaVan, cobrancaSoVolta, totalCobrado } from "./viagens";
+import {
+  novaVolta,
+  pendentesVolta,
+  rotaVolta,
+  aindaNaVan,
+  cobrancaSoVolta,
+  totalCobrado,
+} from "./viagens";
 describe("volta e entrega", () => {
-  const ida: Ida = { ordem: ["a", "b", "c"], fase: "chegou", marcas: [
-    { pid: "a", r: "embarcou", cobrou: 0 }, { pid: "b", r: "embarcou", cobrou: 30 }, { pid: "c", r: "ficou", cobrou: 0 }] };
+  const ida: Ida = {
+    ordem: ["a", "b", "c"],
+    fase: "chegou",
+    marcas: [
+      { pid: "a", r: "embarcou", cobrou: 0 },
+      { pid: "b", r: "embarcou", cobrou: 30 },
+      { pid: "c", r: "ficou", cobrou: 0 },
+    ],
+  };
   it("chamada só libera com todos marcados Na van ou Não volta", () => {
     const v = { ...novaVolta(0), status: { a: { r: "na_van" as const, via: "manual" as const } } };
     expect(pendentesVolta(ida, v)).toEqual(["b"]);
-    expect(pendentesVolta(ida, { ...v, status: { ...v.status, b: { r: "nao", motivo: "Volta outro dia" } } })).toEqual([]);
+    expect(
+      pendentesVolta(ida, {
+        ...v,
+        status: { ...v.status, b: { r: "nao", motivo: "Volta outro dia" } },
+      }),
+    ).toEqual([]);
   });
   it("rota de volta é a ordem contrária da ida, só com quem está na van", () => {
-    const v = { ...novaVolta(0), status: { a: { r: "na_van" as const, via: "manual" as const }, c: { r: "na_van" as const, via: "manual" as const }, b: { r: "nao" as const, motivo: "x" } } };
+    const v = {
+      ...novaVolta(0),
+      status: {
+        a: { r: "na_van" as const, via: "manual" as const },
+        c: { r: "na_van" as const, via: "manual" as const },
+        b: { r: "nao" as const, motivo: "x" },
+      },
+    };
     expect(rotaVolta(ida, v)).toEqual(["c", "a"]);
   });
   it("ainda na van conta quem não foi entregue", () => {
-    expect(aindaNaVan({ ...novaVolta(0), ordem: ["c", "a"], entregas: [{ pid: "c", r: "entregue" }] })).toEqual(["a"]);
+    expect(
+      aindaNaVan({ ...novaVolta(0), ordem: ["c", "a"], entregas: [{ pid: "c", r: "entregue" }] }),
+    ).toEqual(["a"]);
   });
   it("cobra quem só volta e paga por viagem, uma vez só", () => {
     expect(cobrancaSoVolta(ida, "x", "por_viagem", 25)).toBe(25);
     expect(cobrancaSoVolta(ida, "b", "por_viagem", 30)).toBe(0);
     expect(cobrancaSoVolta(ida, "x", "mensal", 25)).toBe(0);
-    expect(totalCobrado({ ...ida, volta: { ...novaVolta(0), extras: [{ pid: "x", cobrou: 25 }] } })).toBe(55);
+    expect(
+      totalCobrado({ ...ida, volta: { ...novaVolta(0), extras: [{ pid: "x", cobrou: 25 }] } }),
+    ).toBe(55);
   });
 });
 
@@ -91,6 +136,8 @@ describe("horário na parada do passageiro", () => {
     expect(horarioNaParada("23:50", "Andirá", trajeto)).toBe("00:30");
   });
   it("aceita bairro/cidade com complemento no trajeto", () => {
-    expect(horarioNaParada("06:40", "Jacarezinho", ["Jacarezinho (Centro)", "Vila São Pedro"])).toBe("06:40");
+    expect(
+      horarioNaParada("06:40", "Jacarezinho", ["Jacarezinho (Centro)", "Vila São Pedro"]),
+    ).toBe("06:40");
   });
 });

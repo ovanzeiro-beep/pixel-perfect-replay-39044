@@ -5,7 +5,10 @@ export function EmConstrucao({ titulo, voltar }: { titulo: string; voltar?: bool
   return (
     <div className="px-5 pt-6">
       {voltar && (
-        <Link to="/vanzeiro/mais" className="mb-4 inline-flex items-center gap-2 text-base font-semibold text-primary">
+        <Link
+          to="/vanzeiro/mais"
+          className="mb-4 inline-flex items-center gap-2 text-base font-semibold text-primary"
+        >
           <ArrowLeft className="h-5 w-5" /> Voltar
         </Link>
       )}
@@ -15,7 +18,9 @@ export function EmConstrucao({ titulo, voltar }: { titulo: string; voltar?: bool
           <HardHat className="h-8 w-8" />
         </div>
         <p className="text-xl font-bold text-foreground">Em construção</p>
-        <p className="mt-2 text-base text-muted-foreground">Esta tela está sendo preparada e chega nas próximas etapas.</p>
+        <p className="mt-2 text-base text-muted-foreground">
+          Esta tela está sendo preparada e chega nas próximas etapas.
+        </p>
       </div>
     </div>
   );

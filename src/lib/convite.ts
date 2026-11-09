@@ -5,6 +5,8 @@ export function linkConvite(passageiroId: string, origem?: string): string {
 }
 
 /** Só quem já recebeu o convite (e segue ativo) pode entrar pelo link. */
-export function conviteValido(p: { ativo: boolean; convite: "nao_enviado" | "enviado" | "no_app" } | undefined): boolean {
+export function conviteValido(
+  p: { ativo: boolean; convite: "nao_enviado" | "enviado" | "no_app" } | undefined,
+): boolean {
   return !!p && p.ativo && p.convite !== "nao_enviado";
 }

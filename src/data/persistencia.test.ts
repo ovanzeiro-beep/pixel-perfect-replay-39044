@@ -1,11 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CHAVE, VERSAO, gravar, ler, limpar } from "./persistencia";
 
-const ehNum = (x: unknown): x is { n: number } => !!x && typeof x === "object" && typeof (x as { n?: unknown }).n === "number";
+const ehNum = (x: unknown): x is { n: number } =>
+  !!x && typeof x === "object" && typeof (x as { n?: unknown }).n === "number";
 
 function armazemFalso() {
   const m = new Map<string, string>();
-  return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k), m };
+  return {
+    getItem: (k: string) => m.get(k) ?? null,
+    setItem: (k: string, v: string) => void m.set(k, v),
+    removeItem: (k: string) => void m.delete(k),
+    m,
+  };
 }
 
 describe("persistencia (funções puras)", () => {
@@ -27,9 +33,22 @@ describe("persistencia (funções puras)", () => {
     expect(ler(a, ehNum)).toBeNull();
   });
   it("não quebra se o armazenamento estiver cheio ou bloqueado", () => {
-    const cheio = { setItem: () => { throw new Error("quota"); } };
+    const cheio = {
+      setItem: () => {
+        throw new Error("quota");
+      },
+    };
     expect(gravar(cheio, { n: 1 })).toBe(false);
-    expect(ler({ getItem: () => { throw new Error("bloqueado"); } }, ehNum)).toBeNull();
+    expect(
+      ler(
+        {
+          getItem: () => {
+            throw new Error("bloqueado");
+          },
+        },
+        ehNum,
+      ),
+    ).toBeNull();
   });
   it("limpar remove o que foi salvo", () => {
     const a = armazemFalso();
@@ -40,14 +59,30 @@ describe("persistencia (funções puras)", () => {
 });
 
 describe("persistencia do app (store)", () => {
-  beforeEach(() => { localStorage.clear(); vi.resetModules(); vi.useFakeTimers(); });
-  afterEach(() => { vi.useRealTimers(); });
+  beforeEach(() => {
+    localStorage.clear();
+    vi.resetModules();
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it("o que o usuário muda sobrevive a um 'recarregar'", async () => {
     const s1 = await import("./store");
     const parar1 = s1.iniciarPersistencia();
     s1.salvarChavePix("minha-chave-pix");
-    s1.salvarVan({ apelido: "Van Nova", modelo: "X", placa: "AAA1B23", lugares: 10, ano: null, cor: "", motoristaId: "", situacao: "rodando", observacoes: "" });
+    s1.salvarVan({
+      apelido: "Van Nova",
+      modelo: "X",
+      placa: "AAA1B23",
+      lugares: 10,
+      ano: null,
+      cor: "",
+      motoristaId: "",
+      situacao: "rodando",
+      observacoes: "",
+    });
     vi.advanceTimersByTime(400);
     parar1();
     expect(localStorage.getItem(CHAVE)).toContain("minha-chave-pix");
@@ -73,7 +108,10 @@ describe("persistencia do app (store)", () => {
   });
 
   it("dados salvos corrompidos são ignorados e o exemplo continua valendo", async () => {
-    localStorage.setItem(CHAVE, JSON.stringify({ versao: VERSAO, salvoEm: "x", dados: { vans: "não é lista" } }));
+    localStorage.setItem(
+      CHAVE,
+      JSON.stringify({ versao: VERSAO, salvoEm: "x", dados: { vans: "não é lista" } }),
+    );
     const s = await import("./store");
     const parar = s.iniciarPersistencia();
     expect(s.obterEstado().vans.length).toBe(2);
@@ -92,7 +130,10 @@ describe("persistencia do app (store)", () => {
     const hoje = new Date();
     const iso = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;
     expect(ex.gastos.every((g) => g.data <= iso)).toBe(true);
-    const recente = ex.gastos.map((g) => g.data).sort().at(-1)!;
+    const recente = ex.gastos
+      .map((g) => g.data)
+      .sort()
+      .at(-1)!;
     const dias = (new Date(iso).getTime() - new Date(recente).getTime()) / 86400000;
     expect(dias).toBeLessThan(31);
   });

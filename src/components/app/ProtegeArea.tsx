@@ -19,7 +19,10 @@ export function ProtegeArea({ papel, children }: { papel: Papel; children: React
   const { passageiros } = useFrota();
   const navigate = useNavigate();
   const negado = destinoSeNegado(papel, sessao);
-  const passageiroSumiu = prontos && sessao?.papel === "passageiro" && !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
+  const passageiroSumiu =
+    prontos &&
+    sessao?.papel === "passageiro" &&
+    !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
 
   useEffect(() => {
     if (negado) void navigate({ to: negado, replace: true });

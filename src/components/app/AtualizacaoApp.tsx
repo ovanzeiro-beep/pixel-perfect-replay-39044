@@ -13,12 +13,24 @@ export function AtualizacaoApp() {
         <RefreshCw className="mt-0.5 h-6 w-6 shrink-0 text-accent" />
         <div className="flex-1">
           <p className="font-extrabold leading-snug">Nova versão do app disponível</p>
-          <p className="text-sm opacity-85">Atualize para ter as últimas melhorias. Seus dados continuam salvos.</p>
+          <p className="text-sm opacity-85">
+            Atualize para ter as últimas melhorias. Seus dados continuam salvos.
+          </p>
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <button onClick={atualizar} className="min-h-12 rounded-xl bg-accent font-extrabold text-accent-foreground">Atualizar agora</button>
-        <button onClick={() => setAdiado(true)} className="min-h-12 rounded-xl border-2 border-primary-foreground/40 font-bold">Depois</button>
+        <button
+          onClick={atualizar}
+          className="min-h-12 rounded-xl bg-accent font-extrabold text-accent-foreground"
+        >
+          Atualizar agora
+        </button>
+        <button
+          onClick={() => setAdiado(true)}
+          className="min-h-12 rounded-xl border-2 border-primary-foreground/40 font-bold"
+        >
+          Depois
+        </button>
       </div>
     </div>
   );

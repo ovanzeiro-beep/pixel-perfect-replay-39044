@@ -48,11 +48,24 @@ for (const e of fonte.etapas) {
   const feitos = especificos.filter((r) => r.ok === true).length;
   const pulados = res.filter((r) => r.ok === null).length;
   const falhas = res.filter((r) => r.ok === false);
-  const real = falhas.length === 0 && pulados === 0 ? "concluida" : falhas.length === 0 ? "sem-comandos" : "pendente";
+  const real =
+    falhas.length === 0 && pulados === 0
+      ? "concluida"
+      : falhas.length === 0
+        ? "sem-comandos"
+        : "pendente";
   const erro = e.status === "concluida" && falhas.length > 0;
   if (erro) divergencia = true;
-  const veredito = erro ? "DIVERGENTE (declarada concluída, mas falha)" : e.status === "concluida" ? "OK" : real === "concluida" ? "PRONTA PARA MARCAR COMO CONCLUÍDA" : "pendente";
-  console.log(`\nEtapa ${e.id} — ${e.titulo}  [declarada: ${e.status}]  ${feitos}/${especificos.length} checks da etapa + ${res.length - especificos.length} comandos de segurança  → ${veredito}`);
+  const veredito = erro
+    ? "DIVERGENTE (declarada concluída, mas falha)"
+    : e.status === "concluida"
+      ? "OK"
+      : real === "concluida"
+        ? "PRONTA PARA MARCAR COMO CONCLUÍDA"
+        : "pendente";
+  console.log(
+    `\nEtapa ${e.id} — ${e.titulo}  [declarada: ${e.status}]  ${feitos}/${especificos.length} checks da etapa + ${res.length - especificos.length} comandos de segurança  → ${veredito}`,
+  );
   for (const r of res) console.log(`  ${r.ok === true ? "✔" : r.ok === null ? "·" : "✘"} ${r.d}`);
   linhas.push({ e, feitos, total: especificos.length, pulados, veredito, falhas });
 }
@@ -60,11 +73,13 @@ for (const e of fonte.etapas) {
 if (registrar) {
   const hoje = new Date().toISOString().slice(0, 16).replace("T", " ");
   let md = `# Contraprova\n\nGerado por \`node scripts/conferir.mjs --registrar\` em ${hoje} UTC${rapido ? " (modo rápido: comandos não executados)" : ""}.\n\n| Etapa | Declarada | Checks da etapa | Resultado |\n| --- | --- | --- | --- |\n`;
-  for (const l of linhas) md += `| ${l.e.id} — ${l.e.titulo} | ${l.e.status} | ${l.feitos}/${l.total}${l.pulados ? ` (${l.pulados} pulados)` : ""} | ${l.veredito} |\n`;
+  for (const l of linhas)
+    md += `| ${l.e.id} — ${l.e.titulo} | ${l.e.status} | ${l.feitos}/${l.total}${l.pulados ? ` (${l.pulados} pulados)` : ""} | ${l.veredito} |\n`;
   const abertos = linhas.filter((l) => l.falhas.length);
   if (abertos.length) {
     md += `\n## O que falta\n`;
-    for (const l of abertos) md += `\n**Etapa ${l.e.id} — ${l.e.titulo}**\n${l.falhas.map((f) => `- ${f.d}`).join("\n")}\n`;
+    for (const l of abertos)
+      md += `\n**Etapa ${l.e.id} — ${l.e.titulo}**\n${l.falhas.map((f) => `- ${f.d}`).join("\n")}\n`;
   }
   writeFileSync("docs/CONTRAPROVA.md", md);
   console.log("\nRegistrado em docs/CONTRAPROVA.md");

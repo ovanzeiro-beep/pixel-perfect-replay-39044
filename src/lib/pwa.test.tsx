@@ -1,10 +1,18 @@
 import { act, cleanup, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-beforeEach(() => { vi.resetModules(); });
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+beforeEach(() => {
+  vi.resetModules();
+});
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
-const trabalhador = () => ({ postMessage: vi.fn() }) as unknown as ServiceWorker & { postMessage: ReturnType<typeof vi.fn> };
+const trabalhador = () =>
+  ({ postMessage: vi.fn() }) as unknown as ServiceWorker & {
+    postMessage: ReturnType<typeof vi.fn>;
+  };
 
 describe("conexão", () => {
   it("acompanha o aparelho ficando sem internet e voltando", async () => {
@@ -12,10 +20,14 @@ describe("conexão", () => {
     const { result } = renderHook(() => useOnline());
     expect(result.current).toBe(true);
     vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
-    act(() => { window.dispatchEvent(new Event("offline")); });
+    act(() => {
+      window.dispatchEvent(new Event("offline"));
+    });
     expect(result.current).toBe(false);
     vi.spyOn(navigator, "onLine", "get").mockReturnValue(true);
-    act(() => { window.dispatchEvent(new Event("online")); });
+    act(() => {
+      window.dispatchEvent(new Event("online"));
+    });
     expect(result.current).toBe(true);
   });
 
@@ -25,7 +37,9 @@ describe("conexão", () => {
     render(<SemConexao />);
     expect(screen.queryByRole("status")).toBeNull();
     vi.spyOn(navigator, "onLine", "get").mockReturnValue(false);
-    act(() => { window.dispatchEvent(new Event("offline")); });
+    act(() => {
+      window.dispatchEvent(new Event("offline"));
+    });
     expect(screen.getByRole("status")).toHaveTextContent(/Sem internet/);
     expect(screen.getByRole("status")).toHaveTextContent(/dados salvos neste aparelho/);
   });
@@ -71,7 +85,10 @@ describe("aviso de nova versão", () => {
 
 describe("instalar o app", () => {
   const eventoInstalacao = (resultado: "accepted" | "dismissed" = "accepted") => {
-    const e = new Event("beforeinstallprompt", { cancelable: true }) as Event & { prompt: ReturnType<typeof vi.fn>; userChoice: Promise<{ outcome: string }> };
+    const e = new Event("beforeinstallprompt", { cancelable: true }) as Event & {
+      prompt: ReturnType<typeof vi.fn>;
+      userChoice: Promise<{ outcome: string }>;
+    };
     e.prompt = vi.fn().mockResolvedValue(undefined);
     e.userChoice = Promise.resolve({ outcome: resultado });
     return e;
@@ -95,7 +112,9 @@ describe("instalar o app", () => {
     const e = eventoInstalacao("accepted");
     window.dispatchEvent(e);
     const { result } = renderHook(() => pwa.useInstalarApp());
-    await act(async () => { await result.current.instalar(); });
+    await act(async () => {
+      await result.current.instalar();
+    });
     expect(e.prompt).toHaveBeenCalledOnce();
     expect(result.current.podeInstalar).toBe(false);
     expect(result.current.instalado).toBe(true);
@@ -105,7 +124,9 @@ describe("instalar o app", () => {
     const pwa = await import("./pwa");
     window.dispatchEvent(eventoInstalacao("dismissed"));
     const { result } = renderHook(() => pwa.useInstalarApp());
-    await act(async () => { await result.current.instalar(); });
+    await act(async () => {
+      await result.current.instalar();
+    });
     expect(result.current.instalado).toBe(false);
   });
 
@@ -115,13 +136,20 @@ describe("instalar o app", () => {
     window.dispatchEvent(eventoInstalacao());
     render(<InstalarApp />);
     expect(await screen.findByText("Instale o app no celular")).toBeInTheDocument();
-    act(() => { window.dispatchEvent(new Event("appinstalled")); });
+    act(() => {
+      window.dispatchEvent(new Event("appinstalled"));
+    });
     expect(screen.queryByText("Instale o app no celular")).toBeNull();
     expect(pwa).toBeDefined();
   });
 
   it("no iPhone mostra o passo a passo em vez do botão", async () => {
-    vi.stubGlobal("navigator", Object.create(navigator, { userAgent: { value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari" } }));
+    vi.stubGlobal(
+      "navigator",
+      Object.create(navigator, {
+        userAgent: { value: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari" },
+      }),
+    );
     const { InstalarApp } = await import("@/components/app/InstalarApp");
     render(<InstalarApp />);
     fireEvent.click(await screen.findByRole("button", { name: /Como instalar no iPhone/ }));

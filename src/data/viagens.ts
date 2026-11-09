@@ -3,7 +3,9 @@ import type { Linha, Passageiro, Van } from "./store";
 
 export type Resposta = "vai" | "nao" | "sem" | "espera";
 export type Ajuste = {
-  vanId?: string; motoristaId?: string; cancelada?: boolean;
+  vanId?: string;
+  motoristaId?: string;
+  cancelada?: boolean;
   respostas: Record<string, Resposta>; // ordem das chaves = ordem de confirmação
   espera: string[]; // ordem de chegada
   extras: string[]; // só nesta viagem
@@ -12,51 +14,92 @@ export type Ajuste = {
 export type Marca = { pid: string; r: "embarcou" | "faltou" | "ficou"; cobrou: number };
 export type Ficou = { pid: string; motivo: string; hora: string };
 export type ParadaFeita = { inicio: number; minutos: number; local: string; ficaram: Ficou[] };
-export type ParadaAtiva = { inicio: number; minutos: number; local: string; chamada: boolean; naVan: Record<string, "manual" | "app"> };
+export type ParadaAtiva = {
+  inicio: number;
+  minutos: number;
+  local: string;
+  chamada: boolean;
+  naVan: Record<string, "manual" | "app">;
+};
 export type StatusVolta = { r: "na_van"; via: "manual" | "app" } | { r: "nao"; motivo: string };
 export type Entrega = { pid: string; r: "entregue" | "outro" | "ficou"; onde?: string };
 export type Volta = {
-  fase: "chamada" | "entrega"; inicio: number;
+  fase: "chamada" | "entrega";
+  inicio: number;
   status: Record<string, StatusVolta>;
   extras: { pid: string; cobrou: number }[];
-  ordem: string[]; entregas: Entrega[];
-  parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[];
+  ordem: string[];
+  entregas: Entrega[];
+  parada?: ParadaAtiva | undefined;
+  paradas?: ParadaFeita[];
 };
 export type Ida = {
-  ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva | undefined; paradas?: ParadaFeita[];
-  inicio?: number; volta?: Volta; encerrada?: number;
+  ordem: string[];
+  marcas: Marca[];
+  fase: "paradas" | "a_caminho" | "chegou";
+  parada?: ParadaAtiva | undefined;
+  paradas?: ParadaFeita[];
+  inicio?: number;
+  volta?: Volta;
+  encerrada?: number;
 };
 
-const hm = (ms: number) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+const hm = (ms: number) => {
+  const d = new Date(ms);
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
 export const horaDe = hm;
 /** Horário de saída da parada (início + duração). */
 export const saidaParada = (inicio: number, minutos: number) => hm(inicio + minutos * 60000);
-export const avisoParada = (minutos: number, saida: string) => `Parada de ${minutos} minutos. Saída às ${saida}. Não se atrase!`;
+export const avisoParada = (minutos: number, saida: string) =>
+  `Parada de ${minutos} minutos. Saída às ${saida}. Não se atrase!`;
 /** "Faltam 2: Maria e Joana" */
 export function textoFaltam(nomes: string[]): string {
   if (nomes.length === 0) return "";
-  const lista = nomes.length === 1 ? nomes[0]! : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+  const lista =
+    nomes.length === 1
+      ? nomes[0]!
+      : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
   return `Falta${nomes.length > 1 ? "m" : ""} ${nomes.length}: ${lista}`;
 }
 /** Abre a chamada da volta. */
-export const novaVolta = (agora: number): Volta => ({ fase: "chamada", inicio: agora, status: {}, extras: [], ordem: [], entregas: [] });
+export const novaVolta = (agora: number): Volta => ({
+  fase: "chamada",
+  inicio: agora,
+  status: {},
+  extras: [],
+  ordem: [],
+  entregas: [],
+});
 /** Quem precisa estar marcado na chamada da volta (embarcou na ida + só volta). */
-export const chamadaVolta = (ida: Ida, volta: Volta) => [...ida.marcas.filter((m) => m.r === "embarcou").map((m) => m.pid), ...volta.extras.map((e) => e.pid)];
+export const chamadaVolta = (ida: Ida, volta: Volta) => [
+  ...ida.marcas.filter((m) => m.r === "embarcou").map((m) => m.pid),
+  ...volta.extras.map((e) => e.pid),
+];
 /** Quem ainda falta marcar "Na van" ou "Não volta". */
-export const pendentesVolta = (ida: Ida, volta: Volta) => chamadaVolta(ida, volta).filter((id) => !volta.status[id]);
+export const pendentesVolta = (ida: Ida, volta: Volta) =>
+  chamadaVolta(ida, volta).filter((id) => !volta.status[id]);
 /** Rota de entrega: ordem contrária da ida, só com quem está na van; quem só volta vai no fim. */
 export function rotaVolta(ida: Ida, volta: Volta): string[] {
   const naVan = (id: string) => volta.status[id]?.r === "na_van";
   const daIda = [...ida.ordem].reverse().filter(naVan);
-  return [...daIda, ...volta.extras.map((e) => e.pid).filter((id) => naVan(id) && !daIda.includes(id))];
+  return [
+    ...daIda,
+    ...volta.extras.map((e) => e.pid).filter((id) => naVan(id) && !daIda.includes(id)),
+  ];
 }
 /** Quem ainda não foi entregue. */
-export const aindaNaVan = (volta: Volta) => volta.ordem.filter((id) => !volta.entregas.some((e) => e.pid === id));
+export const aindaNaVan = (volta: Volta) =>
+  volta.ordem.filter((id) => !volta.entregas.some((e) => e.pid === id));
 /** Cobrança automática para quem só volta e paga por viagem (se ainda não foi cobrado nesta viagem). */
 export const cobrancaSoVolta = (ida: Ida, pid: string, formaPagamento: string, valor: number) =>
-  formaPagamento === "por_viagem" && !ida.marcas.some((m) => m.pid === pid && m.cobrou > 0) ? valor : 0;
+  formaPagamento === "por_viagem" && !ida.marcas.some((m) => m.pid === pid && m.cobrou > 0)
+    ? valor
+    : 0;
 /** Total cobrado na viagem (ida + volta). */
-export const totalCobrado = (ida: Ida) => ida.marcas.reduce((s, m) => s + m.cobrou, 0) + (ida.volta?.extras.reduce((s, e) => s + e.cobrou, 0) ?? 0);
+export const totalCobrado = (ida: Ida) =>
+  ida.marcas.reduce((s, m) => s + m.cobrou, 0) +
+  (ida.volta?.extras.reduce((s, e) => s + e.cobrou, 0) ?? 0);
 /** Parada da volta: quem não foi marcado "Na van" fica registrado e sai da van. */
 export function encerrarParadaVolta(volta: Volta, motivo: string, agora: number): Volta {
   const p = volta.parada;
@@ -64,9 +107,21 @@ export function encerrarParadaVolta(volta: Volta, motivo: string, agora: number)
   const ficaram = aindaNaVan(volta).filter((id) => !p.naVan[id]);
   const hora = hm(agora);
   return {
-    ...volta, parada: undefined,
-    entregas: [...volta.entregas, ...ficaram.map((pid) => ({ pid, r: "ficou" as const, onde: motivo }))],
-    paradas: [...(volta.paradas ?? []), { inicio: p.inicio, minutos: p.minutos, local: p.local, ficaram: ficaram.map((pid) => ({ pid, motivo, hora })) }],
+    ...volta,
+    parada: undefined,
+    entregas: [
+      ...volta.entregas,
+      ...ficaram.map((pid) => ({ pid, r: "ficou" as const, onde: motivo })),
+    ],
+    paradas: [
+      ...(volta.paradas ?? []),
+      {
+        inicio: p.inicio,
+        minutos: p.minutos,
+        local: p.local,
+        ficaram: ficaram.map((pid) => ({ pid, motivo, hora })),
+      },
+    ],
   };
 }
 
@@ -74,24 +129,52 @@ export function encerrarParadaVolta(volta: Volta, motivo: string, agora: number)
 export function encerrarParada(ida: Ida, motivo: string, agora: number): Ida {
   const p = ida.parada;
   if (!p) return ida;
-  const ficaramIds = ida.marcas.filter((m) => m.r === "embarcou" && !p.naVan[m.pid]).map((m) => m.pid);
+  const ficaramIds = ida.marcas
+    .filter((m) => m.r === "embarcou" && !p.naVan[m.pid])
+    .map((m) => m.pid);
   const hora = hm(agora);
   return {
-    ...ida, parada: undefined,
+    ...ida,
+    parada: undefined,
     marcas: ida.marcas.map((m) => (ficaramIds.includes(m.pid) ? { ...m, r: "ficou" } : m)),
-    paradas: [...(ida.paradas ?? []), { inicio: p.inicio, minutos: p.minutos, local: p.local, ficaram: ficaramIds.map((pid) => ({ pid, motivo, hora })) }],
+    paradas: [
+      ...(ida.paradas ?? []),
+      {
+        inicio: p.inicio,
+        minutos: p.minutos,
+        local: p.local,
+        ficaram: ficaramIds.map((pid) => ({ pid, motivo, hora })),
+      },
+    ],
   };
 }
 export type Situacao = "agendada" | "lotada" | "andamento" | "concluida" | "cancelada";
 export type Viagem = {
-  id: string; linhaId: string; data: string; saida: string; volta: string; vanId: string; motoristaId: string;
-  lugares: number; passageiroIds: string[]; ajuste: Ajuste; situacao: Situacao; passada: boolean;
-  vao: string[]; sem: string[]; nao: string[]; espera: string[];
+  id: string;
+  linhaId: string;
+  data: string;
+  saida: string;
+  volta: string;
+  vanId: string;
+  motoristaId: string;
+  lugares: number;
+  passageiroIds: string[];
+  ajuste: Ajuste;
+  situacao: Situacao;
+  passada: boolean;
+  vao: string[];
+  sem: string[];
+  nao: string[];
+  espera: string[];
 };
 
 const COD = ["dom", "seg", "ter", "qua", "qui", "sex", "sab"];
-export const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-export const doIso = (s: string) => { const [a, m, d] = s.split("-").map(Number); return new Date(a!, m! - 1, d!); };
+export const iso = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export const doIso = (s: string) => {
+  const [a, m, d] = s.split("-").map(Number);
+  return new Date(a!, m! - 1, d!);
+};
 export const vazio = (): Ajuste => ({ respostas: {}, espera: [], extras: [] });
 export const idViagem = (linhaId: string, data: string) => `${linhaId}_${data}`;
 
@@ -110,7 +193,12 @@ export function datasDaLinha(l: Linha, hoje: Date): string[] {
 const qtd = (aj: Ajuste, r: Resposta) => Object.values(aj.respostas).filter((x) => x === r).length;
 
 /** Muda a resposta de um passageiro respeitando os lugares. Retorna quem subiu da lista de espera, se alguém. */
-export function definirResposta(aj: Ajuste, pid: string, r: Exclude<Resposta, "espera">, lugares: number): { ajuste: Ajuste; foiParaEspera: boolean; subiu?: string } {
+export function definirResposta(
+  aj: Ajuste,
+  pid: string,
+  r: Exclude<Resposta, "espera">,
+  lugares: number,
+): { ajuste: Ajuste; foiParaEspera: boolean; subiu?: string } {
   const anterior = aj.respostas[pid] ?? "sem";
   const respostas = { ...aj.respostas };
   let espera = aj.espera.filter((x) => x !== pid);
@@ -118,7 +206,8 @@ export function definirResposta(aj: Ajuste, pid: string, r: Exclude<Resposta, "e
   if (r === "vai") {
     if (anterior === "vai") return { ajuste: aj, foiParaEspera: false };
     if (qtd({ ...aj, respostas }, "vai") >= lugares) {
-      respostas[pid] = "espera"; espera = [...espera, pid];
+      respostas[pid] = "espera";
+      espera = [...espera, pid];
       return { ajuste: { ...aj, respostas, espera }, foiParaEspera: true };
     }
     respostas[pid] = "vai";
@@ -127,10 +216,16 @@ export function definirResposta(aj: Ajuste, pid: string, r: Exclude<Resposta, "e
   respostas[pid] = r;
   let subiu: string | undefined;
   if (anterior === "vai" && espera.length > 0 && qtd({ ...aj, respostas }, "vai") < lugares) {
-    subiu = espera[0]!; espera = espera.slice(1);
-    delete respostas[subiu]; respostas[subiu] = "vai";
+    subiu = espera[0]!;
+    espera = espera.slice(1);
+    delete respostas[subiu];
+    respostas[subiu] = "vai";
   }
-  return { ajuste: { ...aj, respostas, espera }, foiParaEspera: false, ...(subiu ? { subiu } : {}) };
+  return {
+    ajuste: { ...aj, respostas, espera },
+    foiParaEspera: false,
+    ...(subiu ? { subiu } : {}),
+  };
 }
 
 /** Quantas pessoas confirmadas sobram se a viagem passar a ter `lugares`. */
@@ -145,12 +240,20 @@ export function aplicarNovaVan(aj: Ajuste, vanId: string, lugares: number): Ajus
   return { ...aj, vanId, respostas, espera: [...excedentes, ...aj.espera] };
 }
 
-export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: Van[], ajustes: Record<string, Ajuste>, agora: Date): Viagem[] {
+export function montarViagens(
+  linhas: Linha[],
+  passageiros: Passageiro[],
+  vans: Van[],
+  ajustes: Record<string, Ajuste>,
+  agora: Date,
+): Viagem[] {
   const hojeIso = iso(agora);
   const hhmm = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
   const out: Viagem[] = [];
   for (const l of linhas) {
-    const daLinha = passageiros.filter((p) => p.ativo && p.linhaIds.includes(l.id)).map((p) => p.id);
+    const daLinha = passageiros
+      .filter((p) => p.ativo && p.linhaIds.includes(l.id))
+      .map((p) => p.id);
     for (const data of datasDaLinha(l, agora)) {
       const id = idViagem(l.id, data);
       const ajuste = ajustes[id] ?? vazio();
@@ -161,17 +264,39 @@ export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: 
       const resp = (p: string) => ajuste.respostas[p] ?? "sem";
       const vao = Object.keys(ajuste.respostas).filter((p) => ids.includes(p) && resp(p) === "vai");
       const espera = ajuste.espera.filter((p) => ids.includes(p));
-      const passada = ajuste.ida?.encerrada ? true : !ajuste.ida && (data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta));
-      const situacao: Situacao = ajuste.cancelada ? "cancelada"
-        : ajuste.ida?.encerrada ? "concluida"
-        : ajuste.ida ? "andamento"
-        : passada ? "concluida"
-        : data === hojeIso && !!l.saida && hhmm >= l.saida ? "andamento"
-        : lugares > 0 && vao.length >= lugares ? "lotada" : "agendada";
+      const passada = ajuste.ida?.encerrada
+        ? true
+        : !ajuste.ida && (data < hojeIso || (data === hojeIso && !!l.volta && hhmm > l.volta));
+      const situacao: Situacao = ajuste.cancelada
+        ? "cancelada"
+        : ajuste.ida?.encerrada
+          ? "concluida"
+          : ajuste.ida
+            ? "andamento"
+            : passada
+              ? "concluida"
+              : data === hojeIso && !!l.saida && hhmm >= l.saida
+                ? "andamento"
+                : lugares > 0 && vao.length >= lugares
+                  ? "lotada"
+                  : "agendada";
       out.push({
-        id, linhaId: l.id, data, saida: l.saida, volta: l.volta, vanId, motoristaId: ajuste.motoristaId ?? l.motoristaId, lugares,
-        passageiroIds: ids, ajuste, situacao, passada: passada || !!ajuste.cancelada,
-        vao, espera, sem: ids.filter((p) => resp(p) === "sem"), nao: ids.filter((p) => resp(p) === "nao"),
+        id,
+        linhaId: l.id,
+        data,
+        saida: l.saida,
+        volta: l.volta,
+        vanId,
+        motoristaId: ajuste.motoristaId ?? l.motoristaId,
+        lugares,
+        passageiroIds: ids,
+        ajuste,
+        situacao,
+        passada: passada || !!ajuste.cancelada,
+        vao,
+        espera,
+        sem: ids.filter((p) => resp(p) === "sem"),
+        nao: ids.filter((p) => resp(p) === "nao"),
       });
     }
   }
@@ -179,8 +304,16 @@ export function montarViagens(linhas: Linha[], passageiros: Passageiro[], vans: 
 }
 
 /** Respostas de exemplo: variadas, mas sempre iguais para o mesmo passageiro e dia. */
-export function semearAjustes(linhas: Linha[], passageiros: Passageiro[], vans: Van[], agora: Date,
-  especial: { lotada: { linhaId: string; diaSemana: string; extras: string[] }; canceladaLinhaId: string }): Record<string, Ajuste> {
+export function semearAjustes(
+  linhas: Linha[],
+  passageiros: Passageiro[],
+  vans: Van[],
+  agora: Date,
+  especial: {
+    lotada: { linhaId: string; diaSemana: string; extras: string[] };
+    canceladaLinhaId: string;
+  },
+): Record<string, Ajuste> {
   const hojeIso = iso(agora);
   const aj: Record<string, Ajuste> = {};
   const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
@@ -188,12 +321,18 @@ export function semearAjustes(linhas: Linha[], passageiros: Passageiro[], vans: 
   let ultimaPassadaCancel = "";
   for (const l of linhas) {
     const lugares = vans.find((v) => v.id === l.vanId)?.lugares ?? 0;
-    const daLinha = passageiros.filter((p) => p.ativo && p.linhaIds.includes(l.id)).map((p) => p.id);
+    const daLinha = passageiros
+      .filter((p) => p.ativo && p.linhaIds.includes(l.id))
+      .map((p) => p.id);
     for (const data of datasDaLinha(l, agora)) {
       const id = idViagem(l.id, data);
       let a = vazio();
       const passada = data < hojeIso;
-      const ehLotada = !lotadaFeita && !passada && l.id === especial.lotada.linhaId && COD[doIso(data).getDay()] === especial.lotada.diaSemana;
+      const ehLotada =
+        !lotadaFeita &&
+        !passada &&
+        l.id === especial.lotada.linhaId &&
+        COD[doIso(data).getDay()] === especial.lotada.diaSemana;
       if (ehLotada) {
         lotadaFeita = true;
         a.extras = especial.lotada.extras;
@@ -209,7 +348,8 @@ export function semearAjustes(linhas: Linha[], passageiros: Passageiro[], vans: 
       if (passada && l.id === especial.canceladaLinhaId) ultimaPassadaCancel = id;
     }
   }
-  if (ultimaPassadaCancel) aj[ultimaPassadaCancel] = { ...aj[ultimaPassadaCancel]!, cancelada: true };
+  if (ultimaPassadaCancel)
+    aj[ultimaPassadaCancel] = { ...aj[ultimaPassadaCancel]!, cancelada: true };
   return aj;
 }
 
@@ -226,11 +366,21 @@ export function rotuloDia(data: string, agora: Date) {
   return `${SEM[d.getDay()]}, ${dm}`;
 }
 export const diaSemana = (data: string) => SEM[doIso(data).getDay()]!;
-export const dataCurta = (data: string) => { const d = doIso(data); return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`; };
+export const dataCurta = (data: string) => {
+  const d = doIso(data);
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+};
 
 /** Ordena os confirmados seguindo as cidades do trajeto da linha (cidades fora do trajeto vão para o fim). */
-export function ordenarParadas(ids: string[], cidadeDe: (id: string) => string, trajeto: string[]): string[] {
-  const pos = (id: string) => { const i = trajeto.findIndex((c) => c.toLowerCase().startsWith(cidadeDe(id).toLowerCase())); return i < 0 ? 999 : i; };
+export function ordenarParadas(
+  ids: string[],
+  cidadeDe: (id: string) => string,
+  trajeto: string[],
+): string[] {
+  const pos = (id: string) => {
+    const i = trajeto.findIndex((c) => c.toLowerCase().startsWith(cidadeDe(id).toLowerCase()));
+    return i < 0 ? 999 : i;
+  };
   return [...ids].sort((a, b) => pos(a) - pos(b));
 }
 
@@ -252,9 +402,13 @@ export function partesRota(enderecos: string[], max = 10): string[] {
 
 /** Tira um passageiro de tudo o que a viagem guardou dele (respostas, espera, ida e volta). */
 export function semPassageiro(aj: Ajuste, pid: string): Ajuste {
-  const tira = <T,>(r: Record<string, T> | undefined) => (r ? Object.fromEntries(Object.entries(r).filter(([k]) => k !== pid)) as Record<string, T> : r);
-  const limpaParada = <P extends { naVan?: Record<string, unknown> }>(p: P | undefined): P | undefined => (p ? { ...p, ...(p.naVan ? { naVan: tira(p.naVan) } : {}) } : p);
-  const limpaFeitas = (ps: ParadaFeita[] | undefined) => ps?.map((p) => ({ ...p, ficaram: p.ficaram.filter((f) => f.pid !== pid) }));
+  const tira = <T>(r: Record<string, T> | undefined) =>
+    r ? (Object.fromEntries(Object.entries(r).filter(([k]) => k !== pid)) as Record<string, T>) : r;
+  const limpaParada = <P extends { naVan?: Record<string, unknown> }>(
+    p: P | undefined,
+  ): P | undefined => (p ? { ...p, ...(p.naVan ? { naVan: tira(p.naVan) } : {}) } : p);
+  const limpaFeitas = (ps: ParadaFeita[] | undefined) =>
+    ps?.map((p) => ({ ...p, ficaram: p.ficaram.filter((f) => f.pid !== pid) }));
   const { ida, ...resto } = aj;
   const novo: Ajuste = {
     ...resto,
@@ -264,14 +418,28 @@ export function semPassageiro(aj: Ajuste, pid: string): Ajuste {
   };
   if (!ida) return novo;
   const { volta, parada, paradas, ...restoIda } = ida;
-  const novaIda: Ida = { ...restoIda, ordem: ida.ordem.filter((x) => x !== pid), marcas: ida.marcas.filter((m) => m.pid !== pid) };
-  const p = limpaParada(parada); if (p) novaIda.parada = p;
-  const ps = limpaFeitas(paradas); if (ps) novaIda.paradas = ps;
+  const novaIda: Ida = {
+    ...restoIda,
+    ordem: ida.ordem.filter((x) => x !== pid),
+    marcas: ida.marcas.filter((m) => m.pid !== pid),
+  };
+  const p = limpaParada(parada);
+  if (p) novaIda.parada = p;
+  const ps = limpaFeitas(paradas);
+  if (ps) novaIda.paradas = ps;
   if (volta) {
     const { parada: vp, paradas: vps, ...restoVolta } = volta;
-    const nv: Volta = { ...restoVolta, status: tira(volta.status)!, extras: volta.extras.filter((x) => x.pid !== pid), ordem: volta.ordem.filter((x) => x !== pid), entregas: volta.entregas.filter((x) => x.pid !== pid) };
-    const vpp = limpaParada(vp); if (vpp) nv.parada = vpp;
-    const vpf = limpaFeitas(vps); if (vpf) nv.paradas = vpf;
+    const nv: Volta = {
+      ...restoVolta,
+      status: tira(volta.status)!,
+      extras: volta.extras.filter((x) => x.pid !== pid),
+      ordem: volta.ordem.filter((x) => x !== pid),
+      entregas: volta.entregas.filter((x) => x.pid !== pid),
+    };
+    const vpp = limpaParada(vp);
+    if (vpp) nv.parada = vpp;
+    const vpf = limpaFeitas(vps);
+    if (vpf) nv.paradas = vpf;
     novaIda.volta = nv;
   }
   return { ...novo, ida: novaIda };
@@ -286,7 +454,13 @@ const somaMinutos = (hhmm: string, min: number) => {
 export const MINUTOS_ENTRE_PARADAS = 20;
 
 /** Horário aproximado na parada do passageiro: a saída mais 20 minutos por cidade até a dele no trajeto. */
-export function horarioNaParada(saida: string, cidadeDoPassageiro: string, trajeto: string[]): string {
-  const pos = trajeto.findIndex((c) => c.toLowerCase().startsWith(cidadeDoPassageiro.toLowerCase()));
+export function horarioNaParada(
+  saida: string,
+  cidadeDoPassageiro: string,
+  trajeto: string[],
+): string {
+  const pos = trajeto.findIndex((c) =>
+    c.toLowerCase().startsWith(cidadeDoPassageiro.toLowerCase()),
+  );
   return pos <= 0 ? saida : somaMinutos(saida, pos * MINUTOS_ENTRE_PARADAS);
 }

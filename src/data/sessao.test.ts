@@ -1,9 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CHAVE_SESSAO, apagarSessao, caminhoInicial, destinoSeNegado, ehSessao, gravarSessao, lerSessao } from "./sessao";
+import {
+  CHAVE_SESSAO,
+  apagarSessao,
+  caminhoInicial,
+  destinoSeNegado,
+  ehSessao,
+  gravarSessao,
+  lerSessao,
+} from "./sessao";
 
 function armazemFalso() {
   const m = new Map<string, string>();
-  return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k) };
+  return {
+    getItem: (k: string) => m.get(k) ?? null,
+    setItem: (k: string, v: string) => void m.set(k, v),
+    removeItem: (k: string) => void m.delete(k),
+  };
 }
 
 describe("formato da sessão", () => {
@@ -61,7 +73,10 @@ describe("quem pode ver cada área", () => {
 });
 
 describe("sessão no aparelho", () => {
-  beforeEach(() => { localStorage.clear(); vi.resetModules(); });
+  beforeEach(() => {
+    localStorage.clear();
+    vi.resetModules();
+  });
 
   it("entrar, sobreviver a recarregar e sair", async () => {
     const a = await import("./sessao");

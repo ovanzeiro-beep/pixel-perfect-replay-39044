@@ -17,14 +17,19 @@ describe("validação", () => {
     expect(Object.keys(e).sort()).toEqual(["apelido", "lugares", "placa"]);
   });
   it("nome e telefone do motorista obrigatórios", () => {
-    expect(Object.keys(validarMotorista({ nome: "", telefone: "" })).sort()).toEqual(["nome", "telefone"]);
+    expect(Object.keys(validarMotorista({ nome: "", telefone: "" })).sort()).toEqual([
+      "nome",
+      "telefone",
+    ]);
   });
 });
 
 import { validarLinha } from "./validacao";
 describe("validação de linha", () => {
   it("nome obrigatório", () => {
-    expect(validarLinha({ nome: "", frequencia: "semanal", dias: ["seg"], data: "" }).nome).toBeDefined();
+    expect(
+      validarLinha({ nome: "", frequencia: "semanal", dias: ["seg"], data: "" }).nome,
+    ).toBeDefined();
     expect(validarLinha({ nome: "X", frequencia: "semanal", dias: ["seg"], data: "" })).toEqual({});
   });
 });
@@ -32,12 +37,20 @@ describe("validação de linha", () => {
 import { validarPassageiro, mensagemConvite } from "./validacao";
 describe("passageiro", () => {
   it("nome e telefone com DDD obrigatórios", () => {
-    expect(Object.keys(validarPassageiro({ nome: "", telefone: "", valor: "" })).sort()).toEqual(["nome", "telefone", "valor"]);
-    expect(validarPassageiro({ nome: "A", telefone: "99999-9999", valor: "150" }).telefone).toBeDefined();
+    expect(Object.keys(validarPassageiro({ nome: "", telefone: "", valor: "" })).sort()).toEqual([
+      "nome",
+      "telefone",
+      "valor",
+    ]);
+    expect(
+      validarPassageiro({ nome: "A", telefone: "99999-9999", valor: "150" }).telefone,
+    ).toBeDefined();
     expect(validarPassageiro({ nome: "A", telefone: "(43) 99999-9999", valor: "150" })).toEqual({});
   });
   it("mensagem do convite", () => {
-    expect(mensagemConvite("Maria", "João Batista", "L")).toBe("Olá, Maria! Aqui é o João Batista, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: L");
+    expect(mensagemConvite("Maria", "João Batista", "L")).toBe(
+      "Olá, Maria! Aqui é o João Batista, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: L",
+    );
   });
 });
 
@@ -65,15 +78,25 @@ describe("passageiro: valor e vencimento", () => {
     expect(validarPassageiro({ ...base, valor: "150,50" }).valor).toBeUndefined();
   });
   it("semanal e mensal exigem vencimento; por viagem não", () => {
-    expect(validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "" }).vencimento).toBeDefined();
-    expect(validarPassageiro({ ...base, formaPagamento: "mensal", vencimento: "" }).vencimento).toBeDefined();
-    expect(validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "sexta" })).toEqual({});
+    expect(
+      validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "" }).vencimento,
+    ).toBeDefined();
+    expect(
+      validarPassageiro({ ...base, formaPagamento: "mensal", vencimento: "" }).vencimento,
+    ).toBeDefined();
+    expect(validarPassageiro({ ...base, formaPagamento: "semanal", vencimento: "sexta" })).toEqual(
+      {},
+    );
     expect(validarPassageiro({ ...base, formaPagamento: "mensal", vencimento: "5" })).toEqual({});
-    expect(validarPassageiro({ ...base, formaPagamento: "por_viagem", vencimento: "" })).toEqual({});
+    expect(validarPassageiro({ ...base, formaPagamento: "por_viagem", vencimento: "" })).toEqual(
+      {},
+    );
   });
   it("telefone de emergência é opcional, mas se vier precisa estar completo", () => {
     expect(validarPassageiro({ ...base, emergenciaTelefone: "" })).toEqual({});
-    expect(validarPassageiro({ ...base, emergenciaTelefone: "1234" }).emergenciaTelefone).toBeDefined();
+    expect(
+      validarPassageiro({ ...base, emergenciaTelefone: "1234" }).emergenciaTelefone,
+    ).toBeDefined();
     expect(validarPassageiro({ ...base, emergenciaTelefone: "(43) 99701-5566" })).toEqual({});
   });
 });

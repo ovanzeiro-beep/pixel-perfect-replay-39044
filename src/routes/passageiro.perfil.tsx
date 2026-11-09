@@ -38,7 +38,10 @@ function MeuPerfil() {
     window.open(url, "_blank");
   };
 
-  const sair = () => { encerrarSessao(); void navigate({ to: "/", replace: true }); };
+  const sair = () => {
+    encerrarSessao();
+    void navigate({ to: "/", replace: true });
+  };
 
   return (
     <div className="px-5 pb-6 pt-6 space-y-5">
@@ -46,7 +49,9 @@ function MeuPerfil() {
       <h1 className="text-3xl font-extrabold text-primary">Meu perfil</h1>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Seus dados</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Seus dados
+        </h2>
         <div className="rounded-3xl bg-card p-5 shadow-sm space-y-4">
           <Campo label="Nome" valor={p.nome} />
           <Campo label="Telefone" valor={p.telefone} />
@@ -65,7 +70,9 @@ function MeuPerfil() {
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Contato de emergência</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Contato de emergência
+        </h2>
         <div className="rounded-3xl bg-card p-5 shadow-sm space-y-3">
           {editEmergencia ? (
             <>
@@ -141,10 +148,14 @@ function MeuPerfil() {
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Seu vanzeiro</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Seu vanzeiro
+        </h2>
         <div className="rounded-3xl bg-card p-5 shadow-sm">
           <p className="font-bold">{vanzeiro.nome}</p>
-          <p className="text-sm text-muted-foreground">{vanzeiro.cidade} — {vanzeiro.estado}</p>
+          <p className="text-sm text-muted-foreground">
+            {vanzeiro.cidade} — {vanzeiro.estado}
+          </p>
         </div>
       </section>
 

@@ -11,14 +11,14 @@ export const Route = createFileRoute("/passageiro")({
   },
   component: () => (
     <ProtegeArea papel="passageiro">
-    <AppShell
-      items={[
-        { to: "/passageiro", label: "Início", icon: Home, exact: true },
-        { to: "/passageiro/viagens", label: "Minhas viagens", icon: RouteIcon },
-        { to: "/passageiro/pagamentos", label: "Pagamentos", icon: Wallet },
-        { to: "/passageiro/perfil", label: "Meu perfil", icon: User },
-      ]}
-    />
+      <AppShell
+        items={[
+          { to: "/passageiro", label: "Início", icon: Home, exact: true },
+          { to: "/passageiro/viagens", label: "Minhas viagens", icon: RouteIcon },
+          { to: "/passageiro/pagamentos", label: "Pagamentos", icon: Wallet },
+          { to: "/passageiro/perfil", label: "Meu perfil", icon: User },
+        ]}
+      />
     </ProtegeArea>
   ),
 });

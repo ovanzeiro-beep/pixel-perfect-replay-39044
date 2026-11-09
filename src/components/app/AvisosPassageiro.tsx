@@ -20,14 +20,25 @@ export function AvisosPassageiro() {
   return (
     <section aria-label="Avisos" className="space-y-2">
       {avisos.map((a) => {
-        const I = a.nivel === "info" ? Info : a.id.startsWith("responder") ? BellRing : AlertTriangle;
+        const I =
+          a.nivel === "info" ? Info : a.id.startsWith("responder") ? BellRing : AlertTriangle;
         return (
-          <div key={a.id} className={`flex items-start gap-3 rounded-2xl border-2 p-4 ${COR[a.nivel]}`}>
+          <div
+            key={a.id}
+            className={`flex items-start gap-3 rounded-2xl border-2 p-4 ${COR[a.nivel]}`}
+          >
             <I className="mt-0.5 h-5 w-5 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="font-extrabold leading-snug">{a.titulo}</p>
               <p className="text-sm text-muted-foreground">{a.detalhe}</p>
-              {a.destino && a.acao && <Link to={a.destino} className="mt-1 inline-flex min-h-11 items-center font-extrabold underline">{a.acao}</Link>}
+              {a.destino && a.acao && (
+                <Link
+                  to={a.destino}
+                  className="mt-1 inline-flex min-h-11 items-center font-extrabold underline"
+                >
+                  {a.acao}
+                </Link>
+              )}
             </div>
           </div>
         );

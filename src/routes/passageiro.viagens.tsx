@@ -18,8 +18,12 @@ function MinhasViagens() {
   if (!p) return null;
 
   const minhasViagens = todasViagens.filter((v) => v.passageiroIds.includes(p.id));
-  const proximas = minhasViagens.filter((v) => !v.passada && !v.ajuste.cancelada).sort((a, b) => a.data.localeCompare(b.data));
-  const anteriores = minhasViagens.filter((v) => v.passada).sort((a, b) => b.data.localeCompare(a.data));
+  const proximas = minhasViagens
+    .filter((v) => !v.passada && !v.ajuste.cancelada)
+    .sort((a, b) => a.data.localeCompare(b.data));
+  const anteriores = minhasViagens
+    .filter((v) => v.passada)
+    .sort((a, b) => b.data.localeCompare(a.data));
 
   const responder = (viagemId: string, vai: boolean) => {
     responderViagemApp(p.id, viagemId, vai);
@@ -30,7 +34,9 @@ function MinhasViagens() {
     <div className="px-5 pb-6 pt-6">
       <Toaster position="top-center" />
       <h1 className="text-3xl font-extrabold text-primary">Minhas viagens</h1>
-      <div className="mt-3"><AvisosPassageiro /></div>
+      <div className="mt-3">
+        <AvisosPassageiro />
+      </div>
 
       <div className="mt-5 flex gap-2 rounded-2xl bg-muted p-1">
         <button
@@ -48,99 +54,111 @@ function MinhasViagens() {
       </div>
 
       <div className="mt-4 space-y-3">
-        {aba === "proximas" && (
-          proximas.length === 0 ? (
+        {aba === "proximas" &&
+          (proximas.length === 0 ? (
             <p className="pt-8 text-center text-muted-foreground">Nenhuma viagem próxima.</p>
-          ) : proximas.map((v) => {
-            const linha = linhas.find((l) => l.id === v.linhaId);
-            const resposta = v.ajuste.respostas[p.id] ?? "sem";
-            const posEspera = v.ajuste.espera.indexOf(p.id);
-            return (
-              <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm space-y-3">
-                <div>
-                  <p className="font-extrabold text-primary">{linha?.nome ?? v.linhaId}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {diaSemana(v.data)}, {dataCurta(v.data)} · saída {v.saida}
-                  </p>
-                  {linha && horarioNaParada(v.saida, p.cidade, linha.paradas) !== v.saida && (
-                    <p className="text-sm font-semibold">Na sua parada: ~{horarioNaParada(v.saida, p.cidade, linha.paradas)}</p>
-                  )}
-                  {resposta === "sem" && <p className="mt-1 text-sm font-semibold text-accent-strong">{prazoViagem(v.data, new Date()).rotulo}</p>}
-                </div>
-                {resposta === "vai" && (
-                  <div className="flex items-center gap-2 text-success">
-                    <Check className="h-4 w-4" />
-                    <span className="text-sm font-bold">Confirmado</span>
-                  </div>
-                )}
-                {resposta === "nao" && (
-                  <div className="flex items-center gap-2 text-destructive">
-                    <X className="h-4 w-4" />
-                    <span className="text-sm font-bold">Não vai</span>
-                  </div>
-                )}
-                {resposta === "espera" && (
-                  <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
-                    Lista de espera — posição {posEspera + 1}
-                  </p>
-                )}
-                {v.situacao !== "cancelada" && (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => responder(v.id, true)}
-                      className={`flex flex-1 min-h-10 items-center justify-center rounded-lg text-sm font-bold ${resposta === "vai" ? "bg-success text-success-foreground" : "bg-success/15 text-success"}`}
-                    >
-                      <Check className="mr-1 h-3.5 w-3.5" /> Vou
-                    </button>
-                    <button
-                      onClick={() => responder(v.id, false)}
-                      className={`flex flex-1 min-h-10 items-center justify-center rounded-lg text-sm font-bold ${resposta === "nao" ? "bg-destructive text-destructive-foreground" : "bg-destructive/10 text-destructive"}`}
-                    >
-                      <X className="mr-1 h-3.5 w-3.5" /> Não vou
-                    </button>
-                  </div>
-                )}
-                {v.situacao === "cancelada" && (
-                  <p className="text-sm font-bold text-muted-foreground">Viagem cancelada</p>
-                )}
-              </div>
-            );
-          })
-        )}
-
-        {aba === "anteriores" && (
-          anteriores.length === 0 ? (
-            <p className="pt-8 text-center text-muted-foreground">Nenhuma viagem anterior.</p>
-          ) : anteriores.map((v) => {
-            const linha = linhas.find((l) => l.id === v.linhaId);
-            const marca = v.ajuste.ida?.marcas.find((m) => m.pid === p.id);
-            const embarcou = marca?.r === "embarcou";
-            const entrega = v.ajuste.ida?.volta?.entregas.find((e) => e.pid === p.id);
-            const entregue = entrega?.r === "entregue";
-            const cancelada = v.ajuste.cancelada;
-            return (
-              <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm">
-                <div className="flex items-start justify-between gap-2">
+          ) : (
+            proximas.map((v) => {
+              const linha = linhas.find((l) => l.id === v.linhaId);
+              const resposta = v.ajuste.respostas[p.id] ?? "sem";
+              const posEspera = v.ajuste.espera.indexOf(p.id);
+              return (
+                <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm space-y-3">
                   <div>
                     <p className="font-extrabold text-primary">{linha?.nome ?? v.linhaId}</p>
                     <p className="text-sm text-muted-foreground">
-                      {diaSemana(v.data)}, {dataCurta(v.data)} · {v.saida}
+                      {diaSemana(v.data)}, {dataCurta(v.data)} · saída {v.saida}
                     </p>
+                    {linha && horarioNaParada(v.saida, p.cidade, linha.paradas) !== v.saida && (
+                      <p className="text-sm font-semibold">
+                        Na sua parada: ~{horarioNaParada(v.saida, p.cidade, linha.paradas)}
+                      </p>
+                    )}
+                    {resposta === "sem" && (
+                      <p className="mt-1 text-sm font-semibold text-accent-strong">
+                        {prazoViagem(v.data, new Date()).rotulo}
+                      </p>
+                    )}
                   </div>
-                  {cancelada ? (
-                    <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">Cancelada</span>
-                  ) : embarcou ? (
-                    <span className="shrink-0 rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success">
-                      {entregue ? "Entregue ✓" : "Embarcou"}
-                    </span>
-                  ) : (
-                    <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">Não embarcou</span>
+                  {resposta === "vai" && (
+                    <div className="flex items-center gap-2 text-success">
+                      <Check className="h-4 w-4" />
+                      <span className="text-sm font-bold">Confirmado</span>
+                    </div>
+                  )}
+                  {resposta === "nao" && (
+                    <div className="flex items-center gap-2 text-destructive">
+                      <X className="h-4 w-4" />
+                      <span className="text-sm font-bold">Não vai</span>
+                    </div>
+                  )}
+                  {resposta === "espera" && (
+                    <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                      Lista de espera — posição {posEspera + 1}
+                    </p>
+                  )}
+                  {v.situacao !== "cancelada" && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => responder(v.id, true)}
+                        className={`flex flex-1 min-h-10 items-center justify-center rounded-lg text-sm font-bold ${resposta === "vai" ? "bg-success text-success-foreground" : "bg-success/15 text-success"}`}
+                      >
+                        <Check className="mr-1 h-3.5 w-3.5" /> Vou
+                      </button>
+                      <button
+                        onClick={() => responder(v.id, false)}
+                        className={`flex flex-1 min-h-10 items-center justify-center rounded-lg text-sm font-bold ${resposta === "nao" ? "bg-destructive text-destructive-foreground" : "bg-destructive/10 text-destructive"}`}
+                      >
+                        <X className="mr-1 h-3.5 w-3.5" /> Não vou
+                      </button>
+                    </div>
+                  )}
+                  {v.situacao === "cancelada" && (
+                    <p className="text-sm font-bold text-muted-foreground">Viagem cancelada</p>
                   )}
                 </div>
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          ))}
+
+        {aba === "anteriores" &&
+          (anteriores.length === 0 ? (
+            <p className="pt-8 text-center text-muted-foreground">Nenhuma viagem anterior.</p>
+          ) : (
+            anteriores.map((v) => {
+              const linha = linhas.find((l) => l.id === v.linhaId);
+              const marca = v.ajuste.ida?.marcas.find((m) => m.pid === p.id);
+              const embarcou = marca?.r === "embarcou";
+              const entrega = v.ajuste.ida?.volta?.entregas.find((e) => e.pid === p.id);
+              const entregue = entrega?.r === "entregue";
+              const cancelada = v.ajuste.cancelada;
+              return (
+                <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-extrabold text-primary">{linha?.nome ?? v.linhaId}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {diaSemana(v.data)}, {dataCurta(v.data)} · {v.saida}
+                      </p>
+                    </div>
+                    {cancelada ? (
+                      <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
+                        Cancelada
+                      </span>
+                    ) : embarcou ? (
+                      <span className="shrink-0 rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success">
+                        {entregue ? "Entregue ✓" : "Embarcou"}
+                      </span>
+                    ) : (
+                      <span className="shrink-0 rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
+                        Não embarcou
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ))}
       </div>
     </div>
   );

@@ -24,7 +24,9 @@ const servicoOffline: Plugin = {
   },
   generateBundle(_opcoes, pacote) {
     if (this.environment?.name !== "client") return;
-    const arquivos = Object.keys(pacote).filter((f) => /^assets\/.+\.(js|css)$/.test(f)).map((f) => `/${f}`);
+    const arquivos = Object.keys(pacote)
+      .filter((f) => /^assets\/.+\.(js|css)$/.test(f))
+      .map((f) => `/${f}`);
     this.emitFile({ type: "asset", fileName: "arquivos.json", source: JSON.stringify(arquivos) });
   },
 };

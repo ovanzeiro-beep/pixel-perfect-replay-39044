@@ -746,7 +746,7 @@
           "d": "Recibo: compartilhar",
           "tipo": "contem",
           "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
-          "regex": "compartilharTexto\\(texto"
+          "regex": "compartilharTexto\\(\\s*texto"
         },
         {
           "d": "Recibo: copiar texto",
