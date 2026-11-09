@@ -1356,6 +1356,210 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 10,
+      "titulo": "Extra: backup e restauração dos dados",
+      "status": "concluida",
+      "objetivo": "O vanzeiro salva um backup em arquivo, restaura (com prévia e confirmação), pode desfazer e é lembrado de fazer backup. Sem banco de dados.",
+      "checks": [
+        {
+          "d": "Módulo de backup",
+          "tipo": "arquivo",
+          "arquivo": "src/data/backup.ts"
+        },
+        {
+          "d": "Arquivo de backup com assinatura de integridade",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "export function criarBackup[\\s\\S]*integridade"
+        },
+        {
+          "d": "Validação do arquivo em português",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "export function validarBackup"
+        },
+        {
+          "d": "Recusa arquivo alterado ou corrompido",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "alterado ou está corrompido"
+        },
+        {
+          "d": "Recusa backup de versão mais nova",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "versão mais nova do app"
+        },
+        {
+          "d": "Confere a forma de cada lista de dados",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "export function erroNosDados"
+        },
+        {
+          "d": "Cópia de segurança para desfazer",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "export function guardarCopiaDeSeguranca"
+        },
+        {
+          "d": "Controle do último backup e alterações",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "export function marcarBackupFeito"
+        },
+        {
+          "d": "Salvar arquivo (compartilhar do celular ou baixar)",
+          "tipo": "contem",
+          "arquivo": "src/lib/compartilhar.ts",
+          "regex": "export async function salvarArquivo"
+        },
+        {
+          "d": "Ler o arquivo escolhido",
+          "tipo": "contem",
+          "arquivo": "src/lib/compartilhar.ts",
+          "regex": "export function lerArquivoTexto"
+        },
+        {
+          "d": "Store troca todos os dados de uma vez",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function substituirTodosOsDados"
+        },
+        {
+          "d": "Contrato do repositório inclui a operação",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "substituirTodosOsDados\\(estado: Estado\\)"
+        },
+        {
+          "d": "Store conta as alterações",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "registrarAlteracao\\(\\)"
+        },
+        {
+          "d": "Cartão de backup na tela",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/BackupDados.tsx"
+        },
+        {
+          "d": "Cartão: salvar, restaurar e desfazer",
+          "tipo": "contem",
+          "arquivo": "src/components/app/BackupDados.tsx",
+          "regex": "Salvar backup[\\s\\S]*Restaurar de um backup[\\s\\S]*Desfazer e voltar"
+        },
+        {
+          "d": "Cartão: prévia com comparação antes de restaurar",
+          "tipo": "contem",
+          "arquivo": "src/components/app/BackupDados.tsx",
+          "regex": "Restaurar este backup\\?"
+        },
+        {
+          "d": "Backup no perfil do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "<BackupDados />"
+        },
+        {
+          "d": "Restaurar exemplo também guarda cópia para desfazer",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "guardarCopiaDeSeguranca\\(\\s*obterEstado\\(\\)"
+        },
+        {
+          "d": "Alerta de backup (regra)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "tipo: \"backup\""
+        },
+        {
+          "d": "Alerta de backup (limites)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "BACKUP_MIN_ALTERACOES = 15"
+        },
+        {
+          "d": "Alerta leva ao perfil",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "/vanzeiro/perfil"
+        },
+        {
+          "d": "Hook de alertas usa o backup",
+          "tipo": "contem",
+          "arquivo": "src/data/useAlertas.ts",
+          "regex": "useBackupMeta"
+        },
+        {
+          "d": "Testes do backup",
+          "tipo": "arquivo",
+          "arquivo": "src/data/backup.test.ts"
+        },
+        {
+          "d": "Teste: arquivo alterado é recusado",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.test.ts",
+          "regex": "arquivo alterado à mão"
+        },
+        {
+          "d": "Teste: ida e volta mantém os dados",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.test.ts",
+          "regex": "guarda e lê de volta exatamente os mesmos dados"
+        },
+        {
+          "d": "Teste da tela de backup (fluxo)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/backup-fluxo.test.tsx"
+        },
+        {
+          "d": "Teste: restaurar e desfazer",
+          "tipo": "contem",
+          "arquivo": "src/test/backup-fluxo.test.tsx",
+          "regex": "dá para desfazer"
+        },
+        {
+          "d": "Teste do alerta de backup",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "alerta de backup"
+        },
+        {
+          "d": "Roteiro de celular cobre o backup",
+          "tipo": "contem",
+          "arquivo": "docs/teste-em-aparelho.md",
+          "regex": "## Backup"
+        },
+        {
+          "d": "Guia de migração cita o backup",
+          "tipo": "contem",
+          "arquivo": "docs/MIGRACAO_BANCO.md",
+          "regex": "backup"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

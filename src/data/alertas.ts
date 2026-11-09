@@ -3,7 +3,7 @@ import { aberto, brl, dataBR, diasEntre, estadoCob, isoDe, type Cobranca } from 
 import { dataCurta, diaSemana, rotuloDia, type Viagem } from "./viagens";
 
 export type Nivel = "urgente" | "atencao" | "info";
-export type TipoAlerta = "cnh" | "cobranca" | "confirmacao" | "lotacao";
+export type TipoAlerta = "cnh" | "cobranca" | "confirmacao" | "lotacao" | "backup";
 export type Alerta = {
   id: string;
   tipo: TipoAlerta;
@@ -13,7 +13,7 @@ export type Alerta = {
   /** Muda quando a situação muda (ex.: mais gente atrasada); um alerta dispensado volta se a assinatura for outra. */
   assinatura: string;
   destino: {
-    to: "/vanzeiro/motoristas" | "/vanzeiro/dinheiro" | "/vanzeiro/viagens";
+    to: "/vanzeiro/motoristas" | "/vanzeiro/dinheiro" | "/vanzeiro/viagens" | "/vanzeiro/perfil";
     search?: { v: string };
   };
   acao: string;
@@ -24,9 +24,20 @@ export const PRAZO = { diasAntes: 1, hora: 20 } as const;
 export const CNH_URGENTE_DIAS = 15;
 export const CNH_AVISO_DIAS = 60;
 export const COBRANCA_URGENTE_DIAS = 15;
+/** Backup: avisa depois de muitas alterações sem backup recente. */
+export const BACKUP_MIN_ALTERACOES = 15;
+export const BACKUP_DIAS = 7;
+export const BACKUP_URGENTE_ALTERACOES = 100;
+export const BACKUP_URGENTE_DIAS = 30;
 
 const ORDEM_NIVEL: Record<Nivel, number> = { urgente: 0, atencao: 1, info: 2 };
-const ORDEM_TIPO: Record<TipoAlerta, number> = { cnh: 0, confirmacao: 1, cobranca: 2, lotacao: 3 };
+const ORDEM_TIPO: Record<TipoAlerta, number> = {
+  cnh: 0,
+  confirmacao: 1,
+  cobranca: 2,
+  backup: 3,
+  lotacao: 4,
+};
 
 const doIso = (s: string) => {
   const [a, m, d] = s.split("-").map(Number);
@@ -77,6 +88,8 @@ export type EntradaAlertas = {
   linhas: { id: string; nome: string }[];
   viagens: Viagem[];
   agora: Date;
+  /** Quando foi o último backup e quantas alterações houve desde então. */
+  backup?: { alteracoes: number; ultimoBackup: string | null };
 };
 
 export function gerarAlertas({
@@ -86,6 +99,7 @@ export function gerarAlertas({
   linhas,
   viagens,
   agora,
+  backup,
 }: EntradaAlertas): Alerta[] {
   const hoje = isoDe(agora);
   const nomePas = (id: string) => passageiros.find((p) => p.id === id)?.nome ?? "Passageiro";
@@ -166,6 +180,33 @@ export function gerarAlertas({
       detalhe: `${nl}, ${quando}. Sem resposta: ${lista(v.sem.map((id) => primeiro(nomePas(id))))}.`,
       destino: { to: "/vanzeiro/viagens", search: { v: v.id } },
     });
+  }
+
+  if (backup && backup.alteracoes >= BACKUP_MIN_ALTERACOES) {
+    const ms = backup.ultimoBackup ? Date.parse(backup.ultimoBackup) : NaN;
+    const dias = Number.isNaN(ms)
+      ? null
+      : Math.max(0, Math.floor((agora.getTime() - ms) / 86400000));
+    if (dias === null || dias >= BACKUP_DIAS) {
+      const nivel: Nivel =
+        backup.alteracoes >= BACKUP_URGENTE_ALTERACOES ||
+        (dias !== null && dias >= BACKUP_URGENTE_DIAS)
+          ? "urgente"
+          : "atencao";
+      out.push({
+        id: "backup",
+        tipo: "backup",
+        nivel,
+        assinatura: nivel,
+        acao: "Fazer backup",
+        titulo: "Faça um backup dos seus dados",
+        detalhe:
+          dias === null
+            ? `Você já fez ${backup.alteracoes} alterações e nunca salvou um backup. Se os dados do app forem apagados, não dá para recuperar.`
+            : `O último backup foi há ${dias} ${dias === 1 ? "dia" : "dias"}; desde então foram ${backup.alteracoes} alterações.`,
+        destino: { to: "/vanzeiro/perfil" },
+      });
+    }
   }
 
   const lotada = viagens.find(

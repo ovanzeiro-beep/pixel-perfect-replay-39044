@@ -49,6 +49,8 @@ export interface Escrita {
   iniciarPersistencia(): () => void;
   /** Volta tudo aos dados de exemplo (modo teste). */
   restaurarExemplo(): void;
+  /** Troca todos os dados de uma vez: restaurar um backup ou desfazer uma restauração. */
+  substituirTodosOsDados(estado: Estado): void;
 
   // --- Vans e motoristas
   salvarVan(van: Salvar<Van>): void;
@@ -114,6 +116,7 @@ export const repositorio: Repositorio = {
   obterEstado: mock.obterEstado,
   iniciarPersistencia: mock.iniciarPersistencia,
   restaurarExemplo: mock.restaurarExemplo,
+  substituirTodosOsDados: mock.substituirTodosOsDados,
   salvarVan: mock.salvarVan,
   excluirVan: mock.excluirVan,
   salvarMotorista: mock.salvarMotorista,
@@ -151,6 +154,7 @@ export const {
   obterEstado,
   iniciarPersistencia,
   restaurarExemplo,
+  substituirTodosOsDados,
   salvarVan,
   excluirVan,
   salvarMotorista,

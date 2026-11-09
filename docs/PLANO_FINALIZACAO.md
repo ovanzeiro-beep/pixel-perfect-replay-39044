@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) concluídas e conferidas** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e o extra de backup (10) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -24,6 +24,7 @@
 | 7 | Área do passageiro completa | Fluxo testado, recibos visíveis, convite sem atalho falso | **Concluída** |
 | 8 | PWA lapidado | Aviso "nova versão disponível", funcionamento offline básico, roteiro de teste em aparelho real | **Concluída** |
 | 9 | Qualidade e congelamento | 404/erros em português, testes de rotas, lint limpo, `repositorio.ts` (ponto único para trocar mock por banco) | **Concluída** |
+| 10 | Extra: backup dos dados | Salvar backup em arquivo, restaurar com prévia, desfazer e lembrete (pedido depois do plano) | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -108,3 +109,14 @@ Aparecem no topo do Início do vanzeiro, com um selo vermelho no menu "Início" 
 - **Repositório (`src/data/repositorio.ts`):** contrato tipado (`Leitura` + `Escrita`) cumprido pelo mock. Todas as telas importam dados só dele (um teste confere), e há uma suíte de contrato que roda contra qualquer implementação.
 - **Guia de migração:** [`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md) mapeia as tabelas, o que é calculado (não se grava), os cuidados e como pedir o banco ao Lovable.
 - **README** atualizado: o que o app faz, como rodar e a regra de ouro dos dados.
+
+## Extra: backup e restauração dos dados (pedido depois do plano)
+
+Como os dados ficam só no aparelho, limpar os dados do navegador ou trocar de celular apagaria tudo. Por isso (Mais → Meu perfil → **Backup dos dados**):
+
+- **Salvar backup:** gera um arquivo `vanzeiro-backup-AAAA-MM-DD.json` (no celular abre o compartilhar: WhatsApp, Drive, Arquivos; "Só baixar o arquivo" baixa direto). O arquivo tem versão do formato, resumo e uma **assinatura de integridade**.
+- **Restaurar:** escolhe o arquivo, o app **confere** (arquivo de outro app, vazio, corrompido, alterado à mão, de versão mais nova ou com registros inválidos são recusados com mensagem em português) e mostra uma **prévia** (no backup × agora) antes de substituir.
+- **Desfazer:** antes de substituir os dados (restaurar backup ou "Restaurar dados de exemplo") o app guarda uma **cópia de segurança**; "Desfazer e voltar aos dados de antes" devolve tudo, inclusive depois de recarregar.
+- **Lembrete:** o Início avisa "Faça um backup dos seus dados" quando houve 15 ou mais alterações e o último backup foi há 7 dias ou mais (ou nunca); vira urgente com 100 alterações ou 30 dias.
+- O arquivo de backup guarda tudo (passageiros, linhas, vans, cobranças, recibos, gastos, viagens). **Não** inclui o login (sessão) nem o modo demonstração.
+- Na futura fase de banco, o mesmo arquivo serve para importar os dados de quem já usa o app (`docs/MIGRACAO_BANCO.md`).

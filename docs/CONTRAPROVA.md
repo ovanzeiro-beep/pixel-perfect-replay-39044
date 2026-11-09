@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:33 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 21:09 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -14,3 +14,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:33 UTC.
 | 7 — Área do passageiro completa | concluida | 24/24 | OK |
 | 8 — PWA lapidado | concluida | 21/21 | OK |
 | 9 — Qualidade final e congelamento do mock | concluida | 21/21 | OK |
+| 10 — Extra: backup e restauração dos dados | concluida | 30/30 | OK |

@@ -49,6 +49,17 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 4. **Nova versão**
    - [ ] Repetir o item "Nova versão" (no iPhone pode precisar fechar o app por completo e abrir de novo).
 
+## Backup
+
+- [ ] Em Mais → Meu perfil → **Backup dos dados** → "Salvar backup": no celular abre o **compartilhar** (WhatsApp, Drive, "Salvar em Arquivos" no iPhone). Guarde o arquivo `vanzeiro-backup-AAAA-MM-DD.json` fora do celular.
+- [ ] Sem compartilhar, "Só baixar o arquivo" salva na pasta de downloads.
+- [ ] Depois do backup aparece **"Último backup: data e hora"**.
+- [ ] Mude algo (ex.: a chave Pix), volte em "Restaurar de um backup", escolha o arquivo: aparece a **prévia** (no backup × agora) e o aviso. Confirmando, os dados voltam ao do arquivo.
+- [ ] Logo depois de restaurar aparece **"Desfazer e voltar aos dados de antes"** e ele devolve o que estava antes.
+- [ ] Escolher um arquivo qualquer (foto, texto) mostra um aviso em português e não muda nada.
+- [ ] Depois de várias alterações e uma semana sem backup, aparece o alerta **"Faça um backup dos seus dados"** no Início.
+- [ ] **Troca de celular:** instale o app no celular novo, entre, abra Backup → "Restaurar de um backup" e escolha o arquivo: tudo volta (passageiros, cobranças, recibos, viagens).
+
 ## Convite do passageiro
 
 - [ ] No celular do vanzeiro, copiar o "link do convite" de um passageiro e abrir **no mesmo aparelho**: abre a tela do convite, confirma os dados e entra no app.
