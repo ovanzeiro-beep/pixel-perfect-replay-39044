@@ -9,8 +9,35 @@ export type Ajuste = {
   extras: string[]; // só nesta viagem
   ida?: Ida;
 };
-export type Marca = { pid: string; r: "embarcou" | "faltou"; cobrou: number };
-export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou" };
+export type Marca = { pid: string; r: "embarcou" | "faltou" | "ficou"; cobrou: number };
+export type Ficou = { pid: string; motivo: string; hora: string };
+export type ParadaFeita = { inicio: number; minutos: number; local: string; ficaram: Ficou[] };
+export type ParadaAtiva = { inicio: number; minutos: number; local: string; chamada: boolean; naVan: Record<string, "manual" | "app"> };
+export type Ida = { ordem: string[]; marcas: Marca[]; fase: "paradas" | "a_caminho" | "chegou"; parada?: ParadaAtiva; paradas?: ParadaFeita[] };
+
+const hm = (ms: number) => { const d = new Date(ms); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+export const horaDe = hm;
+/** Horário de saída da parada (início + duração). */
+export const saidaParada = (inicio: number, minutos: number) => hm(inicio + minutos * 60000);
+export const avisoParada = (minutos: number, saida: string) => `Parada de ${minutos} minutos. Saída às ${saida}. Não se atrase!`;
+/** "Faltam 2: Maria e Joana" */
+export function textoFaltam(nomes: string[]): string {
+  if (nomes.length === 0) return "";
+  const lista = nomes.length === 1 ? nomes[0]! : `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+  return `Falta${nomes.length > 1 ? "m" : ""} ${nomes.length}: ${lista}`;
+}
+/** Encerra a parada: quem não foi marcado "Na van" passa a "Ficou na parada". */
+export function encerrarParada(ida: Ida, motivo: string, agora: number): Ida {
+  const p = ida.parada;
+  if (!p) return ida;
+  const ficaramIds = ida.marcas.filter((m) => m.r === "embarcou" && !p.naVan[m.pid]).map((m) => m.pid);
+  const hora = hm(agora);
+  return {
+    ...ida, parada: undefined,
+    marcas: ida.marcas.map((m) => (ficaramIds.includes(m.pid) ? { ...m, r: "ficou" } : m)),
+    paradas: [...(ida.paradas ?? []), { inicio: p.inicio, minutos: p.minutos, local: p.local, ficaram: ficaramIds.map((pid) => ({ pid, motivo, hora })) }],
+  };
+}
 export type Situacao = "agendada" | "lotada" | "andamento" | "concluida" | "cancelada";
 export type Viagem = {
   id: string; linhaId: string; data: string; saida: string; volta: string; vanId: string; motoristaId: string;
