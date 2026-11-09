@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Bus, ChevronRight, Clock, Fuel, UserPlus, Wallet } from "lucide-react";
 import {
   vanzeiro,
-  gastosMes, aReceberRestoMes,
 } from "@/data/exemplo";
 import { useFrota, useViagens } from "@/data/store";
 import { diaSemana, rotuloDia } from "@/data/viagens";
-import { isoDe, recebidoNoMes, resumoPassageiro } from "@/data/cobrancas";
+import { isoDe, resumoPassageiro } from "@/data/cobrancas";
+import { mesDe, resumoMes } from "@/data/financeiro";
 
 export const Route = createFileRoute("/vanzeiro/")({
   head: () => ({
@@ -29,7 +29,7 @@ function saudacao(h: number) {
 }
 
 function Inicio() {
-  const { vans, motoristas, linhas, passageiros, cobrancas } = useFrota();
+  const { vans, motoristas, linhas, passageiros, cobrancas, gastos: listaGastos } = useFrota();
   const hojeIso = isoDe(new Date());
   const viagens = useViagens();
   const linha = (id: string) => linhas.find((l) => l.id === id) ?? { nome: "Linha excluída" };
@@ -54,10 +54,11 @@ function Inicio() {
   const totalAberto = soma(devedores);
   const top3 = [...devedores].sort((a, b) => b.diasAtraso - a.diasAtraso || b.valor - a.valor).slice(0, 3);
   const emAndamento = viagens.filter((v) => v.ajuste.ida && !v.ajuste.ida.encerrada);
-  const recebido = recebidoNoMes(cobrancas, hojeIso);
-  const gastos = soma(gastosMes);
-  const lucro = recebido - gastos;
-  const faltaReceber = soma(aReceberRestoMes);
+  const mesAtual = resumoMes(cobrancas, listaGastos, mesDe(hojeIso), hojeIso);
+  const recebido = mesAtual.recebido;
+  const gastos = mesAtual.gastos;
+  const lucro = mesAtual.lucro;
+  const faltaReceber = mesAtual.aReceber;
   const primeiroNome = vanzeiro.nome.split(" ")[0];
 
   return (
@@ -174,7 +175,7 @@ function Inicio() {
             { to: "/vanzeiro/dinheiro", label: "Marcar pagamento", icon: Wallet },
             { to: "/vanzeiro/gastos", label: "Lançar gasto", icon: Fuel },
           ] as const).map((a) => (
-            <Link key={a.label} to={a.to} className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm">
+            <Link key={a.label} to={a.to} search={(a.to === "/vanzeiro/gastos" ? { novo: true } : {}) as never} className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm">
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground"><a.icon className="h-7 w-7" /></span>
               <span className="text-sm leading-tight">{a.label}</span>
             </Link>

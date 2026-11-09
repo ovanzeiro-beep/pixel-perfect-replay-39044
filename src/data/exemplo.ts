@@ -242,3 +242,55 @@ export const cobrancasExemplo: CobrancaExemplo[] = [
   { pid: "p13", tipo: "mes", venc: "2026-11-01", valor: 250 },
   { pid: "p15", tipo: "mes", venc: "2026-11-05", valor: 250, pago: [250, "2026-11-05", "pix"] },
 ];
+
+// ===== Etapa 11: gastos de exemplo dos últimos 6 meses (os de novembro estão em gastosMes) =====
+// [valor, data, categoria, vanId, linhaId, descrição, litros?, km?, repete todo mês?]
+export const gastosExemplo: [number, string, string, string, string, string, (number | undefined)?, (number | undefined)?, boolean?][] = [
+  [1200, "2026-06-10", "Outros", "van2", "", "Parcela da van", undefined, undefined, true],
+  [380, "2026-06-15", "Documentos e seguro", "van1", "", "Seguro da van", undefined, undefined, true],
+  [600, "2026-06-30", "Pagamento de motorista", "", "", "Diárias do motorista"],
+  [720, "2026-06-04", "Diesel", "van1", "l1", "Posto Jacarezinho", 120, 184500],
+  [390, "2026-06-12", "Diesel", "van2", "l3", "", 65, 92010],
+  [96, "2026-06-20", "Pedágio", "van1", "l1", "Viagem para Londrina"],
+  [60, "2026-06-22", "Lavagem", "van1", "", "Lavagem completa"],
+  [690, "2026-07-03", "Diesel", "van1", "l1", "", 115, 186200],
+  [410, "2026-07-14", "Diesel", "van2", "l2", "", 68, 93400],
+  [1480, "2026-07-18", "Pneus", "van2", "", "2 pneus dianteiros"],
+  [96, "2026-07-24", "Pedágio", "van1", "l1", ""],
+  [75, "2026-07-24", "Alimentação", "van1", "l1", "Lanche na estrada"],
+  [735, "2026-08-05", "Diesel", "van1", "l1", "", 122, 188050],
+  [4650, "2026-08-16", "Manutenção", "van1", "l1", "Van quebrou na estrada: guincho e conserto do câmbio"],
+  [395, "2026-08-21", "Diesel", "van2", "l3", "", 66, 94800],
+  [96, "2026-08-29", "Pedágio", "van1", "l1", ""],
+  [700, "2026-09-04", "Diesel", "van1", "l1", "", 117, 190100],
+  [420, "2026-09-11", "Diesel", "van2", "l2", "", 70, 96100],
+  [310, "2026-09-19", "Documentos e seguro", "van2", "", "Licenciamento"],
+  [96, "2026-09-26", "Pedágio", "van1", "l1", ""],
+  [60, "2026-09-27", "Lavagem", "van2", "", ""],
+  [710, "2026-10-02", "Diesel", "van1", "l1", "", 118, 192000],
+  [405, "2026-10-09", "Diesel", "van2", "l3", "", 67, 97500],
+  [540, "2026-10-17", "Manutenção", "van2", "", "Revisão e freios"],
+  [96, "2026-10-24", "Pedágio", "van1", "l1", ""],
+  [80, "2026-10-24", "Alimentação", "van1", "l1", ""],
+];
+
+// Histórico de recebimentos de junho a outubro (para o Financeiro ter meses anteriores)
+{
+  const tem = new Set(cobrancasExemplo.map((c) => `${c.pid}_${c.tipo}_${c.venc}`));
+  const add = (c: CobrancaExemplo) => { const k = `${c.pid}_${c.tipo}_${c.venc}`; if (!tem.has(k)) { tem.add(k); cobrancasExemplo.push(c); } };
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const mensais: [string, number, string][] = [["p7", 320, "05"], ["p9", 320, "05"], ["p11", 250, "05"], ["p12", 250, "05"], ["p13", 250, "01"], ["p15", 250, "05"]];
+  const semanais: [string, number][] = [["p6", 90], ["p8", 90], ["p10", 90], ["p14", 65]];
+  const porViagem = ["p1", "p2", "p3", "p4", "p5", "p16", "p17", "p18", "p19", "p20", "p21", "p22"];
+  for (let m = 6; m <= 10; m++) {
+    const mes = `2026-${String(m).padStart(2, "0")}`;
+    mensais.forEach(([pid, valor, dia], i) => add({ pid, tipo: "mes", venc: `${mes}-${dia}`, valor, pago: [valor, `${mes}-${dia}`, i % 2 ? "dinheiro" : "pix"] }));
+    const sextas: string[] = [];
+    for (let d = new Date(2026, m - 1, 1); d.getMonth() === m - 1; d.setDate(d.getDate() + 1)) {
+      const s = iso(d);
+      if (d.getDay() === 1 && s < "2026-10-26") semanais.forEach(([pid, valor]) => add({ pid, tipo: "semana", venc: s, valor, pago: [valor, s, "pix"] }));
+      if (d.getDay() === 5) sextas.push(s);
+    }
+    [sextas[0], sextas[2]].filter(Boolean).forEach((s, j) => porViagem.forEach((pid, i) => add({ pid, tipo: "viagem", venc: s!, valor: 150, pago: [150, s!, (i + j) % 2 ? "dinheiro" : "pix"] })));
+  }
+}

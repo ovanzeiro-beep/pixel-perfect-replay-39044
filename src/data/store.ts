@@ -1,6 +1,7 @@
 // Guarda vans e motoristas na memória da tela (voltam ao original ao recarregar).
 import { useMemo, useSyncExternalStore } from "react";
-import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens, cobrancasExemplo } from "./exemplo";
+import { vans as vansIniciais, motoristas as motoristasIniciais, linhas as linhasIniciais, passageiros as passageirosIniciais, detalhesPassageiros, cobrancasEmAberto, type DetalhePassageiro, type FormaPagamento, detalheVazio, exemploViagens, cobrancasExemplo, gastosMes, gastosExemplo } from "./exemplo";
+import type { Categoria, Gasto } from "./financeiro";
 import { aberto, cancelarCobranca, desfazerPagamento, gerarPeriodicas, idCobranca, isoDe, pagar, refMes, refSemana, refViagem, type Cobranca, type Forma, type Recibo } from "./cobrancas";
 import { semearAjustes, montarViagens, type Ajuste } from "./viagens";
 
@@ -28,7 +29,7 @@ export type Van = {
 };
 export type Motorista = { id: string; nome: string; telefone: string; cnh: string; cnhValidade: string; proprio: boolean; vanId?: string };
 
-type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string };
+type Estado = { vans: Van[]; motoristas: Motorista[]; linhas: Linha[]; passageiros: Passageiro[]; ajustes: Record<string, Ajuste>; cobrancas: Cobranca[]; recibos: Recibo[]; chavePix: string; gastos: Gasto[] };
 let estado: Estado = {
   vans: vansIniciais.map((v) => ({ ...v, situacao: v.situacao as Van["situacao"] })),
   motoristas: motoristasIniciais.map((m) => ({ ...m, vanId: vansIniciais.find((v) => v.motoristaId === m.id)?.id ?? "" })),
@@ -42,6 +43,12 @@ let estado: Estado = {
     emAberto: cobrancasEmAberto.find((c) => c.passageiroId === p.id)?.valor ?? 0,
   })),
   ajustes: {}, cobrancas: [], recibos: [], chavePix: "",
+  gastos: [
+    ...gastosMes.map((g) => ({ id: g.id, valor: g.valor, data: g.data, categoria: (g.descricao === "Diesel" ? "Diesel" : g.descricao === "Pedágio" ? "Pedágio" : "Manutenção") as Categoria,
+      vanId: g.vanId, linhaId: g.descricao === "Pedágio" ? "l1" : "", descricao: g.descricao === "Diesel" || g.descricao === "Pedágio" ? "" : g.descricao, litros: null, km: null, mensal: false })),
+    ...gastosExemplo.map(([valor, data, categoria, vanId, linhaId, descricao, litros, km, mensal], i) => ({
+      id: `ge${i + 1}`, valor, data, categoria: categoria as Categoria, vanId, linhaId, descricao, litros: litros ?? null, km: km ?? null, mensal: !!mensal })),
+  ],
 };
 estado = { ...estado, ajustes: semearAjustes(estado.linhas, estado.passageiros, estado.vans, new Date(), exemploViagens) };
 {
@@ -157,3 +164,9 @@ export function cancelarCob(id: string, motivo: string) {
   set(comAberto({ ...estado, cobrancas: cancelarCobranca(estado.cobrancas, id, motivo) }));
 }
 export function salvarChavePix(chave: string) { set({ ...estado, chavePix: chave.trim() }); }
+
+export function salvarGasto(g: Omit<Gasto, "id"> & { id?: string | undefined }) {
+  const id = g.id ?? novoId("g");
+  set({ ...estado, gastos: g.id ? estado.gastos.map((x) => (x.id === g.id ? { ...g, id } : x)) : [...estado.gastos, { ...g, id }] });
+}
+export function excluirGasto(id: string) { set({ ...estado, gastos: estado.gastos.filter((g) => g.id !== id) }); }

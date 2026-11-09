@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Copy, MessageCircle, Receipt, Search, Undo2, Wallet, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { EmConstrucao } from "@/components/app/EmConstrucao";
+import { Financeiro } from "@/components/app/Financeiro";
 import { BotaoGrande, Campo, Confirmar, Painel, campoClasse } from "@/components/app/Formulario";
 import { vanzeiro } from "@/data/exemplo";
 import { useFrota, marcarPagamento, desfazerRecibo, cancelarCob, type Passageiro } from "@/data/store";
@@ -45,7 +45,7 @@ function Dinheiro() {
           <button key={a} onClick={() => setAba(a)} className={`min-h-12 rounded-xl text-lg font-bold ${aba === a ? "bg-card text-primary shadow-sm" : "text-muted-foreground"}`}>{a === "cobrancas" ? "Cobranças" : "Financeiro"}</button>
         ))}
       </div>
-      {aba === "cobrancas" ? <Cobrancas /> : <div className="-mx-5"><EmConstrucao titulo="Financeiro" /></div>}
+      {aba === "cobrancas" ? <Cobrancas /> : <Financeiro />}
     </div>
   );
 }
