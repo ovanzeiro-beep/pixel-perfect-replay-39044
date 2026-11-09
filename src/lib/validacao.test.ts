@@ -28,3 +28,15 @@ describe("validação de linha", () => {
     expect(validarLinha({ nome: "X", frequencia: "semanal", dias: ["seg"], data: "" })).toEqual({});
   });
 });
+
+import { validarPassageiro, mensagemConvite } from "./validacao";
+describe("passageiro", () => {
+  it("nome e telefone com DDD obrigatórios", () => {
+    expect(Object.keys(validarPassageiro({ nome: "", telefone: "", valor: "" })).sort()).toEqual(["nome", "telefone"]);
+    expect(validarPassageiro({ nome: "A", telefone: "99999-9999", valor: "" }).telefone).toBeDefined();
+    expect(validarPassageiro({ nome: "A", telefone: "(43) 99999-9999", valor: "" })).toEqual({});
+  });
+  it("mensagem do convite", () => {
+    expect(mensagemConvite("Maria", "João Batista", "L")).toBe("Olá, Maria! Aqui é o João Batista, da van. Agora você pode confirmar suas viagens e ver seus pagamentos pelo app O Vanzeiro. É só tocar no link e entrar com sua conta Google: L");
+  });
+});
