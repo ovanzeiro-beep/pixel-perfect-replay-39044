@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { registrarServiceWorker } from "../lib/pwa";
+import { iniciarPersistencia } from "../data/store";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -132,6 +133,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
     registrarServiceWorker();
+    return iniciarPersistencia();
   }, []);
 
   return (

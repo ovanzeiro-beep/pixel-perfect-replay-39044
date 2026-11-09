@@ -1,12 +1,12 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 18:57 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 19:05 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
 | 0 — Visual do login e PWA em tela cheia | concluida | 12/12 | OK |
-| 1 — Fundação do mock: persistência e datas relativas | pendente | 0/6 | pendente |
-| 2 — Sessão e papéis (login simulado de verdade) | pendente | 0/6 | pendente |
+| 1 — Fundação do mock: persistência e datas relativas | concluida | 14/14 | OK |
+| 2 — Sessão e papéis (login simulado de verdade) | pendente | 1/6 | pendente |
 | 3 — Integridade dos dados | pendente | 0/4 | pendente |
 | 4 — Viagem de ponta a ponta | pendente | 1/5 | pendente |
 | 5 — Dinheiro e relatórios | pendente | 0/3 | pendente |
@@ -17,20 +17,11 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 18:57 UTC.
 
 ## O que falta
 
-**Etapa 1 — Fundação do mock: persistência e datas relativas**
-- Módulo de persistência
-- Usa localStorage com versão de schema
-- Botão/função restaurar exemplo
-- Exemplo sem datas fixas de 2026
-- IDs sem colisão
-- Teste da persistência
-
 **Etapa 2 — Sessão e papéis (login simulado de verdade)**
 - Módulo de sessão
 - Sessão tem encerrar
 - Área do vanzeiro protegida
 - Área do passageiro protegida
-- Passageiro vem da sessão, não de variável global
 - Teste da sessão
 
 **Etapa 3 — Integridade dos dados**
