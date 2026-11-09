@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { capturarInstalacao, registrarServiceWorker } from "../lib/pwa";
+import { SCRIPT_TAMANHO_LETRA, iniciarTamanhoLetra } from "../lib/tamanhoLetra";
 import { iniciarPersistencia } from "../data/repositorio";
 import { AtualizacaoApp } from "../components/app/AtualizacaoApp";
 import { SemConexao } from "../components/app/SemConexao";
@@ -99,6 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
     ],
+    scripts: [{ children: SCRIPT_TAMANHO_LETRA }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -123,6 +125,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
+    iniciarTamanhoLetra();
     capturarInstalacao();
     registrarServiceWorker();
     return iniciarPersistencia();

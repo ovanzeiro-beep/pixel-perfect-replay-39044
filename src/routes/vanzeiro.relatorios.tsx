@@ -195,16 +195,16 @@ function Relatorios() {
           <p className="text-lg font-bold text-muted-foreground print:hidden">
             {nomePeriodo(periodo)}
           </p>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2 text-center">
             <div className="rounded-2xl bg-success/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Recebido</p>
-              <p className="whitespace-nowrap text-base font-extrabold text-success">
+              <p className="break-words text-base font-extrabold text-success">
                 {brl(dados.rel.recebido)}
               </p>
             </div>
             <div className="rounded-2xl bg-destructive/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Gastos</p>
-              <p className="whitespace-nowrap text-base font-extrabold text-destructive">
+              <p className="break-words text-base font-extrabold text-destructive">
                 {brl(dados.rel.gastos)}
               </p>
             </div>
@@ -213,7 +213,7 @@ function Relatorios() {
             >
               <p className="text-sm font-bold text-muted-foreground">Lucro</p>
               <p
-                className={`whitespace-nowrap text-base font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
+                className={`break-words text-base font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
               >
                 {brl(dados.rel.lucro)}
               </p>

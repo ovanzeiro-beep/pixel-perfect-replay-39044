@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 22:27 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 23:58 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -17,3 +17,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 22:27 UTC.
 | 10 — Extra: backup e restauração dos dados | concluida | 30/30 | OK |
 | 11 — Extra: começar do zero (primeiro acesso real) | concluida | 35/35 | OK |
 | 12 — Extra: exportar relatórios (planilha e PDF) | concluida | 20/20 | OK |
+| 13 — Extra: tamanho da letra | concluida | 12/12 | OK |

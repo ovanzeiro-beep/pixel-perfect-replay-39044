@@ -1936,6 +1936,102 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 13,
+      "titulo": "Extra: tamanho da letra",
+      "status": "concluida",
+      "objetivo": "Deixar a letra do app maior (normal, grande, muito grande) para quem tem dificuldade de leitura, valendo no aparelho e sem quebrar o layout em tela pequena.",
+      "checks": [
+        {
+          "d": "Lógica do tamanho da letra",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/tamanhoLetra.ts"
+        },
+        {
+          "d": "Três tamanhos (100%, 115%, 130%)",
+          "tipo": "contem",
+          "arquivo": "src/lib/tamanhoLetra.ts",
+          "regex": "percentual: 100[\\s\\S]*percentual: 115[\\s\\S]*percentual: 130"
+        },
+        {
+          "d": "Escolha guardada só no aparelho",
+          "tipo": "contem",
+          "arquivo": "src/lib/tamanhoLetra.ts",
+          "regex": "CHAVE_LETRA = \"vanzeiro:letra\""
+        },
+        {
+          "d": "Script no início da página (sem piscar)",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "SCRIPT_TAMANHO_LETRA"
+        },
+        {
+          "d": "Aplicado ao abrir o app",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "iniciarTamanhoLetra\\(\\)"
+        },
+        {
+          "d": "Cartão de escolha",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/TamanhoDaLetra.tsx"
+        },
+        {
+          "d": "Cartão no perfil do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "<TamanhoDaLetra"
+        },
+        {
+          "d": "Cartão no perfil do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "<TamanhoDaLetra"
+        },
+        {
+          "d": "Cartões de valores não estouram a tela (histórico)",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.historico.tsx",
+          "regex": "minmax\\(0,1fr\\)"
+        },
+        {
+          "d": "Cartões de valores não estouram a tela (relatórios)",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "minmax\\(0,1fr\\)"
+        },
+        {
+          "d": "Testes da lógica",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/tamanhoLetra.test.ts"
+        },
+        {
+          "d": "Testes do cartão",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/TamanhoDaLetra.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

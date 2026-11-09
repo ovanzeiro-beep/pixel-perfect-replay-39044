@@ -73,16 +73,16 @@ function Historico() {
         ))}
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-        <div className="rounded-2xl bg-card p-3 shadow-sm">
+      <div className="mt-4 grid grid-cols-[repeat(3,minmax(0,1fr))] gap-3 text-center">
+        <div className="min-w-0 break-words rounded-2xl bg-card p-3 shadow-sm">
           <p className="text-2xl font-extrabold text-primary">{tot.viagens}</p>
           <p className="text-sm text-muted-foreground">viagens</p>
         </div>
-        <div className="rounded-2xl bg-card p-3 shadow-sm">
+        <div className="min-w-0 break-words rounded-2xl bg-card p-3 shadow-sm">
           <p className="text-2xl font-extrabold text-primary">{tot.passageiros}</p>
           <p className="text-sm text-muted-foreground">embarques</p>
         </div>
-        <div className="rounded-2xl bg-card p-3 shadow-sm">
+        <div className="min-w-0 break-words rounded-2xl bg-card p-3 shadow-sm">
           <p className="text-xl font-extrabold text-success">{brl(tot.cobrado)}</p>
           <p className="text-sm text-muted-foreground">cobrado</p>
         </div>

@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { TamanhoDaLetra } from "@/components/app/TamanhoDaLetra";
 import { useState } from "react";
 import { Check, Edit3, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
@@ -158,6 +159,8 @@ function MeuPerfil() {
           </p>
         </div>
       </section>
+
+      <TamanhoDaLetra />
 
       <section>
         <button
