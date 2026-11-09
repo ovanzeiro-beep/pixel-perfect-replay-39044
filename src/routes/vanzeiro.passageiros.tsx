@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Clock, Copy, MapPin, MessageCircle, Pencil, Phone, Plus, Search, Send, Trash2, UserX } from "lucide-react";
 import { toast } from "sonner";
