@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { useFrota } from "@/data/store";
+import { useFrota } from "@/data/repositorio";
 import { usePassageiroId } from "@/data/sessao";
 import { ListaRecibos } from "@/components/app/ListaRecibos";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
@@ -30,19 +30,27 @@ function Pagamentos() {
     .sort((a, b) => b.vencimento.localeCompare(a.vencimento));
 
   const totalAberto = minhasCobs.reduce((s, c) => s + aberto(c), 0);
-  const proxima = [...minhasCobs].sort((a, b) => a.vencimento.localeCompare(b.vencimento))
+  const proxima = [...minhasCobs]
+    .sort((a, b) => a.vencimento.localeCompare(b.vencimento))
     .find((c) => aberto(c) > 0);
 
   const pix = chavePix || "(Pix não configurado pelo vanzeiro)";
 
   const copiarPix = () => {
-    if (!chavePix) { toast.error("Pix ainda não configurado."); return; }
+    if (!chavePix) {
+      toast.error("Pix ainda não configurado.");
+      return;
+    }
     navigator.clipboard?.writeText(chavePix).then(() => toast.success("Pix copiado!"));
   };
 
   const avisarPagou = () => {
     const valor = totalAberto > 0 ? brl(totalAberto) : "o valor combinado";
-    const refs = minhasCobs.filter((c) => aberto(c) > 0).map((c) => c.ref).join(", ") || "viagem";
+    const refs =
+      minhasCobs
+        .filter((c) => aberto(c) > 0)
+        .map((c) => c.ref)
+        .join(", ") || "viagem";
     const msg = `Olá, ${vanzeiro.nome}! Sou ${p.nome}. Acabei de fazer o pagamento de ${valor} referente a ${refs}. Por favor, confirme quando puder! 🙏`;
     const url = `${linkWhatsApp(vanzeiro.telefone)}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
@@ -64,7 +72,9 @@ function Pagamentos() {
             {proxima && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Próximo vencimento</span>
-                <span className="font-bold">{dataBR(proxima.vencimento)} · {proxima.ref}</span>
+                <span className="font-bold">
+                  {dataBR(proxima.vencimento)} · {proxima.ref}
+                </span>
               </div>
             )}
           </>
@@ -81,9 +91,11 @@ function Pagamentos() {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Pagamento</span>
           <span className="font-bold">
-            {p.formaPagamento === "por_viagem" ? `${brl(p.valor)} por viagem` :
-             p.formaPagamento === "semanal" ? `${brl(p.valor)} por semana` :
-             `${brl(p.valor)} por mês`}
+            {p.formaPagamento === "por_viagem"
+              ? `${brl(p.valor)} por viagem`
+              : p.formaPagamento === "semanal"
+                ? `${brl(p.valor)} por semana`
+                : `${brl(p.valor)} por mês`}
           </span>
         </div>
 
@@ -104,13 +116,21 @@ function Pagamentos() {
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground">Chave Pix: <span className="font-mono">{pix}</span></p>
+        <p className="text-xs text-muted-foreground">
+          Chave Pix: <span className="font-mono">{pix}</span>
+        </p>
       </div>
 
-      <ListaRecibos recibos={recibos.filter((r) => r.pid === p.id)} vanzeiro={vanzeiro.nome} passageiro={p.nome} />
+      <ListaRecibos
+        recibos={recibos.filter((r) => r.pid === p.id)}
+        vanzeiro={vanzeiro.nome}
+        passageiro={p.nome}
+      />
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Histórico</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Histórico
+        </h2>
         {minhasCobs.length === 0 ? (
           <p className="text-center text-muted-foreground">Nenhuma cobrança ainda.</p>
         ) : (
@@ -128,11 +148,14 @@ function Pagamentos() {
                       </p>
                       {c.pagamentos.length > 0 && (
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Pago: {brl(c.pagamentos.reduce((s, pg) => s + pg.valor, 0))} em {dataBR(c.pagamentos[c.pagamentos.length - 1]!.data)}
+                          Pago: {brl(c.pagamentos.reduce((s, pg) => s + pg.valor, 0))} em{" "}
+                          {dataBR(c.pagamentos[c.pagamentos.length - 1]!.data)}
                         </p>
                       )}
                     </div>
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${COR_STATUS[estado] ?? ""}`}>
+                    <span
+                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${COR_STATUS[estado] ?? ""}`}
+                    >
                       {nomeEstado(c, hoje)}
                     </span>
                   </div>

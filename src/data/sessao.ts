@@ -17,7 +17,9 @@ export function ehSessao(x: unknown): x is Sessao {
   if (!x || typeof x !== "object") return false;
   const s = x as Record<string, unknown>;
   if (s["papel"] === "vanzeiro") return true;
-  return s["papel"] === "passageiro" && typeof s["passageiroId"] === "string" && s["passageiroId"] !== "";
+  return (
+    s["papel"] === "passageiro" && typeof s["passageiroId"] === "string" && s["passageiroId"] !== ""
+  );
 }
 
 export function lerSessao(armazem: Leitura): Sessao | null {
@@ -33,7 +35,10 @@ export function lerSessao(armazem: Leitura): Sessao | null {
 
 export function gravarSessao(armazem: Escrita, sessao: Sessao): boolean {
   try {
-    armazem.setItem(CHAVE_SESSAO, JSON.stringify({ versao: VERSAO_SESSAO, entrouEm: new Date().toISOString(), sessao }));
+    armazem.setItem(
+      CHAVE_SESSAO,
+      JSON.stringify({ versao: VERSAO_SESSAO, entrouEm: new Date().toISOString(), sessao }),
+    );
     return true;
   } catch {
     return false;
@@ -60,8 +65,16 @@ export function destinoSeNegado(papel: Papel, s: Sessao | null | undefined): str
 // undefined = ainda não lida (servidor ou primeira renderização); null = sem sessão.
 let sessao: Sessao | null | undefined;
 const ouvintes = new Set<() => void>();
-const assinar = (f: () => void) => { ouvintes.add(f); return () => { ouvintes.delete(f); }; };
-const definir = (s: Sessao | null) => { sessao = s; ouvintes.forEach((f) => f()); };
+const assinar = (f: () => void) => {
+  ouvintes.add(f);
+  return () => {
+    ouvintes.delete(f);
+  };
+};
+const definir = (s: Sessao | null) => {
+  sessao = s;
+  ouvintes.forEach((f) => f());
+};
 
 export function sessaoAtual(): Sessao | null | undefined {
   if (sessao === undefined) {
@@ -71,8 +84,12 @@ export function sessaoAtual(): Sessao | null | undefined {
   return sessao;
 }
 
-export function entrarComoVanzeiro() { entrar({ papel: "vanzeiro" }); }
-export function entrarComoPassageiro(passageiroId: string) { entrar({ papel: "passageiro", passageiroId }); }
+export function entrarComoVanzeiro() {
+  entrar({ papel: "vanzeiro" });
+}
+export function entrarComoPassageiro(passageiroId: string) {
+  entrar({ papel: "passageiro", passageiroId });
+}
 function entrar(s: Sessao) {
   const armazem = armazenamentoLocal();
   if (armazem) gravarSessao(armazem, s);

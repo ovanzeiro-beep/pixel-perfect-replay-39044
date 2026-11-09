@@ -746,7 +746,7 @@
           "d": "Recibo: compartilhar",
           "tipo": "contem",
           "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
-          "regex": "compartilharTexto\\(texto"
+          "regex": "compartilharTexto\\(\\s*texto"
         },
         {
           "d": "Recibo: copiar texto",
@@ -1211,7 +1211,7 @@
     {
       "id": 9,
       "titulo": "Qualidade final e congelamento do mock",
-      "status": "pendente",
+      "status": "concluida",
       "objetivo": "Textos em português, testes de tela, lint limpo e uma interface única de dados para trocar o mock pelo banco depois.",
       "checks": [
         {
@@ -1221,9 +1221,33 @@
           "regex": "Página não encontrada"
         },
         {
-          "d": "Interface de repositório (ponto de troca para o banco)",
+          "d": "Tela de erro em português",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "Não conseguimos abrir esta página"
+        },
+        {
+          "d": "Sem 404/erro em inglês no app",
+          "tipo": "naoContem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "Page not found|Go home|Try again|didn't load|Something went wrong"
+        },
+        {
+          "d": "Página de erro do servidor em português",
+          "tipo": "contem",
+          "arquivo": "src/lib/error-page.ts",
+          "regex": "lang=\"pt-BR\""
+        },
+        {
+          "d": "Página de erro do servidor sem inglês",
+          "tipo": "naoContem",
+          "arquivo": "src/lib/error-page.ts",
+          "regex": "Something went wrong|Try again|Go home|didn't load"
+        },
+        {
+          "d": "Tela de mensagem com a marca do app",
           "tipo": "arquivo",
-          "arquivo": "src/data/repositorio.ts"
+          "arquivo": "src/components/app/TelaMensagem.tsx"
         },
         {
           "d": "Testes de rotas",
@@ -1231,9 +1255,90 @@
           "arquivo": "src/test/rotas.test.tsx"
         },
         {
-          "d": "Lint limpo",
+          "d": "Teste: toda rota classificada (pública/vanzeiro/passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/test/rotas.test.tsx",
+          "regex": "toda rota do app está classificada"
+        },
+        {
+          "d": "Teste: acesso de cada rota por papel",
+          "tipo": "contem",
+          "arquivo": "src/test/rotas.test.tsx",
+          "regex": "não abre para o outro papel"
+        },
+        {
+          "d": "Teste: 404 em português",
+          "tipo": "contem",
+          "arquivo": "src/test/rotas.test.tsx",
+          "regex": "Página não encontrada"
+        },
+        {
+          "d": "Interface de repositório (ponto de troca para o banco)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/repositorio.ts"
+        },
+        {
+          "d": "Contrato tipado de leitura e escrita",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "export type Repositorio = Leitura & Escrita"
+        },
+        {
+          "d": "Mock cumpre o contrato",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "export const repositorio: Repositorio"
+        },
+        {
+          "d": "Testes do contrato (reusáveis para o banco)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/repositorio.test.ts"
+        },
+        {
+          "d": "Teste: nenhuma tela importa o store direto",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "não importam o store direto"
+        },
+        {
+          "d": "Teste: contrato roda contra cada implementação",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "describe\\.each\\(IMPLEMENTACOES\\)"
+        },
+        {
+          "d": "Guia de migração para o banco",
+          "tipo": "arquivo",
+          "arquivo": "docs/MIGRACAO_BANCO.md"
+        },
+        {
+          "d": "Guia: não escrever migrations à mão (Lovable)",
+          "tipo": "contem",
+          "arquivo": "docs/MIGRACAO_BANCO.md",
+          "regex": "supabase/migrations"
+        },
+        {
+          "d": "README descreve o app e o estado atual",
+          "tipo": "contem",
+          "arquivo": "README.md",
+          "regex": "versão de teste com dados de exemplo"
+        },
+        {
+          "d": "README sem o texto antigo do modelo",
+          "tipo": "naoContem",
+          "arquivo": "README.md",
+          "regex": "Implement exactly the screenshot"
+        },
+        {
+          "d": "Lint sem erros nem avisos",
+          "tipo": "contem",
+          "arquivo": "eslint.config.js",
+          "regex": "only-export-components"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
           "tipo": "comando",
-          "cmd": "npx eslint ."
+          "cmd": "npx eslint . --max-warnings 0"
         },
         {
           "d": "Tipos sem erro",

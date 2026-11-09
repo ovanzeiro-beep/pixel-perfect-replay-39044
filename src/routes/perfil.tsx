@@ -2,10 +2,18 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Bus, ChevronRight, User } from "lucide-react";
 import { Logo } from "@/components/app/Logo";
-import { useFrota, type Passageiro } from "@/data/store";
+import { useFrota, type Passageiro } from "@/data/repositorio";
 import { entrarComoPassageiro, entrarComoVanzeiro } from "@/data/sessao";
 
-function PickerPassageiro({ candidatos, onEscolher, onVoltar }: { candidatos: Passageiro[]; onEscolher: (p: Passageiro) => void; onVoltar: () => void }) {
+function PickerPassageiro({
+  candidatos,
+  onEscolher,
+  onVoltar,
+}: {
+  candidatos: Passageiro[];
+  onEscolher: (p: Passageiro) => void;
+  onVoltar: () => void;
+}) {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 py-10">
       <button onClick={onVoltar} className="mb-6 flex items-center gap-2 font-bold text-primary">
@@ -30,7 +38,9 @@ function PickerPassageiro({ candidatos, onEscolher, onVoltar }: { candidatos: Pa
         ))}
       </ul>
       {candidatos.length === 0 && (
-        <p className="mt-10 text-center text-muted-foreground">Nenhum passageiro com convite encontrado.</p>
+        <p className="mt-10 text-center text-muted-foreground">
+          Nenhum passageiro com convite encontrado.
+        </p>
       )}
     </div>
   );
@@ -49,7 +59,13 @@ function PerfilPage() {
   };
 
   if (verPassageiros) {
-    return <PickerPassageiro candidatos={candidatos} onEscolher={escolher} onVoltar={() => setVerPassageiros(false)} />;
+    return (
+      <PickerPassageiro
+        candidatos={candidatos}
+        onEscolher={escolher}
+        onVoltar={() => setVerPassageiros(false)}
+      />
+    );
   }
 
   return (
@@ -58,7 +74,13 @@ function PerfilPage() {
       <h1 className="mt-10 text-3xl font-extrabold text-primary">Como você vai usar?</h1>
       <p className="mt-2 text-lg text-muted-foreground">Escolha uma opção para continuar.</p>
       <div className="mt-8 space-y-4">
-        <button onClick={() => { entrarComoVanzeiro(); void navigate({ to: "/vanzeiro" }); }} className="flex w-full items-center gap-4 rounded-3xl bg-primary p-6 text-left text-primary-foreground shadow-lg">
+        <button
+          onClick={() => {
+            entrarComoVanzeiro();
+            void navigate({ to: "/vanzeiro" });
+          }}
+          className="flex w-full items-center gap-4 rounded-3xl bg-primary p-6 text-left text-primary-foreground shadow-lg"
+        >
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
             <Bus className="h-8 w-8" />
           </span>

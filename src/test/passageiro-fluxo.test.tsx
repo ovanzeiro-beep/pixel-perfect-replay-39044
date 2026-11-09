@@ -4,7 +4,10 @@ import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** Monta o app inteiro (rotas reais) começando em `caminho`, com dados limpos de exemplo. */
-async function abrir(caminho: string, entrarComo?: string | ((store: typeof import("@/data/store")) => string)) {
+async function abrir(
+  caminho: string,
+  entrarComo?: string | ((store: typeof import("@/data/store")) => string),
+) {
   localStorage.clear();
   vi.resetModules();
   const { routeTree } = await import("@/routeTree.gen");
@@ -14,7 +17,11 @@ async function abrir(caminho: string, entrarComo?: string | ((store: typeof impo
   const store = await import("@/data/store");
   const id = typeof entrarComo === "function" ? entrarComo(store) : entrarComo;
   if (id) sessao.entrarComoPassageiro(id);
-  const router = createRouter({ routeTree, context: { queryClient: new QueryClient() }, history: createMemoryHistory({ initialEntries: [caminho] }) });
+  const router = createRouter({
+    routeTree,
+    context: { queryClient: new QueryClient() },
+    history: createMemoryHistory({ initialEntries: [caminho] }),
+  });
   render(<RouterProvider router={router} />);
   return { router, sessao, store };
 }
@@ -66,12 +73,32 @@ describe("passageiro: pagamentos e recibos", () => {
   });
 
   it("passageiro novo, sem pagamentos: explica quando o recibo aparece", async () => {
-    const { store } = await abrir("/passageiro/pagamentos", (st) => st.salvarPassageiro({
-      nome: "Novo Passageiro", telefone: "(43) 99999-0001", endereco: "Rua A", cidade: "Jacarezinho", linhaIds: ["l1"], formaPagamento: "por_viagem", valor: 150,
-      emAberto: 0, ativo: true, numero: "", bairro: "", referencia: "", vencimento: "", emergenciaNome: "", emergenciaTelefone: "", observacoes: "", convite: "no_app", ultimoPagamento: "",
-    }));
+    const { store } = await abrir("/passageiro/pagamentos", (st) =>
+      st.salvarPassageiro({
+        nome: "Novo Passageiro",
+        telefone: "(43) 99999-0001",
+        endereco: "Rua A",
+        cidade: "Jacarezinho",
+        linhaIds: ["l1"],
+        formaPagamento: "por_viagem",
+        valor: 150,
+        emAberto: 0,
+        ativo: true,
+        numero: "",
+        bairro: "",
+        referencia: "",
+        vencimento: "",
+        emergenciaNome: "",
+        emergenciaTelefone: "",
+        observacoes: "",
+        convite: "no_app",
+        ultimoPagamento: "",
+      }),
+    );
     await screen.findByRole("heading", { name: "Pagamentos" });
-    expect(store.obterEstado().recibos.some((r) => r.pid.startsWith("p") && r.pid.length > 3)).toBe(false);
+    expect(store.obterEstado().recibos.some((r) => r.pid.startsWith("p") && r.pid.length > 3)).toBe(
+      false,
+    );
     expect(await screen.findByText(/o recibo aparece aqui/)).toBeInTheDocument();
     expect(screen.getByText("Em dia!")).toBeInTheDocument();
   });
@@ -79,19 +106,30 @@ describe("passageiro: pagamentos e recibos", () => {
 
 describe("passageiro: confirmar presença", () => {
   it("responder 'Vou' grava a resposta na viagem e muda a tela", async () => {
-    vi.resetModules(); localStorage.clear();
+    vi.resetModules();
+    localStorage.clear();
     const { montarViagens } = await import("@/data/viagens");
     const store0 = await import("@/data/store");
     const e = store0.obterEstado();
-    const proximaSem = (pid: string) => montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()).filter((v) => v.passageiroIds.includes(pid) && !v.passada && !v.ajuste.cancelada)[0];
-    const quem = e.passageiros.find((p) => p.ativo && (proximaSem(p.id)?.ajuste.respostas[p.id] ?? "sem") === "sem" && proximaSem(p.id)!.lugares > proximaSem(p.id)!.vao.length);
+    const proximaSem = (pid: string) =>
+      montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()).filter(
+        (v) => v.passageiroIds.includes(pid) && !v.passada && !v.ajuste.cancelada,
+      )[0];
+    const quem = e.passageiros.find(
+      (p) =>
+        p.ativo &&
+        (proximaSem(p.id)?.ajuste.respostas[p.id] ?? "sem") === "sem" &&
+        proximaSem(p.id)!.lugares > proximaSem(p.id)!.vao.length,
+    );
     expect(quem).toBeDefined();
     const pid = quem!.id;
     const alvo = proximaSem(pid)!;
 
     const { store } = await abrir("/passageiro/viagens", pid);
     await screen.findByRole("heading", { name: "Minhas viagens" });
-    expect((await screen.findAllByText(/Confirmações até|Prazo de confirmação encerrado/)).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText(/Confirmações até|Prazo de confirmação encerrado/)).length,
+    ).toBeGreaterThan(0);
     const botoes = await screen.findAllByRole("button", { name: /Vou$/ });
     fireEvent.click(botoes[0]!);
 
@@ -141,7 +179,10 @@ describe("convite pelo link", () => {
   });
 
   it("passageiro desativado não entra pelo convite", async () => {
-    const { sessao } = await abrir("/convite/p3", (st) => { st.desativarPassageiro("p3"); return ""; });
+    const { sessao } = await abrir("/convite/p3", (st) => {
+      st.desativarPassageiro("p3");
+      return "";
+    });
     await screen.findByText("Convite não encontrado");
     expect(sessao.sessaoAtual()).toBeNull();
   });

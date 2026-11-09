@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { LogoIcon } from "./Logo";
-import { useDadosProntos, useFrota } from "@/data/store";
+import { useDadosProntos, useFrota } from "@/data/repositorio";
 import { destinoSeNegado, encerrarSessao, useSessao, type Papel } from "@/data/sessao";
 
 function Carregando() {
@@ -19,7 +19,10 @@ export function ProtegeArea({ papel, children }: { papel: Papel; children: React
   const { passageiros } = useFrota();
   const navigate = useNavigate();
   const negado = destinoSeNegado(papel, sessao);
-  const passageiroSumiu = prontos && sessao?.papel === "passageiro" && !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
+  const passageiroSumiu =
+    prontos &&
+    sessao?.papel === "passageiro" &&
+    !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
 
   useEffect(() => {
     if (negado) void navigate({ to: negado, replace: true });

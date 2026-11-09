@@ -4,7 +4,13 @@ import { Check, Clock, MessageCircle, Phone, SmilePlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens, responderViagemApp, confirmarParadaApp, responderVoltaApp } from "@/data/store";
+import {
+  useFrota,
+  useViagens,
+  responderViagemApp,
+  confirmarParadaApp,
+  responderVoltaApp,
+} from "@/data/repositorio";
 import { vanzeiro } from "@/data/exemplo";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
@@ -13,7 +19,12 @@ import { linkWhatsApp } from "@/lib/validacao";
 import { prazoViagem } from "@/data/alertas";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 
-const MOTIVOS_VOLTA = ["Voltei com a família", "Volto outro dia", "Já estou em casa", "Outro"] as const;
+const MOTIVOS_VOLTA = [
+  "Voltei com a família",
+  "Volto outro dia",
+  "Já estou em casa",
+  "Outro",
+] as const;
 
 function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
   const [agora, setAgora] = useState(Date.now());
@@ -106,7 +117,9 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
         <div className="rounded-2xl bg-primary/10 p-5">
           <p className="font-extrabold text-primary text-lg">🔄 Van voltando</p>
           {faltam > 0 ? (
-            <p className="mt-1 text-muted-foreground">Faltam {faltam} parada{faltam > 1 ? "s" : ""} para a sua.</p>
+            <p className="mt-1 text-muted-foreground">
+              Faltam {faltam} parada{faltam > 1 ? "s" : ""} para a sua.
+            </p>
           ) : (
             <p className="mt-1 text-muted-foreground">Próxima parada é a sua!</p>
           )}
@@ -122,7 +135,10 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
             <p className="mt-1 text-muted-foreground">Confirme se vai voltar com a van.</p>
             <div className="mt-4 flex gap-3">
               <button
-                onClick={() => { responderVoltaApp(pid, v.id, true); toast.success("Confirmado! A van está vindo."); }}
+                onClick={() => {
+                  responderVoltaApp(pid, v.id, true);
+                  toast.success("Confirmado! A van está vindo.");
+                }}
                 className="flex flex-1 min-h-12 items-center justify-center gap-2 rounded-xl bg-success text-success-foreground font-bold"
               >
                 <Check className="h-5 w-5" /> Estou na van
@@ -151,10 +167,22 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
                   ))}
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <button onClick={() => { setModalVolta(false); setMotivoVolta(""); }} className="flex-1 min-h-12 rounded-xl border-2 border-muted font-bold">Cancelar</button>
+                  <button
+                    onClick={() => {
+                      setModalVolta(false);
+                      setMotivoVolta("");
+                    }}
+                    className="flex-1 min-h-12 rounded-xl border-2 border-muted font-bold"
+                  >
+                    Cancelar
+                  </button>
                   <button
                     disabled={!motivoVolta}
-                    onClick={() => { responderVoltaApp(pid, v.id, false, motivoVolta); setModalVolta(false); toast.success("Aviso enviado."); }}
+                    onClick={() => {
+                      responderVoltaApp(pid, v.id, false, motivoVolta);
+                      setModalVolta(false);
+                      toast.success("Aviso enviado.");
+                    }}
                     className="flex-1 min-h-12 rounded-xl bg-destructive text-destructive-foreground font-bold disabled:opacity-40"
                   >
                     Confirmar
@@ -178,7 +206,9 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
     return (
       <div className="rounded-2xl border-2 border-accent bg-accent/10 p-5">
         <div className="flex items-center justify-between">
-          <p className="font-extrabold text-accent-foreground text-lg">🛑 Parada — {parada.local}</p>
+          <p className="font-extrabold text-accent-foreground text-lg">
+            🛑 Parada — {parada.local}
+          </p>
           <span className="flex items-center gap-1 text-sm font-bold text-muted-foreground">
             <Clock className="h-4 w-4" /> {mins}:{String(segs).padStart(2, "0")}
           </span>
@@ -190,7 +220,10 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
           </div>
         ) : (
           <button
-            onClick={() => { confirmarParadaApp(pid, v.id); toast.success("Aviso enviado ao motorista!"); }}
+            onClick={() => {
+              confirmarParadaApp(pid, v.id);
+              toast.success("Aviso enviado ao motorista!");
+            }}
             className="mt-4 flex w-full min-h-14 items-center justify-center rounded-xl bg-success text-success-foreground text-xl font-extrabold"
           >
             <SmilePlus className="mr-2 h-6 w-6" /> Estou na van ✓
@@ -220,9 +253,10 @@ function InicioPassageiro() {
   if (!p) return null;
 
   const minhasViagens = todasViagens.filter(
-    (v) => v.passageiroIds.includes(p.id) && !v.ajuste.cancelada
+    (v) => v.passageiroIds.includes(p.id) && !v.ajuste.cancelada,
   );
-  const proxima = minhasViagens.find((v) => !v.passada) ?? minhasViagens[minhasViagens.length - 1] ?? null;
+  const proxima =
+    minhasViagens.find((v) => !v.passada) ?? minhasViagens[minhasViagens.length - 1] ?? null;
   const linha = proxima ? linhas.find((l) => l.id === proxima.linhaId) : null;
 
   const resposta = proxima?.ajuste.respostas[p.id] ?? "sem";
@@ -245,21 +279,23 @@ function InicioPassageiro() {
   return (
     <div className="px-5 pb-6 pt-6 space-y-5">
       <Toaster position="top-center" />
-      <h1 className="text-3xl font-extrabold text-primary">
-        Olá, {p.nome.split(" ")[0]}! 👋
-      </h1>
+      <h1 className="text-3xl font-extrabold text-primary">Olá, {p.nome.split(" ")[0]}! 👋</h1>
 
       <AvisosPassageiro />
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Próxima viagem</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Próxima viagem
+        </h2>
         {proxima && linha ? (
           <div className="rounded-3xl bg-card p-5 shadow-sm space-y-4">
             <div>
               <p className="text-xl font-extrabold text-primary">{linha.nome}</p>
               <p className="text-muted-foreground">
                 {diaSemana(proxima.data)}, {dataCurta(proxima.data)} · {proxima.saida}
-                {horario !== proxima.saida && <span className="ml-1 text-sm">(~{horario} na sua parada)</span>}
+                {horario !== proxima.saida && (
+                  <span className="ml-1 text-sm">(~{horario} na sua parada)</span>
+                )}
               </p>
             </div>
 
@@ -284,30 +320,36 @@ function InicioPassageiro() {
                     <p className="font-bold text-amber-700 dark:text-amber-400">
                       Lista de espera — posição {posicaoEspera + 1}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">Você será avisado se abrir uma vaga.</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Você será avisado se abrir uma vaga.
+                    </p>
                   </div>
                 )}
 
-                {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
-                  <p className="text-sm font-semibold text-muted-foreground">{prazoViagem(proxima.data, new Date()).rotulo}</p>
-                )}
+                {!proxima.passada &&
+                  (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
+                    <p className="text-sm font-semibold text-muted-foreground">
+                      {prazoViagem(proxima.data, new Date()).rotulo}
+                    </p>
+                  )}
 
-                {!proxima.passada && (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => responder(true)}
-                      className={`flex flex-1 min-h-12 items-center justify-center rounded-xl font-bold transition-colors ${resposta === "vai" ? "bg-success text-success-foreground" : "bg-success/15 text-success"}`}
-                    >
-                      <Check className="mr-1 h-4 w-4" /> Vou
-                    </button>
-                    <button
-                      onClick={() => responder(false)}
-                      className={`flex flex-1 min-h-12 items-center justify-center rounded-xl font-bold transition-colors ${resposta === "nao" ? "bg-destructive text-destructive-foreground" : "bg-destructive/10 text-destructive"}`}
-                    >
-                      <X className="mr-1 h-4 w-4" /> Não vou
-                    </button>
-                  </div>
-                )}
+                {!proxima.passada &&
+                  (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => responder(true)}
+                        className={`flex flex-1 min-h-12 items-center justify-center rounded-xl font-bold transition-colors ${resposta === "vai" ? "bg-success text-success-foreground" : "bg-success/15 text-success"}`}
+                      >
+                        <Check className="mr-1 h-4 w-4" /> Vou
+                      </button>
+                      <button
+                        onClick={() => responder(false)}
+                        className={`flex flex-1 min-h-12 items-center justify-center rounded-xl font-bold transition-colors ${resposta === "nao" ? "bg-destructive text-destructive-foreground" : "bg-destructive/10 text-destructive"}`}
+                      >
+                        <X className="mr-1 h-4 w-4" /> Não vou
+                      </button>
+                    </div>
+                  )}
               </>
             )}
           </div>
@@ -319,7 +361,9 @@ function InicioPassageiro() {
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Meu pagamento</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Meu pagamento
+        </h2>
         <div className="rounded-3xl bg-card p-5 shadow-sm space-y-3">
           {resumo.total > 0 ? (
             <div className="flex items-center justify-between">
@@ -335,13 +379,17 @@ function InicioPassageiro() {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Forma de pagamento</span>
             <span className="font-bold">
-              {p.formaPagamento === "por_viagem" ? `${brl(p.valor)} por viagem` :
-               p.formaPagamento === "semanal" ? `${brl(p.valor)}/semana` :
-               `${brl(p.valor)}/mês`}
+              {p.formaPagamento === "por_viagem"
+                ? `${brl(p.valor)} por viagem`
+                : p.formaPagamento === "semanal"
+                  ? `${brl(p.valor)}/semana`
+                  : `${brl(p.valor)}/mês`}
             </span>
           </div>
           <button
-            onClick={() => { navigator.clipboard?.writeText(pix).then(() => toast.success("Pix copiado!")); }}
+            onClick={() => {
+              navigator.clipboard?.writeText(pix).then(() => toast.success("Pix copiado!"));
+            }}
             className="flex w-full min-h-12 items-center justify-center rounded-xl bg-primary/10 font-bold text-primary"
           >
             Copiar chave Pix
@@ -350,7 +398,9 @@ function InicioPassageiro() {
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Falar com o vanzeiro</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          Falar com o vanzeiro
+        </h2>
         <div className="rounded-3xl bg-card p-5 shadow-sm">
           <p className="font-bold">{vanzeiro.nome}</p>
           <div className="mt-3 flex gap-3">

@@ -3,12 +3,21 @@ import { describe, expect, it } from "vitest";
 
 const ler = (p: string) => readFileSync(p, "utf8");
 const manifest = JSON.parse(ler("public/manifest.webmanifest")) as {
-  display: string; display_override: string[]; start_url: string; scope: string; orientation: string; id: string; lang: string;
+  display: string;
+  display_override: string[];
+  start_url: string;
+  scope: string;
+  orientation: string;
+  id: string;
+  lang: string;
   icons: { src: string; sizes: string; type: string; purpose?: string }[];
   screenshots: { src: string; sizes: string; form_factor: string }[];
   shortcuts: { url: string; icons: { src: string }[] }[];
 };
-const dimensoesPng = (p: string) => { const b = readFileSync(p); return `${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`; };
+const dimensoesPng = (p: string) => {
+  const b = readFileSync(p);
+  return `${b.readUInt32BE(16)}x${b.readUInt32BE(20)}`;
+};
 const arquivoPublico = (src: string) => `public${src}`;
 
 describe("manifest", () => {
@@ -31,7 +40,8 @@ describe("manifest", () => {
     }
   });
   it("tem ícone 192, 512 e um 'maskable' de 512 (Android)", () => {
-    const tem = (tam: string, uso: string) => manifest.icons.some((i) => i.sizes === tam && (i.purpose ?? "any") === uso);
+    const tem = (tam: string, uso: string) =>
+      manifest.icons.some((i) => i.sizes === tam && (i.purpose ?? "any") === uso);
     expect(tem("192x192", "any")).toBe(true);
     expect(tem("512x512", "any")).toBe(true);
     expect(tem("512x512", "maskable")).toBe(true);
@@ -45,7 +55,8 @@ describe("manifest", () => {
     }
   });
   it("os atalhos usam ícones que existem", () => {
-    for (const a of manifest.shortcuts) for (const i of a.icons) expect(existsSync(arquivoPublico(i.src)), i.src).toBe(true);
+    for (const a of manifest.shortcuts)
+      for (const i of a.icons) expect(existsSync(arquivoPublico(i.src)), i.src).toBe(true);
   });
   it("ícone do iPhone e tela offline existem", () => {
     expect(existsSync("public/icons/apple-touch-icon.png")).toBe(true);
@@ -59,7 +70,9 @@ describe("service worker (sw.js)", () => {
   it("NÃO troca de versão sozinho: só quando a página manda SKIP_WAITING", () => {
     expect(sw.match(/skipWaiting\(\)/g)).toHaveLength(1);
     expect(sw).toMatch(/msg\.type === "SKIP_WAITING"\) self\.skipWaiting\(\)/);
-    expect(sw).not.toMatch(/install[\s\S]{0,400}self\.skipWaiting\(\)\s*\)\s*;?\s*\}\)\s*;?\s*\n\s*self\.addEventListener\("activate"/);
+    expect(sw).not.toMatch(
+      /install[\s\S]{0,400}self\.skipWaiting\(\)\s*\)\s*;?\s*\}\)\s*;?\s*\n\s*self\.addEventListener\("activate"/,
+    );
   });
   it("importa o carimbo do build, para o navegador enxergar cada versão nova", () => {
     expect(sw).toContain('importScripts("/build-id.js")');
@@ -70,7 +83,9 @@ describe("service worker (sw.js)", () => {
     expect(sw).toMatch(/cache\.put\("\/",/);
   });
   it("tem plano B offline em camadas: página igual, tela de entrada, tela 'sem conexão'", () => {
-    expect(sw).toMatch(/cache\.match\(req\)[\s\S]*cache\.match\("\/"\)[\s\S]*cache\.match\(OFFLINE_URL\)/);
+    expect(sw).toMatch(
+      /cache\.match\(req\)[\s\S]*cache\.match\("\/"\)[\s\S]*cache\.match\(OFFLINE_URL\)/,
+    );
   });
   it("não guarda resposta de redirecionamento nem de erro", () => {
     expect(sw).toMatch(/res\.ok && !res\.redirected/);

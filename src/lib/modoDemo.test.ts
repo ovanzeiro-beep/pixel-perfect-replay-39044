@@ -1,6 +1,9 @@
 import { beforeEach, expect, it, vi } from "vitest";
 
-beforeEach(() => { localStorage.clear(); vi.resetModules(); });
+beforeEach(() => {
+  localStorage.clear();
+  vi.resetModules();
+});
 
 it("começa desligado, liga, lembra depois de recarregar e desliga", async () => {
   const a = await import("./modoDemo");

@@ -10,22 +10,61 @@ beforeEach(async () => {
   s = await import("./store");
 });
 
-const totalDe = (pid: string) => s.obterEstado().cobrancas.filter((c) => c.pid === pid).reduce((t, c) => t + aberto(c), 0);
+const totalDe = (pid: string) =>
+  s
+    .obterEstado()
+    .cobrancas.filter((c) => c.pid === pid)
+    .reduce((t, c) => t + aberto(c), 0);
 const citaPassageiro = (v: unknown, pid: string) => JSON.stringify(v).includes(`"${pid}"`);
 
 /** Uma viagem com o passageiro espalhado por todo lugar: resposta, espera, extra, ida e volta. */
 function viagemCheia(pid: string, outro: string): Ajuste {
   return {
-    respostas: { [pid]: "vai", [outro]: "vai" }, espera: [pid, outro], extras: [pid],
+    respostas: { [pid]: "vai", [outro]: "vai" },
+    espera: [pid, outro],
+    extras: [pid],
     ida: {
-      ordem: [pid, outro], marcas: [{ pid, r: "embarcou", cobrou: 150 }, { pid: outro, r: "embarcou", cobrou: 0 }], fase: "a_caminho",
-      parada: { inicio: 1, minutos: 5, local: "Posto", chamada: false, naVan: { [pid]: "manual", [outro]: "app" } },
-      paradas: [{ inicio: 1, minutos: 5, local: "Posto", ficaram: [{ pid, motivo: "banheiro", hora: "10:00" }, { pid: outro, motivo: "x", hora: "10:01" }] }],
+      ordem: [pid, outro],
+      marcas: [
+        { pid, r: "embarcou", cobrou: 150 },
+        { pid: outro, r: "embarcou", cobrou: 0 },
+      ],
+      fase: "a_caminho",
+      parada: {
+        inicio: 1,
+        minutos: 5,
+        local: "Posto",
+        chamada: false,
+        naVan: { [pid]: "manual", [outro]: "app" },
+      },
+      paradas: [
+        {
+          inicio: 1,
+          minutos: 5,
+          local: "Posto",
+          ficaram: [
+            { pid, motivo: "banheiro", hora: "10:00" },
+            { pid: outro, motivo: "x", hora: "10:01" },
+          ],
+        },
+      ],
       volta: {
-        fase: "entrega", inicio: 2, status: { [pid]: { r: "na_van", via: "app" }, [outro]: { r: "nao", motivo: "x" } },
-        extras: [{ pid, cobrou: 10 }, { pid: outro, cobrou: 0 }], ordem: [pid, outro], entregas: [{ pid, r: "entregue" }, { pid: outro, r: "entregue" }],
+        fase: "entrega",
+        inicio: 2,
+        status: { [pid]: { r: "na_van", via: "app" }, [outro]: { r: "nao", motivo: "x" } },
+        extras: [
+          { pid, cobrou: 10 },
+          { pid: outro, cobrou: 0 },
+        ],
+        ordem: [pid, outro],
+        entregas: [
+          { pid, r: "entregue" },
+          { pid: outro, r: "entregue" },
+        ],
         parada: { inicio: 3, minutos: 1, local: "Y", chamada: false, naVan: { [pid]: "app" } },
-        paradas: [{ inicio: 3, minutos: 1, local: "Y", ficaram: [{ pid, motivo: "m", hora: "11:00" }] }],
+        paradas: [
+          { inicio: 3, minutos: 1, local: "Y", ficaram: [{ pid, motivo: "m", hora: "11:00" }] },
+        ],
       },
     },
   };
@@ -132,7 +171,8 @@ describe("excluir linha, van e motorista", () => {
 });
 
 describe("lancar cobrança de viagem", () => {
-  const viagensDe = (pid: string) => s.obterEstado().cobrancas.filter((c) => c.pid === pid && c.tipo === "viagem" && !c.cancelada);
+  const viagensDe = (pid: string) =>
+    s.obterEstado().cobrancas.filter((c) => c.pid === pid && c.tipo === "viagem" && !c.cancelada);
 
   it("somar aumenta o que o passageiro deve", () => {
     const antes = totalDe("p4");
@@ -156,7 +196,9 @@ describe("lancar cobrança de viagem", () => {
     expect(s.lancarCobranca("p4", -150)).toBe(true);
     expect(s.obterEstado().recibos).toHaveLength(recibos);
     expect(totalDe("p4")).toBe(totalAntes);
-    expect(s.obterEstado().cobrancas.some((c) => c.cancelada === "Marcação da viagem desfeita")).toBe(true);
+    expect(
+      s.obterEstado().cobrancas.some((c) => c.cancelada === "Marcação da viagem desfeita"),
+    ).toBe(true);
   });
 
   it("tirar o que não existe devolve false e não muda nada", () => {
@@ -168,14 +210,27 @@ describe("lancar cobrança de viagem", () => {
 
 describe("dados de exemplo são coerentes", () => {
   it("todo passageiro semanal ou mensal ativo tem vencimento", () => {
-    const sem = s.obterEstado().passageiros.filter((p) => p.ativo && (p.formaPagamento === "semanal" || p.formaPagamento === "mensal") && !p.vencimento);
+    const sem = s
+      .obterEstado()
+      .passageiros.filter(
+        (p) =>
+          p.ativo &&
+          (p.formaPagamento === "semanal" || p.formaPagamento === "mensal") &&
+          !p.vencimento,
+      );
     expect(sem.map((p) => p.nome)).toEqual([]);
   });
   it("todo passageiro e todo gasto apontam para algo que existe", () => {
     const e = s.obterEstado();
-    const linhas = new Set(e.linhas.map((l) => l.id)), vans = new Set(e.vans.map((v) => v.id)), pas = new Set(e.passageiros.map((p) => p.id));
+    const linhas = new Set(e.linhas.map((l) => l.id)),
+      vans = new Set(e.vans.map((v) => v.id)),
+      pas = new Set(e.passageiros.map((p) => p.id));
     expect(e.passageiros.flatMap((p) => p.linhaIds).filter((id) => !linhas.has(id))).toEqual([]);
-    expect(e.gastos.filter((g) => (g.vanId && !vans.has(g.vanId)) || (g.linhaId && !linhas.has(g.linhaId)))).toEqual([]);
+    expect(
+      e.gastos.filter(
+        (g) => (g.vanId && !vans.has(g.vanId)) || (g.linhaId && !linhas.has(g.linhaId)),
+      ),
+    ).toEqual([]);
     expect(e.cobrancas.filter((c) => !pas.has(c.pid))).toEqual([]);
     expect(e.recibos.filter((r) => !pas.has(r.pid))).toEqual([]);
   });
@@ -192,7 +247,9 @@ describe("histórico de exemplo", () => {
     for (const i of itens) {
       expect(i.data < iso).toBe(true);
       for (const m of i.ida.marcas.filter((x) => x.cobrou > 0)) {
-        const c = e.cobrancas.find((x) => x.pid === m.pid && x.tipo === "viagem" && x.vencimento === i.data && !x.cancelada);
+        const c = e.cobrancas.find(
+          (x) => x.pid === m.pid && x.tipo === "viagem" && x.vencimento === i.data && !x.cancelada,
+        );
         expect(c?.valor).toBe(m.cobrou);
       }
     }

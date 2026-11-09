@@ -1,7 +1,13 @@
 import { useId } from "react";
 
 /** Emblema do app: van + pino de rota sobre fundo azul. Cores fixas para funcionar também como ícone. */
-export function LogoIcon({ className = "h-12 w-12", plano = false }: { className?: string; plano?: boolean }) {
+export function LogoIcon({
+  className = "h-12 w-12",
+  plano = false,
+}: {
+  className?: string;
+  plano?: boolean;
+}) {
   const uid = useId().replace(/:/g, "");
   const bg = `bg${uid}`;
   const pin = `pin${uid}`;
@@ -27,9 +33,23 @@ export function LogoIcon({ className = "h-12 w-12", plano = false }: { className
         </mask>
       </defs>
       {!plano && <rect width="512" height="512" rx="116" fill={`url(#${bg})`} />}
-      {!plano && <path clipPath={`url(#cp${uid})`} d="M0 330C120 270 250 400 512 300V512H0Z" fill="#fff" opacity=".05" />}
+      {!plano && (
+        <path
+          clipPath={`url(#cp${uid})`}
+          d="M0 330C120 270 250 400 512 300V512H0Z"
+          fill="#fff"
+          opacity=".05"
+        />
+      )}
 
-      <path d="M70 410h372" stroke="#fff" strokeOpacity=".35" strokeWidth="10" strokeLinecap="round" strokeDasharray="2 26" />
+      <path
+        d="M70 410h372"
+        stroke="#fff"
+        strokeOpacity=".35"
+        strokeWidth="10"
+        strokeLinecap="round"
+        strokeDasharray="2 26"
+      />
 
       <g mask={`url(#${mask})`}>
         <path
@@ -60,13 +80,21 @@ export function LogoIcon({ className = "h-12 w-12", plano = false }: { className
   );
 }
 
-export function Logo({ size = "md", tema = "claro" }: { size?: "md" | "lg"; tema?: "claro" | "escuro" }) {
+export function Logo({
+  size = "md",
+  tema = "claro",
+}: {
+  size?: "md" | "lg";
+  tema?: "claro" | "escuro";
+}) {
   const lg = size === "lg";
   const escuro = tema === "escuro";
   return (
     <div className="flex items-center gap-3">
       <LogoIcon className={lg ? "h-20 w-20 drop-shadow-lg" : "h-10 w-10"} />
-      <span className={`font-extrabold tracking-tight ${lg ? "text-4xl" : "text-xl"} ${escuro ? "text-white" : "text-primary"}`}>
+      <span
+        className={`font-extrabold tracking-tight ${lg ? "text-4xl" : "text-xl"} ${escuro ? "text-white" : "text-primary"}`}
+      >
         O <span className={escuro ? "text-accent" : "text-accent-strong"}>Vanzeiro</span>
       </span>
     </div>

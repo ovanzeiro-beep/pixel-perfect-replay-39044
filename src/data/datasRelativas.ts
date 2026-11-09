@@ -4,13 +4,16 @@ export const ANCORA = "2026-11-09";
 
 const dias = (a: number, m: number, d: number) => Math.floor(Date.UTC(a, m - 1, d) / 86400000);
 const partes = (s: string) => s.split("-").map(Number) as [number, number, number];
-const fmt = (a: number, m: number, d: number) => `${a}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+const fmt = (a: number, m: number, d: number) =>
+  `${a}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 const isoDe = (d: Date) => fmt(d.getFullYear(), d.getMonth() + 1, d.getDate());
 
 /** Desloca em semanas inteiras: segunda continua segunda, sexta continua sexta. Nunca passa de hoje. */
 export function deslocarSemanas(data: string, hoje: Date = new Date()): string {
   const [aa, am, ad] = partes(ANCORA);
-  const semanas = Math.floor((dias(hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate()) - dias(aa, am, ad)) / 7);
+  const semanas = Math.floor(
+    (dias(hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate()) - dias(aa, am, ad)) / 7,
+  );
   const [a, m, d] = partes(data);
   const t = new Date(Date.UTC(a, m - 1, d + semanas * 7));
   return fmt(t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate());

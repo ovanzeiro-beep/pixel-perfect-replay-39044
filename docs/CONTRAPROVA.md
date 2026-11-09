@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:15 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:33 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -13,12 +13,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-09 20:15 UTC.
 | 6 — Alertas e prazos | concluida | 19/19 | OK |
 | 7 — Área do passageiro completa | concluida | 24/24 | OK |
 | 8 — PWA lapidado | concluida | 21/21 | OK |
-| 9 — Qualidade final e congelamento do mock | pendente | 0/3 | pendente |
-
-## O que falta
-
-**Etapa 9 — Qualidade final e congelamento do mock**
-- Página 404 em português
-- Interface de repositório (ponto de troca para o banco)
-- Testes de rotas
-- Lint limpo
+| 9 — Qualidade final e congelamento do mock | concluida | 21/21 | OK |
