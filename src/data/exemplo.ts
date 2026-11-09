@@ -245,7 +245,7 @@ export const cobrancasExemplo: CobrancaExemplo[] = [
 
 // ===== Etapa 11: gastos de exemplo dos últimos 6 meses (os de novembro estão em gastosMes) =====
 // [valor, data, categoria, vanId, linhaId, descrição, litros?, km?, repete todo mês?]
-export const gastosExemplo: [number, string, string, string, string, string, number?, number?, boolean?][] = [
+export const gastosExemplo: [number, string, string, string, string, string, (number | undefined)?, (number | undefined)?, boolean?][] = [
   [2890, "2026-06-10", "Outros", "van2", "", "Parcela da van", undefined, undefined, true],
   [380, "2026-06-15", "Documentos e seguro", "van1", "", "Seguro da van", undefined, undefined, true],
   [1800, "2026-06-30", "Pagamento de motorista", "", "", "Salário do Carlos (motorista)", undefined, undefined, true],
