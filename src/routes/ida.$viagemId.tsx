@@ -10,6 +10,7 @@ import { useFrota, useViagens, ajustarViagem, lancarCobranca, type Passageiro } 
 import { ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
+import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
 
 export const Route = createFileRoute("/ida/$viagemId")({
   head: () => ({
@@ -57,6 +58,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
   const { vans } = useFrota();
   const [faltou, setFaltou] = useState<Passageiro | null>(null);
   const [construcao, setConstrucao] = useState<string | null>(null);
+  const [novaParada, setNovaParada] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }));
 
   const pas = (id: string) => passageiros.find((p) => p.id === id);
@@ -104,6 +106,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
         {ida.fase !== "paradas" && <p className="mt-1 text-center font-bold text-accent">{ida.fase === "a_caminho" ? `Em andamento — a caminho de ${destino}` : `Chegou em ${destino}`}</p>}
       </header>
 
+      {ida.parada ? <div className="px-4 pt-4"><ParadaAtual ida={ida} salvar={salvar} pas={pas} /></div> : (
       <div className="space-y-4 px-4 pt-4">
         {ida.fase === "paradas" && prox && (
           <section className="rounded-3xl border-4 border-accent bg-card p-5 shadow-lg">
@@ -155,7 +158,7 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
         )}
 
         {ida.fase !== "chegou" && (
-          <BotaoGrande variante="contorno" onClick={() => setConstrucao("A parada no caminho chega na próxima etapa.")}>Fazer parada no caminho</BotaoGrande>
+          <BotaoGrande variante="contorno" onClick={() => setNovaParada(true)}>Fazer parada no caminho</BotaoGrande>
         )}
 
         {ida.marcas.length > 0 && ida.fase !== "chegou" && (
@@ -183,13 +186,16 @@ function Conteudo({ v, ida, destino, nomeLinha, passageiros }: { v: Viagem; ida:
                 <li key={m.pid} className={`flex items-center gap-3 rounded-2xl p-4 ${m.r === "embarcou" ? "bg-success/15" : "bg-muted"}`}>
                   {m.r === "embarcou" ? <Check className="h-6 w-6 text-success" /> : <UserX className="h-6 w-6 text-muted-foreground" />}
                   <span className="flex-1 font-bold">{pas(m.pid)?.nome}</span>
-                  <span className={`text-sm font-bold ${m.r === "embarcou" ? "text-success" : "text-muted-foreground"}`}>{m.r === "embarcou" ? "Embarcou" : "Não apareceu"}</span>
+                  <span className={`text-sm font-bold ${m.r === "embarcou" ? "text-success" : "text-muted-foreground"}`}>{m.r === "embarcou" ? "Embarcou" : m.r === "ficou" ? "Ficou na parada" : "Não apareceu"}</span>
                 </li>
               ))}
             </ul>
           </section>
         )}
       </div>
+      )}
+
+      {novaParada && <IniciarParada onFechar={() => setNovaParada(false)} onIniciar={(minutos, local) => { salvar({ ...ida, parada: { inicio: Date.now(), minutos, local, chamada: false, naVan: {} } }); setNovaParada(false); toast.success(`Parada de ${minutos} minutos`); }} />}
 
       {faltou && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">

@@ -162,6 +162,20 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
           </ul>
         </section>
       ))}
+      {(v.ajuste.ida?.paradas?.length ?? 0) > 0 && (
+        <section>
+          <h3 className="mb-2 text-lg font-extrabold">Paradas</h3>
+          <ul className="space-y-2">
+            {v.ajuste.ida!.paradas!.map((pa, i) => (
+              <li key={i} className="rounded-2xl bg-card p-4 shadow-sm">
+                <p className="font-bold">{horaDe(pa.inicio)} · {pa.local || "Sem local"} · {pa.minutos} min</p>
+                {pa.ficaram.length === 0 ? <p className="text-sm text-success">Todos voltaram para a van</p>
+                  : pa.ficaram.map((f) => <p key={f.pid} className="text-sm text-destructive">{pas(f.pid)?.nome ?? "Passageiro"} ficou na parada às {f.hora} — {f.motivo}</p>)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {v.passageiroIds.length === 0 && <p className="text-center text-muted-foreground">Nenhum passageiro nesta viagem.</p>}
 
       {editavel && (
