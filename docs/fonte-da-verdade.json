@@ -2368,6 +2368,75 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 18,
+      "titulo": "Extra: preparação da publicação",
+      "status": "concluida",
+      "objetivo": "Deixar o app pronto para ser publicado no Lovable e instalado no celular: build de produção conferida, passo a passo escrito e sem aviso de erro na entrada.",
+      "checks": [
+        {
+          "d": "Guia de publicação",
+          "tipo": "arquivo",
+          "arquivo": "docs/PUBLICACAO.md"
+        },
+        {
+          "d": "Guia: passo a passo de publicar uma versão nova",
+          "tipo": "contem",
+          "arquivo": "docs/PUBLICACAO.md",
+          "regex": "Publish"
+        },
+        {
+          "d": "Guia: conferência no celular depois de publicar",
+          "tipo": "contem",
+          "arquivo": "docs/PUBLICACAO.md",
+          "regex": "Conferir depois de publicar"
+        },
+        {
+          "d": "Guia: avisa que o login ainda é simulado",
+          "tipo": "contem",
+          "arquivo": "docs/PUBLICACAO.md",
+          "regex": "login é simulado"
+        },
+        {
+          "d": "Manifesto em tela cheia",
+          "tipo": "contem",
+          "arquivo": "public/manifest.webmanifest",
+          "regex": "\"display\": \"fullscreen\""
+        },
+        {
+          "d": "Página sem aviso de hidratação com letra maior",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "suppressHydrationWarning"
+        },
+        {
+          "d": "Teste do casco da página",
+          "tipo": "contem",
+          "arquivo": "src/lib/tamanhoLetra.test.ts",
+          "regex": "casco da página"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
