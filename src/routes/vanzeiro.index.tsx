@@ -115,7 +115,6 @@ function Inicio() {
       })}
 
       <PrimeirosPassos />
-      <Alertas />
 
       {prox ? (
         <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg">
@@ -152,6 +151,8 @@ function Inicio() {
           <p className="text-lg font-bold">Nenhuma viagem agendada.</p>
         </section>
       )}
+
+      <Alertas />
 
       <section className="rounded-3xl bg-card p-5 shadow-sm">
         <h2 className="text-xl font-extrabold text-primary">Viagens da semana</h2>

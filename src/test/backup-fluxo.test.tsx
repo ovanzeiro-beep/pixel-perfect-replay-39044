@@ -199,6 +199,8 @@ describe("alerta de backup no início", () => {
     act(() => {
       for (let i = 0; i < 15; i++) store.salvarChavePix(`chave-${i}`);
     });
+    // Com os dados de exemplo há vários alertas: os menos urgentes ficam atrás de "Ver mais".
+    fireEvent.click(await screen.findByRole("button", { name: /Ver mais \d+ alertas?/ }));
     expect(await screen.findByText("Faça um backup dos seus dados")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("link", { name: "Fazer backup" }));
@@ -209,5 +211,19 @@ describe("alerta de backup no início", () => {
     });
     await screen.findByRole("region", { name: "Alertas" });
     expect(screen.queryByText("Faça um backup dos seus dados")).toBeNull();
+  });
+});
+
+describe("alertas do início: lista curta", () => {
+  it("mostra poucos alertas, com os urgentes sempre à vista, e abre o resto em 'Ver mais'", async () => {
+    await abrir("/vanzeiro");
+    const regiao = await screen.findByRole("region", { name: "Alertas" });
+    const antes = within(regiao).getAllByRole("listitem").length;
+    expect(antes).toBeLessThan(6);
+    const botao = within(regiao).getByRole("button", { name: /Ver mais (\d+) alertas?/ });
+    const escondidos = Number(/(\d+)/.exec(botao.textContent ?? "")![1]);
+    fireEvent.click(botao);
+    expect(within(regiao).getAllByRole("listitem").length).toBe(antes + escondidos);
+    expect(within(regiao).queryByRole("button", { name: /Ver mais/ })).toBeNull();
   });
 });

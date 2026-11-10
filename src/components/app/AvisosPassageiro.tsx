@@ -11,11 +11,13 @@ const COR: Record<Nivel, string> = {
 };
 
 /** Avisos do passageiro (pagamento atrasado, prazo para responder, viagem cancelada). Some quando está tudo em dia. */
-export function AvisosPassageiro() {
+export function AvisosPassageiro({ so }: { so?: "pagamento" }) {
   const { cobrancas } = useFrota();
   const viagens = useViagens();
   const pid = usePassageiroId();
-  const avisos = gerarAvisosPassageiro({ pid, cobrancas, viagens, agora: new Date() });
+  const avisos = gerarAvisosPassageiro({ pid, cobrancas, viagens, agora: new Date() }).filter(
+    (a) => so !== "pagamento" || a.id === "atraso",
+  );
   if (avisos.length === 0) return null;
   return (
     <section aria-label="Avisos" className="space-y-2">

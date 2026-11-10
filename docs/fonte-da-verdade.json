@@ -2032,6 +2032,76 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 14,
+      "titulo": "Extra: revisão de clareza das telas",
+      "status": "concluida",
+      "objetivo": "Deixar o início do motorista e as telas do passageiro mais diretos: menos alertas de uma vez, sem avisos repetidos e sem copiar texto de aviso como se fosse a chave Pix.",
+      "checks": [
+        {
+          "d": "Início do motorista: poucos alertas, resto em 'Ver mais'",
+          "tipo": "contem",
+          "arquivo": "src/components/app/Alertas.tsx",
+          "regex": "LIMITE_VISIVEL = 3"
+        },
+        {
+          "d": "Alertas urgentes nunca ficam escondidos",
+          "tipo": "contem",
+          "arquivo": "src/components/app/Alertas.tsx",
+          "regex": "nivel === \"urgente\""
+        },
+        {
+          "d": "Início do motorista: próxima viagem vem antes dos alertas",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.index.tsx",
+          "regex": "Próxima viagem[\\s\\S]*<Alertas />"
+        },
+        {
+          "d": "Pagamentos do passageiro: só aviso de pagamento",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "<AvisosPassageiro so=\"pagamento\" />"
+        },
+        {
+          "d": "Início do passageiro: não copia texto de aviso no lugar da chave Pix",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "chavePix \\? \\("
+        },
+        {
+          "d": "Teste da lista curta de alertas",
+          "tipo": "contem",
+          "arquivo": "src/test/backup-fluxo.test.tsx",
+          "regex": "alertas do início: lista curta"
+        },
+        {
+          "d": "Teste do Pix e dos avisos do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "telas sem repetição e Pix"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

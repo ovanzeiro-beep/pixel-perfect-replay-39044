@@ -211,3 +211,41 @@ describe("passageiro: acesso", () => {
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
   });
 });
+
+describe("passageiro: telas sem repetição e Pix", () => {
+  it("sem chave Pix no início: não oferece copiar (nem copia texto de aviso) e orienta", async () => {
+    const copiar = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: copiar },
+      configurable: true,
+    });
+    await abrir("/passageiro", "p1");
+    expect(await screen.findByText(/ainda não informou a chave Pix/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Copiar chave Pix" })).toBeNull();
+    expect(copiar).not.toHaveBeenCalled();
+  });
+
+  it("com chave Pix no início: copia a chave de verdade", async () => {
+    const copiar = vi.fn(() => Promise.resolve());
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: copiar },
+      configurable: true,
+    });
+    const { store } = await abrir("/passageiro", "p1");
+    await screen.findByRole("navigation");
+    const { act } = await import("@testing-library/react");
+    act(() => store.salvarChavePix("chave-do-joao"));
+    fireEvent.click(await screen.findByRole("button", { name: "Copiar chave Pix" }));
+    expect(copiar).toHaveBeenCalledWith("chave-do-joao");
+  });
+
+  it("em 'Pagamentos' não mostra avisos de viagem; em 'Minhas viagens' também não repete os avisos", async () => {
+    await abrir("/passageiro/pagamentos", "p4");
+    await screen.findByRole("navigation");
+    expect(screen.queryByText(/Responda a viagem/)).toBeNull();
+    cleanup();
+    await abrir("/passageiro/viagens", "p4");
+    await screen.findByRole("navigation");
+    expect(screen.queryByRole("region", { name: "Avisos" })).toBeNull();
+  });
+});

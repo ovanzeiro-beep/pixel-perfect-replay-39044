@@ -1,5 +1,15 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AlertTriangle, BellRing, CreditCard, IdCard, Info, Save, X } from "lucide-react";
+import {
+  AlertTriangle,
+  BellRing,
+  ChevronDown,
+  CreditCard,
+  IdCard,
+  Info,
+  Save,
+  X,
+} from "lucide-react";
 import type { Alerta, Nivel, TipoAlerta } from "@/data/alertas";
 import { dispensarAlerta, restaurarAlertas } from "@/data/repositorio";
 import { useAlertas } from "@/data/useAlertas";
@@ -63,18 +73,34 @@ function Cartao({ a }: { a: Alerta }) {
   );
 }
 
+const LIMITE_VISIVEL = 3;
+
 /** Lista de alertas do vanzeiro. Não mostra nada quando está tudo em dia. */
 export function Alertas() {
   const { alertas, dispensados } = useAlertas();
+  const [todos, setTodos] = useState(false);
+  // Os urgentes (vêm primeiro na lista) nunca ficam escondidos.
+  const limite = Math.max(LIMITE_VISIVEL, alertas.filter((x) => x.nivel === "urgente").length);
+  const visiveis = todos ? alertas : alertas.slice(0, limite);
+  const escondidos = alertas.length - visiveis.length;
   if (alertas.length === 0 && dispensados === 0) return null;
   return (
     <section aria-label="Alertas" className="space-y-2">
       {alertas.length > 0 && (
         <ul className="space-y-2">
-          {alertas.map((a) => (
+          {visiveis.map((a) => (
             <Cartao key={a.id} a={a} />
           ))}
         </ul>
+      )}
+      {escondidos > 0 && (
+        <button
+          onClick={() => setTodos(true)}
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary font-bold text-primary"
+        >
+          <ChevronDown className="h-5 w-5" />
+          {escondidos === 1 ? "Ver mais 1 alerta" : `Ver mais ${escondidos} alertas`}
+        </button>
       )}
       {dispensados > 0 && (
         <button

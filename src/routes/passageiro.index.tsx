@@ -387,14 +387,20 @@ function InicioPassageiro() {
                   : `${brl(p.valor)}/mês`}
             </span>
           </div>
-          <button
-            onClick={() => {
-              navigator.clipboard?.writeText(pix).then(() => toast.success("Pix copiado!"));
-            }}
-            className="flex w-full min-h-12 items-center justify-center rounded-xl bg-primary/10 font-bold text-primary"
-          >
-            Copiar chave Pix
-          </button>
+          {chavePix ? (
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(chavePix).then(() => toast.success("Pix copiado!"));
+              }}
+              className="flex w-full min-h-12 items-center justify-center rounded-xl bg-primary/10 font-bold text-primary"
+            >
+              Copiar chave Pix
+            </button>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              O vanzeiro ainda não informou a chave Pix. Combine o pagamento com ele.
+            </p>
+          )}
         </div>
       </section>
 
