@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) e revisão de clareza (14) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) e navegação com Waze/Maps (15) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -29,6 +29,7 @@
 | 12 | Extra: exportar relatórios | Planilhas (recebimentos, gastos, resumo) e PDF do relatório, para o contador | **Concluída** |
 | 13 | Extra: tamanho da letra | Letra normal, grande ou muito grande, sem quebrar o layout em tela pequena | **Concluída** |
 | 14 | Extra: revisão de clareza | Menos alertas de uma vez, sem avisos repetidos, Pix sem falso "copiado" | **Concluída** |
+| 15 | Extra: navegar com Waze ou Maps | Na viagem, o motorista escolhe Google Maps ou Waze | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -165,3 +166,11 @@ Revisão feita passando pelo app como motorista e como passageiro (390 px, naveg
 - **Passageiro:** os avisos de viagem aparecem só no Início; em **Pagamentos** só o aviso de pagamento atrasado; **Minhas viagens** não repete os avisos (o cartão de cada viagem já mostra o prazo).
 - **Pix no início do passageiro:** sem chave cadastrada, não oferece "Copiar" (antes copiava o texto "— Pix não configurado —" e dizia "Pix copiado!"); mostra a orientação de combinar com o vanzeiro.
 - **Ainda depende de teste com pessoas:** esta revisão não substitui ver um motorista e um passageiro usando o app sem ajuda.
+
+## Extra: navegar com Waze ou Google Maps
+
+Na tela da viagem (ida e volta) há dois botões, **Google Maps** e **Waze**, para a próxima parada e para o destino.
+
+- O app **só abre o app de navegação** com o endereço pronto. Não usa GPS próprio, não guarda localização e não tem banco de dados.
+- O **Waze aceita um destino só**: por isso a "Rota completa" (todas as paradas de uma vez) continua só no Google Maps, e a tela explica isso.
+- **Radar:** o app não tem detector nem lista de radares (aparelho detector é proibido pelo CONTRAN e o PWA não acompanha a localização com a tela bloqueada). Quem quiser aviso de fiscalização usa o próprio Waze ou Google Maps, que já trazem isso.

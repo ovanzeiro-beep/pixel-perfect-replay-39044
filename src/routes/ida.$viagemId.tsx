@@ -25,7 +25,6 @@ import {
   GripVertical,
   MapPin,
   MessageCircle,
-  Navigation,
   Phone,
   Route as RouteIcon,
   Undo2,
@@ -51,6 +50,7 @@ import {
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
 import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
+import { NavegarCom } from "@/components/app/NavegarCom";
 import { TelaVolta } from "@/components/app/VoltaViagem";
 
 export const Route = createFileRoute("/ida/$viagemId")({
@@ -74,8 +74,6 @@ export const Route = createFileRoute("/ida/$viagemId")({
 });
 
 const primeiro = (n: string) => n.split(" (")[0]!.split(" ")[0]!;
-const mapsPara = (end: string) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(end)}&travelmode=driving`;
 
 function TelaIda() {
   const { viagemId } = Route.useParams();
@@ -249,14 +247,9 @@ function Conteudo({
                   Referência: {prox.referencia}
                 </p>
               )}
-              <a
-                href={mapsPara(enderecoCompleto(prox))}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-primary text-xl font-extrabold text-primary-foreground"
-              >
-                <Navigation className="h-6 w-6" /> Navegar
-              </a>
+              <div className="mt-4">
+                <NavegarCom endereco={enderecoCompleto(prox)} />
+              </div>
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <a
                   href={`tel:${prox.telefone.replace(/\D/g, "")}`}
@@ -304,6 +297,9 @@ function Conteudo({
                   {rotas.length > 1 ? ` · Parte ${i + 1}` : ""}
                 </a>
               ))}
+              <p className="text-center text-sm text-muted-foreground">
+                O Waze abre uma parada por vez. Para a rota com todas as paradas, use o Google Maps.
+              </p>
             </div>
           )}
 
@@ -320,14 +316,7 @@ function Conteudo({
           )}
 
           {ida.fase === "a_caminho" && (
-            <a
-              href={mapsPara(destino)}
-              target="_blank"
-              rel="noreferrer"
-              className="flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-primary text-xl font-extrabold text-primary-foreground"
-            >
-              <Navigation className="h-6 w-6" /> Navegar até o destino
-            </a>
+            <NavegarCom endereco={destino} rotulo="Navegar até o destino" />
           )}
           {ida.fase === "a_caminho" && (
             <BotaoGrande

@@ -2102,6 +2102,90 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 15,
+      "titulo": "Extra: navegar com Waze ou Google Maps",
+      "status": "concluida",
+      "objetivo": "Na viagem, o motorista escolhe Google Maps ou Waze para ir até a parada ou o destino. Só abre o app de navegação: sem GPS próprio, sem banco e sem lista de radares.",
+      "checks": [
+        {
+          "d": "Link do Google Maps",
+          "tipo": "contem",
+          "arquivo": "src/lib/navegacao.ts",
+          "regex": "export const linkGoogleMaps"
+        },
+        {
+          "d": "Link do Waze (já navegando)",
+          "tipo": "contem",
+          "arquivo": "src/lib/navegacao.ts",
+          "regex": "navigate=yes"
+        },
+        {
+          "d": "Botões Google Maps e Waze",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/NavegarCom.tsx"
+        },
+        {
+          "d": "Ida: próxima parada com os dois",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "<NavegarCom endereco=\\{enderecoCompleto\\(prox\\)\\}"
+        },
+        {
+          "d": "Ida: destino com os dois",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "<NavegarCom endereco=\\{destino\\}"
+        },
+        {
+          "d": "Ida: aviso de que o Waze vai parada por parada",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "O Waze abre uma parada por vez"
+        },
+        {
+          "d": "Volta: próxima parada com os dois",
+          "tipo": "contem",
+          "arquivo": "src/components/app/VoltaViagem.tsx",
+          "regex": "<NavegarCom"
+        },
+        {
+          "d": "Testes dos links",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/navegacao.test.ts"
+        },
+        {
+          "d": "Teste do componente",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/NavegarCom.test.tsx"
+        },
+        {
+          "d": "Teste na tela da viagem",
+          "tipo": "arquivo",
+          "arquivo": "src/test/navegar-fluxo.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

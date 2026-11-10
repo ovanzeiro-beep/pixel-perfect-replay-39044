@@ -56,6 +56,12 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Navegar com Waze ou Google Maps
+
+- [ ] Inicie uma viagem: na **próxima parada** aparecem os botões **Google Maps** e **Waze**. Toque em cada um: abre o app (ou o site) já com o endereço do passageiro.
+- [ ] "Rota completa no Google Maps" abre com todas as paradas; o texto explica que o Waze vai uma parada por vez.
+- [ ] Depois de embarcar todos, "Seguir para o destino" → "Navegar até o destino" mostra os dois botões.
+
 ## Tamanho da letra
 
 - [ ] Perfil → **Tamanho da letra** → "Muito grande": a letra de todo o app aumenta na hora. Navegue por Viagens, Passageiros, Dinheiro, Gastos, Relatórios e Histórico: **nada corta nem aparece rolagem para o lado**.

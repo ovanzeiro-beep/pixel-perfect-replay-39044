@@ -26,7 +26,6 @@ import {
   GripVertical,
   MapPin,
   MessageCircle,
-  Navigation,
   Phone,
   Route as RouteIcon,
   Smartphone,
@@ -58,10 +57,9 @@ import {
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande, campoClasse } from "@/components/app/Formulario";
 import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
+import { NavegarCom } from "@/components/app/NavegarCom";
 
 const primeiro = (n: string) => n.split(" (")[0]!.split(" ")[0]!;
-const mapsPara = (end: string) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(end)}&travelmode=driving`;
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const MOTIVOS = ["Voltou com a família", "Volta outro dia", "Outro"] as const;
 
@@ -595,14 +593,9 @@ function EntregaVolta({
           {prox.referencia && (
             <p className="mt-1 text-base text-muted-foreground">Referência: {prox.referencia}</p>
           )}
-          <a
-            href={mapsPara(enderecoCompleto(prox))}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-primary text-xl font-extrabold text-primary-foreground"
-          >
-            <Navigation className="h-6 w-6" /> Navegar
-          </a>
+          <div className="mt-4">
+            <NavegarCom endereco={enderecoCompleto(prox)} />
+          </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <a
               href={`tel:${prox.telefone.replace(/\D/g, "")}`}
