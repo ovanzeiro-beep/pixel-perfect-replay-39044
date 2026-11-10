@@ -37,7 +37,8 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
     id: "confirmacao",
     titulo: "Confirmações e lista de espera",
     passos: [
-      "Cada passageiro responde “Vou” ou “Não vou” pelo app, até o prazo (o horário aparece na viagem).",
+      "Cada passageiro responde “Vou” ou “Não vou” pelo app, até as 20h da véspera (o prazo aparece na viagem). Depois disso os botões somem para ele.",
+      "Se alguém perder o prazo, abra a viagem, toque no nome dele e escolha Vai, Não vai ou Sem resposta. Só o vanzeiro consegue mudar depois do prazo.",
       "Se a van lotar, quem confirmar depois entra na lista de espera e sobe sozinho quando abrir uma vaga.",
       "Em Viagens, o botão Compartilhar lista da viagem manda a lista de passageiros pelo WhatsApp.",
       "Para cancelar um dia, abra a viagem e toque em Cancelar viagem.",
@@ -98,7 +99,8 @@ export const AJUDA_PASSAGEIRO: TopicoAjuda[] = [
     titulo: "Avisar se vai viajar",
     passos: [
       "Na tela Início ou em Minhas viagens, toque em Vou ou em Não vou em cada viagem.",
-      "Responda antes do prazo que aparece no cartão da viagem.",
+      "Responda antes do prazo que aparece no cartão da viagem (até as 20h da véspera). Depois disso os botões somem.",
+      "Se precisar mudar depois do prazo, toque em Falar com o vanzeiro: ele consegue ajustar a sua resposta.",
       "Se a van estiver cheia, você entra na lista de espera (o cartão mostra a sua posição) e sobe quando abrir uma vaga.",
       "Para mudar a resposta, toque no outro botão.",
     ],

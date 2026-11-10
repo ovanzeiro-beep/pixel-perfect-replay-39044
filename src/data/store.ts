@@ -1,5 +1,6 @@
 // Guarda todos os dados do app. Ficam salvos no aparelho (localStorage) e "Restaurar exemplo" volta ao início.
 import { useMemo, useSyncExternalStore } from "react";
+import { prazoViagem } from "./alertas";
 import { novoId } from "./ids";
 import { CHAVE, armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
 import { registrarAlteracao, salvarMeta } from "./backup";
@@ -716,15 +717,22 @@ export function aceitarConvite(pid: string) {
     ),
   });
 }
-export function responderViagemApp(pid: string, viagemId: string, vai: boolean) {
+/**
+ * O passageiro responde "Vou" / "Não vou". Depois do prazo de confirmação ele não muda mais
+ * (devolve `false`); o vanzeiro ainda ajusta a resposta dele na própria viagem.
+ */
+export function responderViagemApp(pid: string, viagemId: string, vai: boolean): boolean {
   const aj = estado.ajustes[viagemId];
-  if (!aj) return;
+  if (!aj) return false;
+  const data = viagemId.split("_")[1] ?? "";
+  if (prazoViagem(data, new Date()).encerrado) return false;
   const [linhaId] = viagemId.split("_");
   const linha = estado.linhas.find((l) => l.id === linhaId);
   const vanId = aj.vanId ?? linha?.vanId ?? "";
   const lugares = estado.vans.find((v) => v.id === vanId)?.lugares ?? 0;
   const { ajuste } = definirResposta(aj, pid, vai ? "vai" : "nao", lugares);
   set({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: ajuste } });
+  return true;
 }
 export function confirmarParadaApp(pid: string, viagemId: string) {
   const aj = estado.ajustes[viagemId];

@@ -45,12 +45,13 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 - `lancarCobranca` com valor negativo remove a cobrança ainda não paga; se já foi paga, **cancela** (o recibo fica); sem cobrança para tirar, devolve `false`.
 - `marcarPagamento` quita as cobranças **mais antigas primeiro**, devolve o recibo (número sequencial crescente) e `null` se nada estava em aberto.
 - Lotação: quem confirma além dos lugares da van vai para a lista de espera; quando abre vaga, o primeiro da espera sobe.
+- Prazo de confirmação: `responderViagemApp` (o passageiro) devolve `false` e **não grava** depois do prazo (20h da véspera, `PRAZO` em `src/data/alertas.ts`). O vanzeiro continua ajustando a resposta dele pela própria viagem (`ajustarViagem`). Com banco, a regra deve valer **no servidor**, não só na tela.
 
 ## O que mudar ao trocar (e cuidados)
 
 | Tema | Hoje (mock) | Com banco |
 | --- | --- | --- |
-| Síncrono × assíncrono | Tudo síncrono | Cada escrita vira `Promise`. As que devolvem valor (`salvarPassageiro` → id, `marcarPagamento` → recibo, `lancarCobranca` → boolean) devolvem `Promise` do mesmo valor. Os hooks de leitura mantêm a assinatura, por cima de um cache (o projeto já tem `@tanstack/react-query`). |
+| Síncrono × assíncrono | Tudo síncrono | Cada escrita vira `Promise`. As que devolvem valor (`salvarPassageiro` → id, `marcarPagamento` → recibo, `lancarCobranca` → boolean, `responderViagemApp` → boolean) devolvem `Promise` do mesmo valor. Os hooks de leitura mantêm a assinatura, por cima de um cache (o projeto já tem `@tanstack/react-query`). |
 | Ids | Texto curto gerado no aparelho (`src/data/ids.ts`) | Ids gerados pelo banco (uuid). Cuidado: o id da viagem é `"<linhaId>_<AAAA-MM-DD>"` e o de cobrança periódica é `"<passageiroId>_<tipo>_<vencimento>"`; esses são **chaves compostas** previsíveis, mantenha-as assim ou troque por colunas. |
 | Dono dos dados | Um aparelho = um vanzeiro | Todo registro pertence a um vanzeiro. Passageiro só enxerga o que é dele (hoje garantido na tela; no banco, na política de acesso). |
 | Login | `src/data/sessao.ts` (simulado: papel + passageiro) | Login real (Google). Só o módulo de sessão muda; os hooks `useSessao`/`usePassageiroId` continuam. |

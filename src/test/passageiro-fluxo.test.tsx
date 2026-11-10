@@ -2,6 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { montarViagens } from "@/data/viagens";
 import { semearExemploNoAparelho } from "./apoio";
 
 /** Monta o app inteiro (rotas reais) começando em `caminho`, com dados limpos de exemplo. */
@@ -247,5 +248,38 @@ describe("passageiro: telas sem repetição e Pix", () => {
     await abrir("/passageiro/viagens", "p4");
     await screen.findByRole("navigation");
     expect(screen.queryByRole("region", { name: "Avisos" })).toBeNull();
+  });
+});
+
+describe("passageiro: depois do prazo", () => {
+  it("sem os botões Vou / Não vou: explica e oferece falar com o vanzeiro", async () => {
+    const meioDia = new Date();
+    meioDia.setHours(12, 0, 0, 0);
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(meioDia);
+    try {
+      // Um passageiro com viagem hoje à tarde/noite: o prazo era ontem às 20h.
+      await abrir("/passageiro/viagens", (store) => {
+        const e = store.obterEstado();
+        const v = montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()).find(
+          (x) => !x.passada && !x.ajuste.cancelada && x.passageiroIds.length > 0,
+        )!;
+        return v.passageiroIds[0]!;
+      });
+      await screen.findByRole("navigation");
+      expect((await screen.findAllByText("O prazo para responder acabou.")).length).toBeGreaterThan(
+        0,
+      );
+      const cartao = screen
+        .getAllByText("O prazo para responder acabou.")[0]!
+        .closest("div.rounded-2xl")!;
+      expect(within(cartao as HTMLElement).queryByRole("button", { name: /^Vou$/ })).toBeNull();
+      expect(screen.getAllByRole("link", { name: /Falar com o vanzeiro/ })[0]).toHaveAttribute(
+        "href",
+        expect.stringContaining("wa.me/55"),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
