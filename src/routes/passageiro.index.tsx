@@ -264,9 +264,9 @@ function InicioPassageiro() {
 
   const whatsVanzeiro = `${linkWhatsApp(vanzeiro.telefone)}?text=${encodeURIComponent(`Olá, ${vanzeiro.nome}! Sou ${p.nome}.`)}`;
 
-  const responder = (vai: boolean) => {
+  const responder = async (vai: boolean) => {
     if (!proxima) return;
-    if (!responderViagemApp(p.id, proxima.id, vai)) {
+    if (!(await responderViagemApp(p.id, proxima.id, vai))) {
       toast.error("O prazo para responder acabou. Fale com o vanzeiro.");
       return;
     }

@@ -2610,6 +2610,103 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 21,
+      "titulo": "Contrato assíncrono (passo 6 do plano do banco)",
+      "status": "concluida",
+      "objetivo": "Toda escrita do contrato devolve Promise, com aviso de falha e indicador de salvando; as telas esperam o resultado.",
+      "checks": [
+        {
+          "d": "Controle das gravações em andamento",
+          "tipo": "arquivo",
+          "arquivo": "src/data/gravacao.ts"
+        },
+        {
+          "d": "Falha de gravação tem erro próprio",
+          "tipo": "contem",
+          "arquivo": "src/data/gravacao.ts",
+          "regex": "class FalhaDeGravacao"
+        },
+        {
+          "d": "Contrato: escritas devolvem Promise",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "Assincrono<Omit<EscritaDoMock"
+        },
+        {
+          "d": "Mock embrulhado como contrato assíncrono",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "escrever\\(mock\\.salvarPassageiro\\)"
+        },
+        {
+          "d": "Indicador Salvando…",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/IndicadorSalvando.tsx"
+        },
+        {
+          "d": "Aviso de falha registrado no app",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "registrarFalhaDeGravacao"
+        },
+        {
+          "d": "Tela espera o resultado do pagamento",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "await marcarPagamento"
+        },
+        {
+          "d": "Tela espera a resposta do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "await responderViagemApp"
+        },
+        {
+          "d": "Lint pega `await` esquecido em condição",
+          "tipo": "contem",
+          "arquivo": "eslint.config.js",
+          "regex": "no-misused-promises"
+        },
+        {
+          "d": "Testes das gravações",
+          "tipo": "arquivo",
+          "arquivo": "src/data/gravacao.test.tsx"
+        },
+        {
+          "d": "Teste: cada escrita passa pelo mock e devolve Promise",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "devolve Promise"
+        },
+        {
+          "d": "Guia do banco: contrato já é assíncrono",
+          "tipo": "contem",
+          "arquivo": "docs/MIGRACAO_BANCO.md",
+          "regex": "Já é assíncrono no contrato"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

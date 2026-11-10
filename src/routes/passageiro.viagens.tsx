@@ -23,8 +23,8 @@ function MinhasViagens() {
     .filter((v) => v.passada)
     .sort((a, b) => b.data.localeCompare(a.data));
 
-  const responder = (viagemId: string, vai: boolean) => {
-    if (!responderViagemApp(p.id, viagemId, vai)) {
+  const responder = async (viagemId: string, vai: boolean) => {
+    if (!(await responderViagemApp(p.id, viagemId, vai))) {
       toast.error("O prazo para responder acabou. Fale com o vanzeiro.");
       return;
     }

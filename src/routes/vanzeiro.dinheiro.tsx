@@ -344,7 +344,9 @@ function JanelaPagamento({
   const [forma, setForma] = useState<Forma>("pix");
   const [data, setData] = useState(isoDe(new Date()));
   const [erro, setErro] = useState("");
-  const confirmar = () => {
+  const [enviando, setEnviando] = useState(false);
+  const confirmar = async () => {
+    if (enviando) return;
     const n = Number(v.replace(/\./g, "").replace(",", "."));
     if (!n || n <= 0) {
       setErro("Digite o valor recebido");
@@ -354,7 +356,15 @@ function JanelaPagamento({
       setErro("Escolha a data");
       return;
     }
-    const r = marcarPagamento(p.id, n, forma, data, ids);
+    setEnviando(true);
+    let r: Awaited<ReturnType<typeof marcarPagamento>>;
+    try {
+      r = await marcarPagamento(p.id, n, forma, data, ids);
+    } catch {
+      setEnviando(false);
+      return;
+    }
+    setEnviando(false);
     if (!r) {
       setErro("Não há nada em aberto");
       return;
@@ -403,7 +413,7 @@ function JanelaPagamento({
         <p className="text-sm text-muted-foreground">
           Se for só uma parte, o valor quita primeiro as cobranças mais antigas.
         </p>
-        <BotaoGrande variante="destaque" onClick={confirmar}>
+        <BotaoGrande variante="destaque" onClick={confirmar} disabled={enviando}>
           Confirmar pagamento
         </BotaoGrande>
         <BotaoGrande variante="contorno" onClick={onFechar}>

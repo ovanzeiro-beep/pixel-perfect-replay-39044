@@ -35,11 +35,27 @@ describe("o contrato do repositório cobre tudo o que o mock faz", () => {
     ).toEqual(doStore);
   });
 
-  it("cada operação do contrato é a do mock (a tela usa o contrato, o contrato usa o mock)", async () => {
+  it("leituras e ciclo de vida são do mock; cada escrita passa pelo mock e devolve Promise", async () => {
     const { mock, repositorio } = await carregar();
+    const IMEDIATAS = [
+      "useFrota",
+      "useViagens",
+      "useDadosProntos",
+      "useVanzeiro",
+      "usePassageiroVisao",
+      "useConvite",
+      "obterEstado",
+      "iniciarPersistencia",
+    ];
     for (const [nome, fn] of Object.entries(repositorio)) {
-      expect(fn, nome).toBe((mock as Record<string, unknown>)[nome]);
+      const doMock = (mock as Record<string, unknown>)[nome];
+      if (IMEDIATAS.includes(nome)) expect(fn, nome).toBe(doMock);
+      else expect(fn, nome).not.toBe(doMock);
     }
+    const promessa = repositorio.salvarChavePix("chave-do-teste");
+    expect(promessa).toBeInstanceOf(Promise);
+    expect(mock.obterEstado().chavePix).toBe("chave-do-teste");
+    await expect(promessa).resolves.toBeUndefined();
   });
 
   it("as telas e componentes não importam o store direto, só o repositório", () => {
@@ -129,26 +145,26 @@ describe.each(IMPLEMENTACOES)("contrato do repositório: %s", (_nome, criar) => 
     observacoes: "",
   });
 
-  it("vans: criar, editar e excluir", () => {
+  it("vans: criar, editar e excluir", async () => {
     const antes = r.obterEstado().vans.length;
-    r.salvarVan(novaVan("Van Nova"));
+    await r.salvarVan(novaVan("Van Nova"));
     const criada = r.obterEstado().vans.find((v) => v.apelido === "Van Nova")!;
     expect(r.obterEstado().vans).toHaveLength(antes + 1);
-    r.salvarVan({ ...novaVan("Van Editada"), id: criada.id });
+    await r.salvarVan({ ...novaVan("Van Editada"), id: criada.id });
     expect(r.obterEstado().vans.find((v) => v.id === criada.id)?.apelido).toBe("Van Editada");
     expect(r.obterEstado().vans).toHaveLength(antes + 1);
-    r.excluirVan(criada.id);
+    await r.excluirVan(criada.id);
     expect(r.obterEstado().vans).toHaveLength(antes);
   });
 
-  it("passageiros: salvar devolve id único; excluir apaga cobranças e recibos dele", () => {
-    const a = r.salvarPassageiro(novoPassageiro("Ana"));
-    const b = r.salvarPassageiro(novoPassageiro("Beto"));
+  it("passageiros: salvar devolve id único; excluir apaga cobranças e recibos dele", async () => {
+    const a = await r.salvarPassageiro(novoPassageiro("Ana"));
+    const b = await r.salvarPassageiro(novoPassageiro("Beto"));
     expect(a).not.toBe(b);
-    expect(r.lancarCobranca(a, 150, "l1")).toBe(true);
-    const recibo = r.marcarPagamento(a, 150, "pix", "2026-11-09");
+    expect(await r.lancarCobranca(a, 150, "l1")).toBe(true);
+    const recibo = await r.marcarPagamento(a, 150, "pix", "2026-11-09");
     expect(recibo?.pid).toBe(a);
-    r.excluirPassageiro(a);
+    await r.excluirPassageiro(a);
     const e = r.obterEstado();
     expect(e.passageiros.some((p) => p.id === a)).toBe(false);
     expect(e.cobrancas.some((c) => c.pid === a)).toBe(false);
@@ -156,34 +172,34 @@ describe.each(IMPLEMENTACOES)("contrato do repositório: %s", (_nome, criar) => 
     expect(e.passageiros.some((p) => p.id === b)).toBe(true);
   });
 
-  it("dinheiro: lançar, pagar (recibos com número crescente), desfazer e cancelar", () => {
-    const p = r.salvarPassageiro(novoPassageiro());
-    r.lancarCobranca(p, 100, "l1");
-    r.lancarCobranca(p, 50, "l1");
+  it("dinheiro: lançar, pagar (recibos com número crescente), desfazer e cancelar", async () => {
+    const p = await r.salvarPassageiro(novoPassageiro());
+    await r.lancarCobranca(p, 100, "l1");
+    await r.lancarCobranca(p, 50, "l1");
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.emAberto).toBe(150);
-    const r1 = r.marcarPagamento(p, 100, "dinheiro", "2026-11-09")!;
-    const r2 = r.marcarPagamento(p, 50, "pix", "2026-11-09")!;
+    const r1 = (await r.marcarPagamento(p, 100, "dinheiro", "2026-11-09"))!;
+    const r2 = (await r.marcarPagamento(p, 50, "pix", "2026-11-09"))!;
     expect(r2.numero).toBeGreaterThan(r1.numero);
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.emAberto).toBe(0);
-    r.desfazerRecibo(r2.numero);
+    await r.desfazerRecibo(r2.numero);
     expect(r.obterEstado().recibos.some((x) => x.numero === r2.numero)).toBe(false);
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.emAberto).toBe(50);
     const cob = r.obterEstado().cobrancas.find((c) => c.pid === p && c.valor === 50)!;
-    r.cancelarCob(cob.id, "erro");
+    await r.cancelarCob(cob.id, "erro");
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.emAberto).toBe(0);
   });
 
-  it("lançar cobrança negativa que não existe devolve false", () => {
-    const p = r.salvarPassageiro(novoPassageiro());
-    expect(r.lancarCobranca(p, -999)).toBe(false);
+  it("lançar cobrança negativa que não existe devolve false", async () => {
+    const p = await r.salvarPassageiro(novoPassageiro());
+    expect(await r.lancarCobranca(p, -999)).toBe(false);
   });
 
-  it("pagamento sem nada em aberto não gera recibo", () => {
-    const p = r.salvarPassageiro(novoPassageiro());
-    expect(r.marcarPagamento(p, 100, "pix", "2026-11-09")).toBeNull();
+  it("pagamento sem nada em aberto não gera recibo", async () => {
+    const p = await r.salvarPassageiro(novoPassageiro());
+    expect(await r.marcarPagamento(p, 100, "pix", "2026-11-09")).toBeNull();
   });
 
-  it("gastos: salvar e excluir", () => {
+  it("gastos: salvar e excluir", async () => {
     const g = {
       valor: 80,
       data: "2026-11-05",
@@ -196,38 +212,38 @@ describe.each(IMPLEMENTACOES)("contrato do repositório: %s", (_nome, criar) => 
       mensal: false,
     };
     const antes = r.obterEstado().gastos.length;
-    r.salvarGasto(g);
+    await r.salvarGasto(g);
     const criado = r.obterEstado().gastos.at(-1)!;
     expect(r.obterEstado().gastos).toHaveLength(antes + 1);
-    r.excluirGasto(criado.id);
+    await r.excluirGasto(criado.id);
     expect(r.obterEstado().gastos).toHaveLength(antes);
   });
 
-  it("chave Pix e alertas dispensados", () => {
-    r.salvarChavePix("  minha@chave  ");
+  it("chave Pix e alertas dispensados", async () => {
+    await r.salvarChavePix("  minha@chave  ");
     expect(r.obterEstado().chavePix).toBe("minha@chave");
-    r.dispensarAlerta("cnh_m2", "x");
+    await r.dispensarAlerta("cnh_m2", "x");
     expect(r.obterEstado().alertasDispensados).toEqual({ cnh_m2: "x" });
-    r.restaurarAlertas();
+    await r.restaurarAlertas();
     expect(r.obterEstado().alertasDispensados).toEqual({});
   });
 
-  it("linhas: o passageiro entra e sai da linha; excluir a linha tira dele", () => {
-    const p = r.salvarPassageiro({ ...novoPassageiro(), linhaIds: [] });
-    r.colocarNaLinha("l2", [p]);
+  it("linhas: o passageiro entra e sai da linha; excluir a linha tira dele", async () => {
+    const p = await r.salvarPassageiro({ ...novoPassageiro(), linhaIds: [] });
+    await r.colocarNaLinha("l2", [p]);
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.linhaIds).toEqual(["l2"]);
-    r.tirarDaLinha(p, "l2");
+    await r.tirarDaLinha(p, "l2");
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.linhaIds).toEqual([]);
-    r.colocarNaLinha("l3", [p]);
-    r.excluirLinha("l3");
+    await r.colocarNaLinha("l3", [p]);
+    await r.excluirLinha("l3");
     expect(r.obterEstado().passageiros.find((x) => x.id === p)?.linhaIds).toEqual([]);
     expect(r.obterEstado().linhas.some((l) => l.id === "l3")).toBe(false);
   });
 
-  it("restaurar exemplo volta ao início", () => {
-    r.salvarChavePix("x");
-    r.salvarPassageiro(novoPassageiro());
-    r.restaurarExemplo();
+  it("restaurar exemplo volta ao início", async () => {
+    await r.salvarChavePix("x");
+    await r.salvarPassageiro(novoPassageiro());
+    await r.restaurarExemplo();
     expect(r.obterEstado().chavePix).toBe("");
     expect(r.obterEstado().passageiros).toHaveLength(22);
   });

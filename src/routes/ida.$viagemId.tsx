@@ -87,8 +87,9 @@ function TelaIda() {
   useEffect(() => {
     if (!v || v.ajuste.ida || v.ajuste.cancelada || !linha) return;
     const cidade = (id: string) => passageiros.find((p) => p.id === id)?.cidade ?? "";
-    if (iniciarIda(v.id, ordenarParadas(v.vao, cidade, linha.paradas)))
-      toast.success("Viagem iniciada");
+    void iniciarIda(v.id, ordenarParadas(v.vao, cidade, linha.paradas)).then((ok) => {
+      if (ok) toast.success("Viagem iniciada");
+    });
   }, [v, linha, passageiros]);
 
   if (!v || !linha) {
@@ -143,8 +144,8 @@ function Conteudo({
   const prox = faltam[0] ? pas(faltam[0]) : undefined;
   const van = vans.find((x) => x.id === v.vanId);
 
-  const marcar = (p: Passageiro, r: "embarcou" | "faltou") => {
-    const { ok, cobrou } = marcarEmbarque(v.id, p.id, r);
+  const marcar = async (p: Passageiro, r: "embarcou" | "faltou") => {
+    const { ok, cobrou } = await marcarEmbarque(v.id, p.id, r);
     if (!ok) return;
     toast.success(
       r === "embarcou"
@@ -152,8 +153,8 @@ function Conteudo({
         : `${primeiro(p.nome)} não apareceu`,
     );
   };
-  const desfazer = () => {
-    const { ok, cobrancaAchada } = desfazerUltimaMarcacaoDaIda(v.id);
+  const desfazer = async () => {
+    const { ok, cobrancaAchada } = await desfazerUltimaMarcacaoDaIda(v.id);
     if (!ok) return;
     if (!cobrancaAchada) toast.warning("Não achei a cobrança dessa viagem. Confira em Dinheiro.");
     toast.success("Última marcação desfeita");
@@ -332,7 +333,7 @@ function Conteudo({
                   ))}
               </ul>
               <div className="mt-3">
-                <BotaoGrande variante="destaque" onClick={() => iniciarVolta(v.id)}>
+                <BotaoGrande variante="destaque" onClick={() => void iniciarVolta(v.id)}>
                   Iniciar volta
                 </BotaoGrande>
               </div>

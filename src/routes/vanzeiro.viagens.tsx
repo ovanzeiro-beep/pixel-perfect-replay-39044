@@ -187,8 +187,8 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
   const quando = `${diaSemana(v.data).toLowerCase()}, ${dataCurta(v.data)}`;
   const editavel = !v.passada;
 
-  const responder = (p: Passageiro, r: Exclude<Resposta, "espera">) => {
-    const res = definirRespostaDoPassageiro(v.id, p.id, r);
+  const responder = async (p: Passageiro, r: Exclude<Resposta, "espera">) => {
+    const res = await definirRespostaDoPassageiro(v.id, p.id, r);
     setTocado(null);
     if (!res) {
       toast.error("Não consegui salvar a resposta. Tente de novo.");
