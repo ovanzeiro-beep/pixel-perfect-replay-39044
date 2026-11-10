@@ -323,6 +323,9 @@ export function ehEstado(x: unknown): x is Estado {
     ) &&
     !!e["ajustes"] &&
     typeof e["ajustes"] === "object" &&
+    (e["pausas"] === undefined || Array.isArray(e["pausas"])) &&
+    (e["configCobranca"] === undefined ||
+      (!!e["configCobranca"] && typeof e["configCobranca"] === "object")) &&
     typeof e["chavePix"] === "string"
   );
 }
@@ -550,6 +553,8 @@ export function excluirLinha(id: string) {
       })),
       ajustes: mapAjustes(estado.ajustes, (aj, chave) => (chave.split("_")[0] === id ? null : aj)),
       gastos: estado.gastos.map((g) => (g.linhaId === id ? { ...g, linhaId: "" } : g)),
+      // Pausa só daquela linha perde o sentido; a de "todas as linhas" fica.
+      ...(estado.pausas ? { pausas: estado.pausas.filter((z) => z.linhaId !== id) } : {}),
       cobrancas: estado.cobrancas.map((c) => {
         if (c.linhaId !== id) return c;
         const { linhaId: _l, ...resto } = c;

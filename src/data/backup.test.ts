@@ -84,6 +84,34 @@ describe("arquivo de backup", () => {
       return refazer(b);
     };
 
+    it("recusa pausas e configuração de cobrança estragadas (senão o app quebra ao restaurar)", () => {
+      expect(erroDe(comDados((d) => (d["pausas"] = "x")))).toMatch(/pausas/);
+      expect(
+        erroDe(
+          comDados((d) => (d["pausas"] = [{ id: "a", de: "ontem", ate: "hoje", motivo: "" }])),
+        ),
+      ).toMatch(/pausas/);
+      expect(
+        erroDe(
+          comDados(
+            (d) => (d["pausas"] = [{ id: "a", de: "2026-12-10", ate: "2026-12-01", motivo: "" }]),
+          ),
+        ),
+      ).toMatch(/pausas/);
+      expect(erroDe(comDados((d) => (d["configCobranca"] = { diasDeAviso: "dois" })))).toMatch(
+        /cobrança/,
+      );
+      expect(erroDe(comDados((d) => (d["configCobranca"] = 5)))).toMatch(/cobrança/);
+    });
+    it("aceita pausas e configuração de cobrança corretas", () => {
+      const ok = comDados((d) => {
+        d["pausas"] = [
+          { id: "a", de: "2026-12-01", ate: "2026-12-10", motivo: "Férias", linhaId: "l1" },
+        ];
+        d["configCobranca"] = { diasDeAviso: 3, textoCobranca: "", pagaNaHoraPadrao: true };
+      });
+      expect(erroDe(ok)).toBeNull();
+    });
     it("vazio e não-JSON", () => {
       expect(erroDe("")).toBe("O arquivo está vazio.");
       expect(erroDe("   \n")).toBe("O arquivo está vazio.");

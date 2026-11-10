@@ -134,3 +134,48 @@ Os passos 1 a 3 e 6 são os de maior risco e os que mais valem fazer **antes** d
   - **Falha ao guardar neste aparelho:** o app avisa "Seus dados não estão sendo salvos" (com atalho para backup). **Duas janelas** (app instalado e navegador) agora acompanham uma à outra, e uma janela parada não sobrescreve a outra.
   - **Código morto removido:** dois avisos "Em construção" que nunca apareciam.
 - **Falta só o que depende do banco:** P0-5 (login real, convite com token, fim da tela "Qual é o seu nome?"), P1-9 a P1-11 (prazo no servidor, offline, LGPD) e os itens "No dia do banco".
+
+---
+
+# Segunda varredura (etapas 23 a 30)
+
+Feita depois das etapas 23 a 30 (aviso de van chegando, pagar na hora, Pix com valor, configuração de cobrança, contraste e telas vazias, férias e feriados, importar e exportar planilha), sobre o `main` na etapa 30. Foco: o que as etapas novas mudaram na prontidão para o banco.
+
+## Resultado
+
+- **Fluxos fechados:** os fluxos do vanzeiro e do passageiro estão completos no mock (cadastro, viagem ida/parada/volta, dinheiro, cobrança, pausas, importação/exportação, backup, convite simulado). Em navegador real (celular simulado), 135 cliques em 21 telas dos dois papéis (até 10 botões por tela) deram 0 erro de página, 0 erro de console e 0 requisição falha; acessibilidade (axe, WCAG A/AA) sem violações em todas as telas, incluindo "Cobrança" e "Férias e feriados".
+- **Contrato:** toda função de escrita do mock está no contrato (`repositorio.ts`); as 4 que não estão são internas (`criarEstadoExemplo`, `criarEstadoVazio`, `ehEstado`) ou só de teste (`ajustarViagem`, e um teste garante que nenhuma tela a usa).
+- **Código morto:** nenhum código do app sem uso. Sobram só o modelo de componentes do Lovable (45 arquivos em `src/components/ui/` e 41 dependências, deliberadamente mantidos) e 24 exportações usadas só dentro do próprio arquivo (inofensivas).
+
+## Falhas achadas e corrigidas nesta varredura
+
+| # | Falha | Efeito | Correção |
+| --- | --- | --- | --- |
+| 1 | **Backup não conferia `pausas` nem `configCobranca`** | Um arquivo de backup com `pausas` estragado passava pela conferência e derrubava o app ao restaurar | A conferência valida as duas; o estado salvo no aparelho também recusa esses campos estragados |
+| 2 | **Excluir uma linha deixava as pausas dela para trás** | Pausa "órfã" na lista de Férias e feriados, apontando para uma linha que não existe | `excluirLinha` leva junto as pausas daquela linha (a de "todas as linhas" fica) |
+| 3 | **Importação barrava irmãos que dividem o telefone** | Dois irmãos com o telefone do responsável: o segundo era tratado como repetido e ficava de fora | Repetido agora é **mesmo nome e mesmo telefone**; mesmo telefone com nome diferente entra, com aviso |
+| 4 | **`MIGRACAO_BANCO.md` desatualizado** | Citava `ajustarViagem` (removida do contrato) e `store.ts` como fonte dos tipos; faltavam `config_cobranca`, `paga na hora` e `marca.pagou` | Documento corrigido |
+
+Cada correção tem teste (`backup.test.ts`, `store.test.ts`, `importacao.test.ts`).
+
+## O que ainda falta antes do banco (sem banco)
+
+Nada bloqueia. Estes itens deixam a troca mais segura, e podem ser feitos antes ou junto com o banco:
+
+1. **Testes das telas com menos cobertura.** Cobertura geral: **84% das linhas, 76% dos ramos** (734 testes). As telas mais fracas são `vanzeiro.viagens` (23%), `vanzeiro.linhas` (27%), `vanzeiro.index` (42%) e `passageiro.perfil`/`perfil` (cerca de 50%). Foram conferidas em navegador, mas um teste de tela protege a troca da camada de dados.
+2. **Dependências sem auditoria automática.** O projeto usa `bun.lock`; o `npm audit` não roda sem `package-lock.json`. Antes de publicar para muita gente, vale rodar uma auditoria (o Lovable/GitHub podem fazer).
+3. **`store.ts` tem 1.026 linhas.** É o que o banco substitui, então não vale quebrar agora; as regras puras já estão em módulos separados (`cobrancas`, `viagens`, `operacoesViagem`, `pausas`).
+
+## O que só dá para fazer COM o banco (já mapeado)
+
+- Login real e convite com token aleatório e prazo (hoje o link usa o id do passageiro e a tela "Qual é o seu nome?" lista todos).
+- Prazo de confirmação e dia de pausa validados **no servidor** (hoje valem na tela e no mock).
+- Cobranças semanais e mensais geradas por uma rotina diária no servidor (hoje nascem quando alguém abre o app) e número do recibo sequencial garantido pelo banco (hoje é "maior + 1" no aparelho).
+- Quem grava é sempre o usuário logado: no banco, `responderViagemApp` e semelhantes **não podem receber o id do passageiro** de quem chama; o servidor deve usar a identidade do login.
+- Offline (decisão sua), LGPD (aviso e consentimento no convite) e o teste com dois aparelhos ao mesmo tempo.
+- Van ao vivo, notificação push, confirmação automática de Pix e WhatsApp automático: veja `VAN_AO_VIVO.md`.
+
+## Decisões suas (as 7 de antes continuam valendo, mais 2 novas)
+
+8. **O telefone identifica o passageiro?** Hoje não é único (irmãos dividem o telefone). Se o login do passageiro for por telefone/WhatsApp, é preciso decidir como separar duas pessoas com o mesmo número.
+9. **Pausas e configuração de cobrança** valem por vanzeiro (uma configuração por conta). Se um dia houver mais de um responsável por conta, decidir quem pode alterá-las.

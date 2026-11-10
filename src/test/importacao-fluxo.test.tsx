@@ -50,7 +50,7 @@ describe("importar passageiros por planilha", () => {
         CAB,
         "Zélia Nova;43988880001;mensal;180;10",
         "Zeca Novo;43988880002;mensal;190;12",
-        `Repetido;${ja.telefone};mensal;100;5`,
+        `${ja.nome};${ja.telefone};mensal;100;5`,
         "Sem Fone;;mensal;100;5",
       ].join("\n"),
     );

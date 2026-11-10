@@ -343,3 +343,25 @@ describe("importarPassageiros", () => {
     expect(store.obterEstado().passageiros).toHaveLength(antes + 2);
   });
 });
+
+describe("excluir linha com pausa", () => {
+  it("leva junto as pausas daquela linha e mantém as de todas as linhas", async () => {
+    const st = await import("./store");
+    const linha = st.obterEstado().linhas[0]!;
+    st.salvarPausa({ de: "2030-01-01", ate: "2030-01-10", motivo: "da linha", linhaId: linha.id });
+    st.salvarPausa({ de: "2030-02-01", ate: "2030-02-10", motivo: "de todas" });
+    st.excluirLinha(linha.id);
+    expect((st.obterEstado().pausas ?? []).map((x) => x.motivo)).toEqual(["de todas"]);
+  });
+});
+
+describe("dados salvos no aparelho com campos novos estragados", () => {
+  it("não são aceitos como estado (o app começaria quebrado)", async () => {
+    const st = await import("./store");
+    const e = st.obterEstado();
+    expect(st.ehEstado(e)).toBe(true);
+    expect(st.ehEstado({ ...e, pausas: "x" })).toBe(false);
+    expect(st.ehEstado({ ...e, configCobranca: 7 })).toBe(false);
+    expect(st.ehEstado({ ...e, pausas: [] })).toBe(true);
+  });
+});

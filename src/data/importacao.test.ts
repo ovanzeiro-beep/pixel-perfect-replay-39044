@@ -141,15 +141,29 @@ describe("analisarImportacao", () => {
     const { itens } = analisar(
       [
         cab,
-        "Outra Ana;(43) 99999-0001;;mensal;100;5",
+        "Ana Antiga;(43) 99999-0001;;mensal;100;5",
         "Iara;43999990010;;mensal;100;5",
-        "Iara de novo;+55 43 99999-0010;;mensal;100;5",
+        "Iara;+55 43 99999-0010;;mensal;100;5",
       ].join("\n"),
     );
     expect(itens.map((i) => i.situacao)).toEqual(["duplicado", "novo", "duplicado"]);
     expect(itens[0]!.avisos[0]).toMatch(/Ana Antiga/);
     expect(itens[2]!.avisos[0]).toMatch(/linha 3/);
     expect(itens[2]!.dados).toBeNull();
+  });
+
+  it("irmãos com o mesmo telefone entram, com aviso (só mesmo nome e telefone é repetido)", () => {
+    const { itens } = analisar(
+      [
+        cab,
+        "Lia;43999990020;;mensal;100;5",
+        "Léo;43999990020;;mensal;100;5",
+        "Ana Nova;(43) 99999-0001;;mensal;100;5",
+      ].join("\n"),
+    );
+    expect(itens.map((i) => i.situacao)).toEqual(["novo", "novo", "novo"]);
+    expect(itens[1]!.avisos[0]).toMatch(/Mesmo telefone de Lia/);
+    expect(itens[2]!.avisos[0]).toMatch(/Mesmo telefone de Ana Antiga/);
   });
 
   it("avisa linha não encontrada mas ainda importa", () => {
