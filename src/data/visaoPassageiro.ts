@@ -22,6 +22,8 @@ export type MinhaIda = {
   fase: Ida["fase"];
   /** Como o vanzeiro marcou o embarque dele (ausente: ainda não marcou). */
   minhaMarca?: Marca["r"];
+  /** Na ida, enquanto a van recolhe: quantas paradas faltam antes da dele (0: a próxima é a dele). */
+  faltamParadasIda?: number;
   /** Parada em andamento (o passageiro confirma "estou na van"). */
   parada?: { local: string; inicio: number; minutos: number; confirmei: boolean };
   volta?: {
@@ -63,6 +65,12 @@ function minhaIda(ida: Ida, pid: string): MinhaIda {
   const marca = ida.marcas.find((m) => m.pid === pid)?.r;
   const out: MinhaIda = { encerrada: !!ida.encerrada, fase: ida.fase };
   if (marca) out.minhaMarca = marca;
+  const pos = ida.ordem.indexOf(pid);
+  if (!marca && pos >= 0 && ida.fase === "paradas") {
+    out.faltamParadasIda = ida.ordem
+      .slice(0, pos)
+      .filter((id) => !ida.marcas.some((m) => m.pid === id)).length;
+  }
   if (ida.parada) {
     out.parada = {
       local: ida.parada.local,

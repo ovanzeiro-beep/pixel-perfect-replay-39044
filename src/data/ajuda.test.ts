@@ -62,6 +62,8 @@ describe("a ajuda cita só botões que existem nas telas", () => {
     "Copiar chave Pix",
     "Avisar que paguei",
     "Falar com o vanzeiro",
+    "Avisar: chegando",
+    "Avisar o grupo que a van saiu",
     "Google Maps",
     "Waze",
     "Instalar agora",

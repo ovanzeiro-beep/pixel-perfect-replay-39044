@@ -135,6 +135,61 @@ describe("visão do passageiro: só o que é dele", () => {
   });
 });
 
+describe("ida em andamento: quantas paradas faltam até a dele", () => {
+  it("conta só quem está na frente e ainda não embarcou; some depois que ele embarca", () => {
+    const e = estado();
+    const [a, b, c] = e.passageiros;
+    const t = montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, AGORA).find(
+      (x) => !x.passada && x.passageiroIds.includes(c!.id),
+    )!;
+    const ida = (marcas: { pid: string; r: "embarcou" | "faltou"; cobrou: number }[]) => ({
+      ordem: [a!.id, b!.id, c!.id],
+      marcas,
+      fase: "paradas" as const,
+    });
+    const falta = (pid: string) =>
+      visaoDoPassageiro(e, pid, AGORA).viagens.find((x) => x.id === t.id)!.ida?.faltamParadasIda;
+
+    e.ajustes[t.id] = { respostas: {}, espera: [], extras: [], ida: ida([]) };
+    expect(falta(c!.id)).toBe(2);
+    expect(falta(a!.id)).toBe(0);
+    e.ajustes[t.id] = {
+      respostas: {},
+      espera: [],
+      extras: [],
+      ida: ida([{ pid: a!.id, r: "embarcou", cobrou: 0 }]),
+    };
+    expect(falta(c!.id)).toBe(1);
+    // quem faltou à parada também deixa de contar
+    e.ajustes[t.id] = {
+      respostas: {},
+      espera: [],
+      extras: [],
+      ida: ida([
+        { pid: a!.id, r: "embarcou", cobrou: 0 },
+        { pid: b!.id, r: "faltou", cobrou: 0 },
+      ]),
+    };
+    expect(falta(c!.id)).toBe(0);
+    // depois de marcado ele mesmo, não há mais contagem
+    e.ajustes[t.id] = {
+      respostas: {},
+      espera: [],
+      extras: [],
+      ida: ida([{ pid: c!.id, r: "embarcou", cobrou: 0 }]),
+    };
+    expect(falta(c!.id)).toBeUndefined();
+    // fora da fase de recolher, também não
+    e.ajustes[t.id] = {
+      respostas: {},
+      espera: [],
+      extras: [],
+      ida: { ...ida([]), fase: "a_caminho" },
+    };
+    expect(falta(c!.id)).toBeUndefined();
+  });
+});
+
 describe("prévia do convite (antes do login): sem dado pessoal", () => {
   it("diz só se existe, se é válido e se já entrou", () => {
     const e = estado();

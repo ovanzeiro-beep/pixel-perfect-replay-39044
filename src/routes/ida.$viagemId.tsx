@@ -27,6 +27,7 @@ import {
   MessageCircle,
   Phone,
   Route as RouteIcon,
+  Share2,
   Undo2,
   UserX,
 } from "lucide-react";
@@ -47,7 +48,9 @@ import {
   reordenarFaltamNaIda,
   type Passageiro,
 } from "@/data/repositorio";
-import { ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
+import { horarioNaParada, ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
+import { textoChegando, textoSaida } from "@/data/avisosVan";
+import { compartilharTexto } from "@/lib/compartilhar";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
 import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
@@ -109,6 +112,7 @@ function TelaIda() {
       ida={v.ajuste.ida}
       destino={linha.destino || linha.nome}
       nomeLinha={linha.nome}
+      paradasDaLinha={linha.paradas}
       passageiros={passageiros}
     />
   );
@@ -119,12 +123,14 @@ function Conteudo({
   ida,
   destino,
   nomeLinha,
+  paradasDaLinha,
   passageiros,
 }: {
   v: Viagem;
   ida: Ida;
   destino: string;
   nomeLinha: string;
+  paradasDaLinha: string[];
   passageiros: Passageiro[];
 }) {
   const { vans } = useFrota();
@@ -143,6 +149,14 @@ function Conteudo({
   const prox = faltam[0] ? pas(faltam[0]) : undefined;
   const van = vans.find((x) => x.id === v.vanId);
 
+  const avisarGrupo = async () => {
+    const quem = faltam
+      .map((id) => pas(id))
+      .filter((p): p is Passageiro => !!p)
+      .map((p) => ({ nome: p.nome, horario: horarioNaParada(v.saida, p.cidade, paradasDaLinha) }));
+    const r = await compartilharTexto(textoSaida({ linha: nomeLinha, quem }), "Aviso da van");
+    if (r === "whatsapp") toast.success("Abrindo o WhatsApp com o aviso");
+  };
   const marcar = async (p: Passageiro, r: "embarcou" | "faltou") => {
     const { ok, cobrou } = await marcarEmbarque(v.id, p.id, r);
     if (!ok) return;
@@ -247,12 +261,12 @@ function Conteudo({
                   <Phone className="h-5 w-5" /> Ligar
                 </a>
                 <a
-                  href={`${linkWhatsApp(prox.telefone)}?text=${encodeURIComponent(`Olá, ${primeiro(prox.nome)}! A van está chegando aí, uns 5 minutos.`)}`}
+                  href={`${linkWhatsApp(prox.telefone)}?text=${encodeURIComponent(textoChegando(prox.nome, horarioNaParada(v.saida, prox.cidade, paradasDaLinha)))}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success text-lg font-bold text-success"
                 >
-                  <MessageCircle className="h-5 w-5" /> WhatsApp
+                  <MessageCircle className="h-5 w-5" /> Avisar: chegando
                 </a>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -274,6 +288,9 @@ function Conteudo({
 
           {ida.fase === "paradas" && faltam.length > 0 && (
             <div className="space-y-2">
+              <BotaoGrande variante="contorno" onClick={avisarGrupo}>
+                <Share2 className="h-5 w-5" /> Avisar o grupo que a van saiu
+              </BotaoGrande>
               {rotas.map((url, i) => (
                 <a
                   key={url}

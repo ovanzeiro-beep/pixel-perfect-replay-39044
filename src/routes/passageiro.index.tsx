@@ -55,7 +55,13 @@ function CardDuranteViagem({ v, pid }: { v: MinhaViagem; pid: string }) {
     return (
       <div className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-5">
         <p className="font-extrabold text-primary text-lg">🚐 A van está a caminho</p>
-        <p className="mt-1 text-muted-foreground">Fique pronto na parada.</p>
+        <p className="mt-1 text-muted-foreground">
+          {ida.faltamParadasIda === undefined
+            ? "Fique pronto na parada."
+            : ida.faltamParadasIda === 0
+              ? "A próxima parada é a sua! Fique pronto."
+              : `Faltam ${ida.faltamParadasIda} parada${ida.faltamParadasIda > 1 ? "s" : ""} para a sua.`}
+        </p>
       </div>
     );
   }

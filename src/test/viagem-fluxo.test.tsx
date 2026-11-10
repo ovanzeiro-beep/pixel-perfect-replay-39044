@@ -273,3 +273,36 @@ describe("resumo com dinheiro", () => {
     expect(e.passageiros.length).toBeGreaterThan(0);
   });
 });
+
+describe("avisos pelo WhatsApp durante a ida", () => {
+  it("'Avisar: chegando' leva o horário combinado e o nome de quem é a próxima parada", async () => {
+    const { nomes } = await abrirIda();
+    const link = (await screen.findByRole("link", {
+      name: /Avisar: chegando/,
+    })) as HTMLAnchorElement;
+    const texto = decodeURIComponent(link.href.split("text=")[1]!);
+    expect(link.href).toContain("wa.me/55");
+    expect(texto).toContain("A van está chegando aí");
+    expect(texto).toMatch(/horário combinado: \d{2}:\d{2}/);
+    expect(texto).not.toContain("5 minutos");
+    expect(texto).toContain(nomes[0]!.split(" ")[0]!);
+  });
+
+  it("'Avisar o grupo que a van saiu' lista só quem ainda falta embarcar", async () => {
+    const abrirJanela = vi.fn();
+    vi.stubGlobal("open", abrirJanela);
+    const { nomes } = await abrirIda();
+    await clicar(/^Embarcou$/); // o primeiro já está na van
+    await waitFor(() => expect(document.body.textContent).toMatch(/Na van: 1 de/));
+    await clicar(/Avisar o grupo que a van saiu/);
+    await waitFor(() => expect(abrirJanela).toHaveBeenCalled());
+    const url = String(abrirJanela.mock.calls[0]![0]);
+    const texto = decodeURIComponent(url.split("text=")[1]!);
+    expect(url).toContain("wa.me/?text=");
+    expect(texto).toContain("A van saiu!");
+    expect(texto).not.toContain(`• ${nomes[0]!.split(" ")[0]} —`);
+    expect(texto).toContain(`• ${nomes[1]!.split(" ")[0]} —`);
+    expect(texto).toMatch(/— \d{2}:\d{2}/);
+    vi.unstubAllGlobals();
+  });
+});

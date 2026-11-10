@@ -93,6 +93,10 @@ Fonte: tipos em `src/data/store.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.
 | **viagem_ida / viagem_volta** | marcações de embarque, paradas, chamada e entregas. Podem ser tabelas próprias ou um `jsonb` por viagem (é o formato de `Ida` e `Volta` em `viagens.ts`) |
 | **alertas_dispensados** | alerta, assinatura |
 
+## Ver a van ao vivo e notificações
+
+Pedidos para a fase do banco (posição da van em tempo real e notificação push "a van está chegando"): veja [`VAN_AO_VIVO.md`](VAN_AO_VIVO.md). Entram tabelas novas (`posicoes_da_van`, `inscricoes_push`) e chaves de push em Secrets.
+
 ## O que NÃO se grava (é calculado)
 
 Para não ficar fora de sincronia, continuam derivados:
