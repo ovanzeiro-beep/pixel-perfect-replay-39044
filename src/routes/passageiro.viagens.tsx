@@ -4,23 +4,20 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens, useVanzeiro, responderViagemApp } from "@/data/repositorio";
+import { usePassageiroVisao, useVanzeiro, responderViagemApp } from "@/data/repositorio";
 import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
 import { prazoViagem } from "@/data/alertas";
 import { PrazoEncerrado } from "@/components/app/PrazoEncerrado";
 
 function MinhasViagens() {
-  const { passageiros, linhas } = useFrota();
   const vanzeiro = useVanzeiro();
   const passageiroId = usePassageiroId();
-  const todasViagens = useViagens();
+  const { eu: p, linhas, viagens: minhasViagens } = usePassageiroVisao(passageiroId);
   const [aba, setAba] = useState<"proximas" | "anteriores">("proximas");
-  const p = passageiros.find((x) => x.id === passageiroId);
   if (!p) return null;
 
-  const minhasViagens = todasViagens.filter((v) => v.passageiroIds.includes(p.id));
   const proximas = minhasViagens
-    .filter((v) => !v.passada && !v.ajuste.cancelada)
+    .filter((v) => !v.passada && !v.cancelada)
     .sort((a, b) => a.data.localeCompare(b.data));
   const anteriores = minhasViagens
     .filter((v) => v.passada)
@@ -62,8 +59,8 @@ function MinhasViagens() {
           ) : (
             proximas.map((v) => {
               const linha = linhas.find((l) => l.id === v.linhaId);
-              const resposta = v.ajuste.respostas[p.id] ?? "sem";
-              const posEspera = v.ajuste.espera.indexOf(p.id);
+              const resposta = v.resposta;
+              const posEspera = v.posicaoEspera - 1;
               return (
                 <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm space-y-3">
                   <div>
@@ -136,11 +133,9 @@ function MinhasViagens() {
           ) : (
             anteriores.map((v) => {
               const linha = linhas.find((l) => l.id === v.linhaId);
-              const marca = v.ajuste.ida?.marcas.find((m) => m.pid === p.id);
-              const embarcou = marca?.r === "embarcou";
-              const entrega = v.ajuste.ida?.volta?.entregas.find((e) => e.pid === p.id);
-              const entregue = entrega?.r === "entregue";
-              const cancelada = v.ajuste.cancelada;
+              const embarcou = v.ida?.minhaMarca === "embarcou";
+              const entregue = v.ida?.volta?.minhaEntrega === "entregue";
+              const cancelada = v.cancelada;
               return (
                 <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-2">

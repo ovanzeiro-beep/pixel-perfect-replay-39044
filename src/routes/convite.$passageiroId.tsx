@@ -3,8 +3,7 @@ import { useEffect } from "react";
 import { LinkIcon } from "lucide-react";
 import { LogoIcon } from "@/components/app/Logo";
 import { entrarComoPassageiro } from "@/data/sessao";
-import { useDadosProntos, useFrota } from "@/data/repositorio";
-import { conviteValido } from "@/lib/convite";
+import { useConvite, useDadosProntos } from "@/data/repositorio";
 
 export const Route = createFileRoute("/convite/$passageiroId")({
   head: () => ({
@@ -18,20 +17,18 @@ export const Route = createFileRoute("/convite/$passageiroId")({
 
 function EntrarPeloConvite() {
   const { passageiroId } = Route.useParams();
-  const { passageiros } = useFrota();
+  const { valido, jaNoApp } = useConvite(passageiroId);
   const prontos = useDadosProntos();
   const navigate = useNavigate();
-  const p = passageiros.find((x) => x.id === passageiroId);
-  const valido = conviteValido(p);
 
   useEffect(() => {
-    if (!prontos || !valido || !p) return;
-    entrarComoPassageiro(p.id);
+    if (!prontos || !valido) return;
+    entrarComoPassageiro(passageiroId);
     void navigate({
-      to: p.convite === "no_app" ? "/passageiro" : "/passageiro/convite",
+      to: jaNoApp ? "/passageiro" : "/passageiro/convite",
       replace: true,
     });
-  }, [prontos, valido, p, navigate]);
+  }, [prontos, valido, jaNoApp, passageiroId, navigate]);
 
   if (!prontos || valido) {
     return (

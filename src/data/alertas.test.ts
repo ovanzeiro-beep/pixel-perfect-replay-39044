@@ -351,12 +351,22 @@ describe("alertas com os dados de exemplo do app", () => {
 });
 
 import { gerarAvisosPassageiro } from "./alertas";
+import type { MinhaViagem } from "./visaoPassageiro";
 
 describe("avisos do passageiro", () => {
-  const av = (o: { cobrancas?: Cobranca[]; viagens?: Viagem[]; agora?: Date } = {}) =>
+  const av = (o: { cobrancas?: Cobranca[]; viagens?: MinhaViagem[]; agora?: Date } = {}) =>
     gerarAvisosPassageiro({ pid: "a", cobrancas: [], viagens: [], agora: AGORA, ...o });
-  const minha = (o: Partial<Viagem> & { id: string; data: string }) =>
-    viagem({ passageiroIds: ["a"], ...o });
+  const minha = (o: Partial<MinhaViagem> & { id: string; data: string }): MinhaViagem => ({
+    linhaId: "l1",
+    saida: "17:30",
+    situacao: "agendada",
+    passada: false,
+    cancelada: false,
+    resposta: "sem",
+    posicaoEspera: 0,
+    iniciada: false,
+    ...o,
+  });
 
   it("sem pendência, sem aviso", () => {
     expect(av()).toEqual([]);
@@ -394,39 +404,15 @@ describe("avisos do passageiro", () => {
     expect(tarde.titulo).toBe("Prazo encerrado: viagem de terça, 10/11");
     expect(tarde.detalhe).toContain("Fale com o vanzeiro");
   });
-  it("quem já respondeu, viagem longe, viagem de outro passageiro ou já iniciada não geram aviso", () => {
-    const resp = minha({
-      id: "x1",
-      data: "2026-11-10",
-      ajuste: { respostas: { a: "vai" }, espera: [], extras: [] },
-    });
+  it("quem já respondeu, viagem longe, ou viagem já iniciada não geram aviso", () => {
+    const resp = minha({ id: "x1", data: "2026-11-10", resposta: "vai" });
     const longe = minha({ id: "x2", data: "2026-11-14" });
-    const dosOutros = viagem({ id: "x3", data: "2026-11-10", passageiroIds: ["b"] });
-    const iniciada = minha({
-      id: "x4",
-      data: "2026-11-10",
-      ajuste: {
-        respostas: {},
-        espera: [],
-        extras: [],
-        ida: { ordem: [], marcas: [], fase: "paradas" },
-      },
-    });
-    expect(av({ viagens: [resp, longe, dosOutros, iniciada] })).toEqual([]);
+    const iniciada = minha({ id: "x4", data: "2026-11-10", iniciada: true });
+    expect(av({ viagens: [resp, longe, iniciada] })).toEqual([]);
   });
   it("avisa viagem cancelada dos próximos 7 dias", () => {
-    const cancelada = minha({
-      id: "c1",
-      data: "2026-11-13",
-      passada: true,
-      ajuste: { respostas: {}, espera: [], extras: [], cancelada: true },
-    });
-    const longe = minha({
-      id: "c2",
-      data: "2026-11-30",
-      passada: true,
-      ajuste: { respostas: {}, espera: [], extras: [], cancelada: true },
-    });
+    const cancelada = minha({ id: "c1", data: "2026-11-13", passada: true, cancelada: true });
+    const longe = minha({ id: "c2", data: "2026-11-30", passada: true, cancelada: true });
     const r = av({ viagens: [cancelada, longe] });
     expect(r).toHaveLength(1);
     expect(r[0]).toMatchObject({ nivel: "info", titulo: "A viagem de sexta, 13/11 foi cancelada" });

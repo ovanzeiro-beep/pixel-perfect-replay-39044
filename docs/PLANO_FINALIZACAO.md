@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) e varredura antes do banco (19) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) e preparação do banco, passos 1 a 3 (20) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -34,6 +34,7 @@
 | 17 | Extra: regra do prazo | Depois do prazo o passageiro não muda a resposta; o vanzeiro ajusta | **Concluída** |
 | 18 | Extra: preparação da publicação | Build de produção conferida e guia para publicar e instalar no celular | **Concluída** |
 | 19 | Extra: varredura antes do banco | Erros, fluxos, código morto e lacunas, com checklist e plano ([`VARREDURA_PRE_BANCO.md`](VARREDURA_PRE_BANCO.md)) | **Concluída** |
+| 20 | Extra: preparação do banco (passos 1 a 3) | Visão do passageiro, operações pequenas de viagem e dinheiro atômico ([`VARREDURA_PRE_BANCO.md`](VARREDURA_PRE_BANCO.md)) | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 

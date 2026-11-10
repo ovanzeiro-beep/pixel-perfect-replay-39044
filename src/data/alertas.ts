@@ -1,6 +1,7 @@
 // Alertas dentro do app: CNH, pagamentos atrasados, prazo de confirmação das viagens e lotação.
 import { aberto, brl, dataBR, diasEntre, estadoCob, isoDe, type Cobranca } from "./cobrancas";
 import { dataCurta, diaSemana, rotuloDia, type Viagem } from "./viagens";
+import type { MinhaViagem } from "./visaoPassageiro";
 
 export type Nivel = "urgente" | "atencao" | "info";
 export type TipoAlerta = "cnh" | "cobranca" | "confirmacao" | "lotacao" | "backup";
@@ -260,7 +261,8 @@ export function gerarAvisosPassageiro({
 }: {
   pid: string;
   cobrancas: Cobranca[];
-  viagens: Viagem[];
+  /** As viagens do próprio passageiro (`MinhaViagem`), nunca as de outros. */
+  viagens: MinhaViagem[];
   agora: Date;
 }): AvisoPassageiro[] {
   const hoje = isoDe(agora);
@@ -280,11 +282,9 @@ export function gerarAvisosPassageiro({
     });
   }
 
-  const minhas = viagens.filter(
-    (v) => v.passageiroIds.includes(pid) && !v.ajuste.cancelada && !v.passada && !v.ajuste.ida,
-  );
+  const minhas = viagens.filter((v) => !v.cancelada && !v.passada && !v.iniciada);
   for (const v of minhas) {
-    if ((v.ajuste.respostas[pid] ?? "sem") !== "sem") continue;
+    if (v.resposta !== "sem") continue;
     if (inicioDaViagem(v.data, v.saida).getTime() <= agora.getTime()) continue;
     const { limite, encerrado } = prazoViagem(v.data, agora);
     if (limite.getTime() - agora.getTime() > 24 * 3600000) continue;
@@ -302,11 +302,7 @@ export function gerarAvisosPassageiro({
   }
 
   const canceladas = viagens.filter(
-    (v) =>
-      v.passageiroIds.includes(pid) &&
-      v.ajuste.cancelada &&
-      v.data >= hoje &&
-      diasEntre(hoje, v.data) <= 7,
+    (v) => v.cancelada && v.data >= hoje && diasEntre(hoje, v.data) <= 7,
   );
   for (const v of canceladas) {
     out.push({

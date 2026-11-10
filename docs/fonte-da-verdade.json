@@ -2506,6 +2506,110 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 20,
+      "titulo": "Preparação do banco: passos 1 a 3 (visão do passageiro, operações pequenas, dinheiro atômico)",
+      "status": "concluida",
+      "objetivo": "Antes do banco: o passageiro só lê o que é dele; ninguém grava a viagem inteira (passageiro e vanzeiro não se apagam); embarque e cobrança mudam juntos.",
+      "checks": [
+        {
+          "d": "Visão do passageiro (só o que é dele)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/visaoPassageiro.ts"
+        },
+        {
+          "d": "Contrato: leitura própria do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "usePassageiroVisao\\(passageiroId: string\\)"
+        },
+        {
+          "d": "Contrato: prévia do convite sem dado pessoal",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "useConvite\\(passageiroId: string\\)"
+        },
+        {
+          "d": "Operações pequenas de viagem (puras)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/operacoesViagem.ts"
+        },
+        {
+          "d": "Contrato: embarque já lança a cobrança",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "marcarEmbarque\\("
+        },
+        {
+          "d": "Contrato: desfazer já desfaz a cobrança",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "desfazerUltimaMarcacaoDaIda\\("
+        },
+        {
+          "d": "Contrato: parada soma presenças, não substitui",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "marcarPresencasNaParada\\("
+        },
+        {
+          "d": "Dados: tudo em uma transição só (viagem + cobrança)",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "function mudarViagem"
+        },
+        {
+          "d": "Teste: passageiro não vê dado de outro",
+          "tipo": "contem",
+          "arquivo": "src/data/visaoPassageiro.test.ts",
+          "regex": "não deixa escapar dado de outro passageiro"
+        },
+        {
+          "d": "Teste: passageiro e vanzeiro ao mesmo tempo",
+          "tipo": "contem",
+          "arquivo": "src/data/viagemOperacoes.test.ts",
+          "regex": "não se apagam"
+        },
+        {
+          "d": "Teste: embarque e cobrança andam juntos",
+          "tipo": "contem",
+          "arquivo": "src/data/viagemOperacoes.test.ts",
+          "regex": "embarque e cobrança andam juntos"
+        },
+        {
+          "d": "Teste: ninguém grava a viagem inteira",
+          "tipo": "contem",
+          "arquivo": "src/data/operacoesViagem.test.ts",
+          "regex": "ninguém grava a viagem inteira"
+        },
+        {
+          "d": "Guia do banco descreve as operações pequenas",
+          "tipo": "contem",
+          "arquivo": "docs/MIGRACAO_BANCO.md",
+          "regex": "operações pequenas"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

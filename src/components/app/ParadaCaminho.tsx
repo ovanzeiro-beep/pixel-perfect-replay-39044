@@ -58,12 +58,15 @@ export function IniciarParada({
 export function ParadaAtual({
   parada: p,
   bordo,
-  onMudar,
+  onPresencas,
+  onChamada,
   onSeguir,
 }: {
   parada: ParadaAtiva;
   bordo: Passageiro[];
-  onMudar: (p: ParadaAtiva) => void;
+  /** Marca (ou desmarca, com `null`) quem está na van, sem apagar o que os outros já marcaram. */
+  onPresencas: (mudancas: Record<string, "manual" | "app" | null>) => void;
+  onChamada: () => void;
   onSeguir: (motivo: string) => void;
 }) {
   const [agora, setAgora] = useState(() => Date.now());
@@ -83,20 +86,14 @@ export function ParadaAtual({
   const aviso = avisoParada(p.minutos, saida);
   const faltando = bordo.filter((x) => !p.naVan[x.id]);
   const modoDemo = useModoDemo();
-  const mudar = (naVan: Record<string, "manual" | "app">) => onMudar({ ...p, naVan });
 
-  const alternar = (id: string) => {
-    const n = { ...p.naVan };
-    if (n[id]) delete n[id];
-    else n[id] = "manual";
-    mudar(n);
-  };
+  const alternar = (id: string) => onPresencas({ [id]: p.naVan[id] ? null : "manual" });
   const simular = () => {
-    const n = { ...p.naVan };
+    const n: Record<string, "app"> = {};
     faltando.slice(0, Math.max(1, Math.ceil(faltando.length / 2))).forEach((x) => {
       n[x.id] = "app";
     });
-    mudar(n);
+    onPresencas(n);
     toast.success("Confirmações simuladas");
   };
   const copiar = async () => {
@@ -140,7 +137,7 @@ export function ParadaAtual({
           <Copy className="h-5 w-5" /> Copiar aviso
         </BotaoGrande>
         <p className="text-sm text-muted-foreground">“{aviso}”</p>
-        <BotaoGrande variante="destaque" onClick={() => onMudar({ ...p, chamada: true })}>
+        <BotaoGrande variante="destaque" onClick={onChamada}>
           Retomar viagem
         </BotaoGrande>
       </section>
@@ -233,11 +230,11 @@ export function ParadaAtual({
             <BotaoGrande
               variante="destaque"
               onClick={() => {
-                const n = { ...p.naVan };
+                const n: Record<string, "manual"> = {};
                 bordo.forEach((x) => {
-                  n[x.id] ??= "manual";
+                  if (!p.naVan[x.id]) n[x.id] = "manual";
                 });
-                mudar(n);
+                onPresencas(n);
                 setConferir(false);
               }}
             >

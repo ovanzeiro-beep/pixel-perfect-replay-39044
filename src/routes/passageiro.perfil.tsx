@@ -5,15 +5,14 @@ import { Check, ChevronRight, CircleHelp, Edit3, MessageCircle, Phone } from "lu
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { encerrarSessao, usePassageiroId } from "@/data/sessao";
-import { useFrota, atualizarPassageiro, useVanzeiro } from "@/data/repositorio";
+import { usePassageiroVisao, atualizarPassageiro, useVanzeiro } from "@/data/repositorio";
 import { linkWhatsApp } from "@/lib/validacao";
 
 function MeuPerfil() {
   const vanzeiro = useVanzeiro();
-  const { passageiros } = useFrota();
   const passageiroId = usePassageiroId();
+  const { eu: p } = usePassageiroVisao(passageiroId);
   const navigate = useNavigate();
-  const p = passageiros.find((x) => x.id === passageiroId);
 
   const [editEmergencia, setEditEmergencia] = useState(false);
   const [emergNome, setEmergNome] = useState("");

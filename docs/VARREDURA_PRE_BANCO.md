@@ -68,9 +68,9 @@ Feita em 10/11/2026 sobre a `main` (etapa 18, `08215df`). Objetivo: achar erros,
 - [x] Varredura de console, requisições e fluxo da viagem sem erros.
 
 **Antes do banco (preparação, sem banco)**
-- [ ] P0-1 Leituras próprias do passageiro e telas do passageiro usando só elas.
-- [ ] P0-2 Operações pequenas de viagem no contrato, no mock e nas telas.
-- [ ] P0-4 Operação única "embarque + cobrança" (e a equivalente da volta).
+- [x] P0-1 Leituras próprias do passageiro e telas do passageiro usando só elas. *(feito, etapa 20)*
+- [x] P0-2 Operações pequenas de viagem no contrato, no mock e nas telas. *(feito, etapa 20)*
+- [x] P0-4 Operação única "embarque + cobrança" (e a equivalente da volta). *(feito, etapa 20)*
 - [ ] P0-3 Contrato assíncrono, com estados de salvando e erro nas telas.
 - [ ] P1-6 Tipos em `tipos.ts`.
 - [ ] P1-7 Testes de tela da viagem (ida, volta, resumo), do financeiro e dos cadastros.
@@ -121,3 +121,9 @@ Os passos 1 a 3 e 6 são os de maior risco e os que mais valem fazer **antes** d
 - Remover o modelo de componentes do Lovable e suas dependências (P2-12).
 - Reescrever arquivos grandes sem necessidade (P2-13).
 - Mexer em `supabase/migrations/`: o esquema é pedido ao Lovable (veja `AGENTS.md`).
+
+## Andamento (atualizado)
+
+- **Etapa 20 (feita):** passos 1, 2 e 3 do plano. O passageiro só lê a visão dele (`usePassageiroVisao`, `useConvite`); `ajustarViagem` saiu do contrato e foi trocada por 21 operações pequenas; embarque, desfazer e extra da volta mudam viagem e cobrança numa operação só.
+- **Bug achado e corrigido no caminho:** em conta nova (sem os dados de exemplo), uma viagem sem registro gravado **não aceitava a resposta do passageiro** (a gravação era descartada). Agora a viagem é reconhecida pela linha e pelo dia, e o registro nasce na primeira escrita (há teste).
+- **Falta:** passo 6 (contrato assíncrono), passos 4, 5, 7 e 8 (tipos neutros, testes de tela, falha ao gravar, contraprova final) e a tela "Qual é o seu nome?" (P0-5, com o login real).

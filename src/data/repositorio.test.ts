@@ -11,6 +11,8 @@ const FORA_DO_CONTRATO = [
   "TIPOS_LINHA",
   "DIAS",
   "estaDevendo",
+  // Só prepara dados (exemplo e testes). As telas usam as operações pequenas de viagem, que mexem só no que é delas.
+  "ajustarViagem",
 ];
 
 async function carregar() {

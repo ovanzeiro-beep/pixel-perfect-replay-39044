@@ -5,8 +5,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
 import {
-  useFrota,
-  useViagens,
+  usePassageiroVisao,
   responderViagemApp,
   confirmarParadaApp,
   responderVoltaApp,
@@ -14,7 +13,8 @@ import {
 } from "@/data/repositorio";
 import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
-import { diaSemana, dataCurta, horarioNaParada, type Viagem } from "@/data/viagens";
+import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
+import type { MinhaViagem } from "@/data/repositorio";
 import { linkWhatsApp } from "@/lib/validacao";
 import { prazoViagem } from "@/data/alertas";
 import { PrazoEncerrado } from "@/components/app/PrazoEncerrado";
@@ -27,7 +27,7 @@ const MOTIVOS_VOLTA = [
   "Outro",
 ] as const;
 
-function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
+function CardDuranteViagem({ v, pid }: { v: MinhaViagem; pid: string }) {
   const [agora, setAgora] = useState(Date.now());
   const [modalVolta, setModalVolta] = useState(false);
   const [motivoVolta, setMotivoVolta] = useState<string>("");
@@ -37,8 +37,8 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
     return () => clearInterval(t);
   }, []);
 
-  const ida = v.ajuste.ida!;
-  const marca = ida.marcas.find((m) => m.pid === pid);
+  const ida = v.ida!;
+  const marca = ida.minhaMarca;
   const parada = ida.parada;
   const volta = ida.volta;
 
@@ -60,10 +60,10 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
     );
   }
 
-  if (marca.r === "faltou" || marca.r === "ficou") {
-    const entrega = volta?.entregas.find((e) => e.pid === pid);
-    const voltaStatus = volta?.status[pid];
-    if (entrega?.r === "entregue") {
+  if (marca === "faltou" || marca === "ficou") {
+    const entrega = volta?.minhaEntrega;
+    const voltaStatus = volta?.meuStatus;
+    if (entrega === "entregue") {
       return (
         <div className="rounded-2xl bg-success/10 p-5 text-center">
           <p className="text-4xl">🏠</p>
@@ -88,10 +88,10 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
   }
 
   if (volta) {
-    const voltaStatus = volta.status[pid];
-    const entrega = volta.entregas.find((e) => e.pid === pid);
+    const voltaStatus = volta.meuStatus;
+    const entrega = volta.minhaEntrega;
 
-    if (entrega?.r === "entregue" || entrega?.r === "ficou") {
+    if (entrega === "entregue" || entrega === "ficou") {
       return (
         <div className="rounded-2xl bg-success/10 p-5 text-center">
           <p className="text-4xl">🏠</p>
@@ -111,9 +111,7 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
     }
 
     if (voltaStatus?.r === "na_van") {
-      const posicao = volta.ordem.indexOf(pid);
-      const entregues = volta.entregas.length;
-      const faltam = posicao >= 0 ? posicao - entregues : 0;
+      const faltam = volta.faltamParadas;
       return (
         <div className="rounded-2xl bg-primary/10 p-5">
           <p className="font-extrabold text-primary text-lg">🔄 Van voltando</p>
@@ -197,8 +195,8 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
     }
   }
 
-  if (parada && ida.marcas.find((m) => m.pid === pid && m.r === "embarcou")) {
-    const confirmado = !!parada.naVan[pid];
+  if (parada && marca === "embarcou") {
+    const confirmado = parada.confirmei;
     const saida = parada.inicio + parada.minutos * 60000;
     const faltamMs = Math.max(0, saida - agora);
     const mins = Math.floor(faltamMs / 60000);
@@ -246,23 +244,19 @@ function CardDuranteViagem({ v, pid }: { v: Viagem; pid: string }) {
 
 function InicioPassageiro() {
   const vanzeiro = useVanzeiro();
-  const { passageiros, cobrancas, linhas, chavePix } = useFrota();
   const passageiroId = usePassageiroId();
-  const todasViagens = useViagens();
-  const p = passageiros.find((x) => x.id === passageiroId);
+  const { eu: p, cobrancas, linhas, viagens, chavePix } = usePassageiroVisao(passageiroId);
   const hoje = isoDe(new Date());
 
   if (!p) return null;
 
-  const minhasViagens = todasViagens.filter(
-    (v) => v.passageiroIds.includes(p.id) && !v.ajuste.cancelada,
-  );
+  const minhasViagens = viagens.filter((v) => !v.cancelada);
   const proxima =
     minhasViagens.find((v) => !v.passada) ?? minhasViagens[minhasViagens.length - 1] ?? null;
   const linha = proxima ? linhas.find((l) => l.id === proxima.linhaId) : null;
 
-  const resposta = proxima?.ajuste.respostas[p.id] ?? "sem";
-  const posicaoEspera = proxima?.ajuste.espera.indexOf(p.id) ?? -1;
+  const resposta = proxima?.resposta ?? "sem";
+  const posicaoEspera = proxima ? proxima.posicaoEspera - 1 : -1;
   const emAndamento = proxima?.situacao === "andamento";
 
   const resumo = resumoPassageiro(cobrancas, p.id, hoje);
@@ -304,7 +298,7 @@ function InicioPassageiro() {
               </p>
             </div>
 
-            {emAndamento && proxima.ajuste.ida ? (
+            {emAndamento && proxima.ida ? (
               <CardDuranteViagem v={proxima} pid={p.id} />
             ) : (
               <>

@@ -13,9 +13,17 @@ import * as mock from "./store";
 import type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van } from "./store";
 import type { Forma, Recibo } from "./cobrancas";
 import type { Gasto } from "./financeiro";
-import type { Ajuste, Viagem } from "./viagens";
+import type { StatusVolta, Viagem } from "./viagens";
+import type { ConvitePreview, VisaoPassageiro } from "./visaoPassageiro";
 
 export type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van };
+export type {
+  ConvitePreview,
+  MinhaIda,
+  MinhaLinha,
+  MinhaViagem,
+  VisaoPassageiro,
+} from "./visaoPassageiro";
 // Regras e listas de domínio (não são acesso a dados): continuam saindo do mesmo lugar para as telas.
 export { TIPOS_LINHA, DIAS, estaDevendo } from "./store";
 
@@ -37,6 +45,13 @@ export interface Leitura {
   useDadosProntos(): boolean;
   /** Dados do próprio vanzeiro (nome, cidade, telefone...) e se o primeiro acesso já foi concluído. */
   useVanzeiro(): PerfilVanzeiro;
+  /**
+   * O que UM passageiro pode ver: o cadastro dele, as linhas e viagens dele, as cobranças e recibos dele.
+   * É a ÚNICA leitura das telas do passageiro: nenhum dado de outro passageiro chega ao aparelho dele.
+   */
+  usePassageiroVisao(passageiroId: string): VisaoPassageiro;
+  /** Prévia do convite (tela aberta antes do login): existe, é válido e se já entrou no app. Sem dados pessoais. */
+  useConvite(passageiroId: string): ConvitePreview;
   /** Leitura pontual, fora de componentes (testes, funções). */
   obterEstado(): Estado;
 }
@@ -86,12 +101,73 @@ export interface Escrita {
   aceitarConvite(passageiroId: string): void;
 
   // --- Viagens
-  /** Grava o ajuste de uma viagem (respostas, van/motorista da viagem, ida, volta, cancelamento). */
-  ajustarViagem(viagemId: string, ajuste: Ajuste): void;
-  /** Devolve `false` se o prazo de confirmação já acabou (o passageiro não muda mais; o vanzeiro ajusta em `ajustarViagem`). */
+  // Operações PEQUENAS: cada uma mexe só no que é dela, sobre o dado mais recente (ninguém grava a viagem inteira).
+  // Assim passageiro e vanzeiro mexendo ao mesmo tempo não apagam o trabalho um do outro.
+  // As que devolvem `false` não encontraram a viagem ou não tinham o que mudar.
+
+  // O passageiro, pelo app
+  /** Devolve `false` se o prazo de confirmação já acabou (o passageiro não muda mais; o vanzeiro ajusta em `definirRespostaDoPassageiro`). */
   responderViagemApp(passageiroId: string, viagemId: string, vai: boolean): boolean;
-  confirmarParadaApp(passageiroId: string, viagemId: string): void;
-  responderVoltaApp(passageiroId: string, viagemId: string, naVan: boolean, motivo?: string): void;
+  confirmarParadaApp(passageiroId: string, viagemId: string): boolean;
+  responderVoltaApp(
+    passageiroId: string,
+    viagemId: string,
+    naVan: boolean,
+    motivo?: string,
+  ): boolean;
+
+  // O vanzeiro: a viagem em geral
+  /** Marca Vai / Não vai / Sem resposta de um passageiro, respeitando lotação e fila de espera. `null`: viagem não encontrada. */
+  definirRespostaDoPassageiro(
+    viagemId: string,
+    passageiroId: string,
+    resposta: "vai" | "nao" | "sem",
+  ): { foiParaEspera: boolean; subiu?: string } | null;
+  adicionarExtraNaViagem(viagemId: string, passageiroId: string): boolean;
+  cancelarViagem(viagemId: string): boolean;
+  /** Troca o motorista e, se informada, a van da viagem (quem não cabe vai para a lista de espera). */
+  trocarVanOuMotoristaDaViagem(viagemId: string, motoristaId: string, vanId?: string): boolean;
+
+  // O vanzeiro: a ida
+  iniciarIda(viagemId: string, ordem: string[]): boolean;
+  /** Marca embarcou / não apareceu. Quem paga por viagem e embarcou recebe a cobrança NA MESMA operação. */
+  marcarEmbarque(
+    viagemId: string,
+    passageiroId: string,
+    resposta: "embarcou" | "faltou",
+  ): { ok: boolean; cobrou: number };
+  /** Desfaz a última marcação e a cobrança dela, NA MESMA operação. `cobrancaAchada: false` avisa que não havia cobrança a tirar. */
+  desfazerUltimaMarcacaoDaIda(viagemId: string): { ok: boolean; cobrancaAchada: boolean };
+  reordenarFaltamNaIda(viagemId: string, faltam: string[]): boolean;
+  mudarFaseDaIda(viagemId: string, fase: "paradas" | "a_caminho" | "chegou"): boolean;
+  iniciarVolta(viagemId: string): boolean;
+  encerrarViagem(viagemId: string): boolean;
+
+  // O vanzeiro: parada no caminho (na ida ou na volta)
+  iniciarParada(viagemId: string, trecho: "ida" | "volta", minutos: number, local: string): boolean;
+  /** Marca ou desmarca (`null`) quem está na van na parada, sem apagar o que os outros já marcaram. */
+  marcarPresencasNaParada(
+    viagemId: string,
+    trecho: "ida" | "volta",
+    mudancas: Record<string, "manual" | "app" | null>,
+  ): boolean;
+  pedirChamadaNaParada(viagemId: string, trecho: "ida" | "volta"): boolean;
+  encerrarParada(viagemId: string, trecho: "ida" | "volta", motivo: string): boolean;
+
+  // O vanzeiro: a volta
+  /** Marca ou desmarca (`null`) quem volta na van, sem apagar o que os outros já responderam. */
+  marcarStatusNaVolta(viagemId: string, mudancas: Record<string, StatusVolta | null>): boolean;
+  iniciarEntregas(viagemId: string, ordem: string[]): boolean;
+  /** Quem só volta entra na chamada; quem paga por viagem e ainda não foi cobrado recebe a cobrança NA MESMA operação. */
+  adicionarExtraNaVolta(viagemId: string, passageiroId: string): { ok: boolean; cobrou: number };
+  entregarNaVolta(
+    viagemId: string,
+    passageiroId: string,
+    resposta: "entregue" | "outro",
+    onde?: string,
+  ): boolean;
+  desfazerEntregaNaVolta(viagemId: string): boolean;
+  reordenarEntregasDaVolta(viagemId: string, aindaNaVan: string[]): boolean;
 
   // --- Dinheiro
   /** Soma (valor > 0) ou tira (valor < 0) uma cobrança de viagem. Devolve false se não achou cobrança para tirar. */
@@ -123,6 +199,8 @@ export const repositorio: Repositorio = {
   useViagens: mock.useViagens,
   useDadosProntos: mock.useDadosProntos,
   useVanzeiro: mock.useVanzeiro,
+  usePassageiroVisao: mock.usePassageiroVisao,
+  useConvite: mock.useConvite,
   obterEstado: mock.obterEstado,
   iniciarPersistencia: mock.iniciarPersistencia,
   restaurarExemplo: mock.restaurarExemplo,
@@ -143,8 +221,28 @@ export const repositorio: Repositorio = {
   desativarPassageiro: mock.desativarPassageiro,
   excluirPassageiro: mock.excluirPassageiro,
   aceitarConvite: mock.aceitarConvite,
-  ajustarViagem: mock.ajustarViagem,
   responderViagemApp: mock.responderViagemApp,
+  definirRespostaDoPassageiro: mock.definirRespostaDoPassageiro,
+  adicionarExtraNaViagem: mock.adicionarExtraNaViagem,
+  cancelarViagem: mock.cancelarViagem,
+  trocarVanOuMotoristaDaViagem: mock.trocarVanOuMotoristaDaViagem,
+  iniciarIda: mock.iniciarIda,
+  marcarEmbarque: mock.marcarEmbarque,
+  desfazerUltimaMarcacaoDaIda: mock.desfazerUltimaMarcacaoDaIda,
+  reordenarFaltamNaIda: mock.reordenarFaltamNaIda,
+  mudarFaseDaIda: mock.mudarFaseDaIda,
+  iniciarVolta: mock.iniciarVolta,
+  encerrarViagem: mock.encerrarViagem,
+  iniciarParada: mock.iniciarParada,
+  marcarPresencasNaParada: mock.marcarPresencasNaParada,
+  pedirChamadaNaParada: mock.pedirChamadaNaParada,
+  encerrarParada: mock.encerrarParada,
+  marcarStatusNaVolta: mock.marcarStatusNaVolta,
+  iniciarEntregas: mock.iniciarEntregas,
+  adicionarExtraNaVolta: mock.adicionarExtraNaVolta,
+  entregarNaVolta: mock.entregarNaVolta,
+  desfazerEntregaNaVolta: mock.desfazerEntregaNaVolta,
+  reordenarEntregasDaVolta: mock.reordenarEntregasDaVolta,
   confirmarParadaApp: mock.confirmarParadaApp,
   responderVoltaApp: mock.responderVoltaApp,
   lancarCobranca: mock.lancarCobranca,
@@ -164,6 +262,8 @@ export const {
   useViagens,
   useDadosProntos,
   useVanzeiro,
+  usePassageiroVisao,
+  useConvite,
   obterEstado,
   iniciarPersistencia,
   restaurarExemplo,
@@ -184,8 +284,29 @@ export const {
   desativarPassageiro,
   excluirPassageiro,
   aceitarConvite,
-  ajustarViagem,
   responderViagemApp,
+  definirRespostaDoPassageiro,
+  adicionarExtraNaViagem,
+  cancelarViagem,
+  trocarVanOuMotoristaDaViagem,
+  iniciarIda,
+  marcarEmbarque,
+  desfazerUltimaMarcacaoDaIda,
+  reordenarFaltamNaIda,
+  mudarFaseDaIda,
+  iniciarVolta,
+  encerrarViagem,
+  iniciarParada,
+  marcarPresencasNaParada,
+  pedirChamadaNaParada,
+  encerrarParada,
+  marcarStatusNaVolta,
+  iniciarEntregas,
+  adicionarExtraNaVolta,
+  entregarNaVolta,
+  desfazerEntregaNaVolta,
+  reordenarEntregasDaVolta,
+
   confirmarParadaApp,
   responderVoltaApp,
   lancarCobranca,
