@@ -123,6 +123,8 @@ export interface EscritaDoMock {
   // --- Passageiros
   /** Devolve o id do passageiro salvo. */
   salvarPassageiro(passageiro: Salvar<Passageiro>): string;
+  /** Cadastra vários passageiros de uma vez (importação de planilha), numa gravação só. Devolve os ids novos. */
+  importarPassageiros(passageiros: Omit<Passageiro, "id">[]): string[];
   atualizarPassageiro(id: string, mudancas: Partial<Passageiro>): void;
   /** Guarda o histórico e a dívida; sai das linhas. */
   desativarPassageiro(id: string): void;
@@ -264,6 +266,7 @@ export const repositorio: Repositorio = {
   colocarNaLinha: escrever(mock.colocarNaLinha),
   tirarDaLinha: escrever(mock.tirarDaLinha),
   salvarPassageiro: escrever(mock.salvarPassageiro),
+  importarPassageiros: escrever(mock.importarPassageiros),
   atualizarPassageiro: escrever(mock.atualizarPassageiro),
   desativarPassageiro: escrever(mock.desativarPassageiro),
   excluirPassageiro: escrever(mock.excluirPassageiro),
@@ -330,6 +333,7 @@ export const {
   colocarNaLinha,
   tirarDaLinha,
   salvarPassageiro,
+  importarPassageiros,
   atualizarPassageiro,
   desativarPassageiro,
   excluirPassageiro,

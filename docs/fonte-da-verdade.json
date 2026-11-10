@@ -3402,6 +3402,85 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 29,
+      "titulo": "Extra: importar passageiros por planilha",
+      "status": "concluida",
+      "objetivo": "Trazer os passageiros de uma planilha (CSV ou texto colado): conferir linha a linha antes de gravar, sem duplicar quem já existe.",
+      "checks": [
+        {
+          "d": "Análise da planilha",
+          "tipo": "contem",
+          "arquivo": "src/data/importacao.ts",
+          "regex": "export function analisarImportacao"
+        },
+        {
+          "d": "Repetidos (cadastro e planilha)",
+          "tipo": "contem",
+          "arquivo": "src/data/importacao.ts",
+          "regex": "Repetido na planilha"
+        },
+        {
+          "d": "Dados: importar vários de uma vez",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function importarPassageiros"
+        },
+        {
+          "d": "Contrato: importar passageiros",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "importarPassageiros\\("
+        },
+        {
+          "d": "Leitura com acentos (Windows-1252)",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ImportarPassageiros.tsx",
+          "regex": "windows-1252"
+        },
+        {
+          "d": "Tela de importação",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ImportarPassageiros.tsx"
+        },
+        {
+          "d": "Entrada em Passageiros",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Importar de planilha"
+        },
+        {
+          "d": "Testes da importação (dados)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/importacao.test.ts"
+        },
+        {
+          "d": "Testes da importação (tela)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/importacao-fluxo.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

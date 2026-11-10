@@ -29,7 +29,7 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 **Linhas:** `salvarLinha`, `alternarLinha`, `excluirLinha`, `colocarNaLinha`, `tirarDaLinha`.
 
-**Passageiros:** `salvarPassageiro`, `atualizarPassageiro`, `desativarPassageiro`, `excluirPassageiro`, `aceitarConvite`.
+**Passageiros:** `salvarPassageiro`, `importarPassageiros`, `atualizarPassageiro`, `desativarPassageiro`, `excluirPassageiro`, `aceitarConvite`.
 
 **Viagens (operações pequenas):** ninguém grava a viagem inteira; cada operação mexe só no que é dela, sobre o dado mais recente, para passageiro e vanzeiro poderem mexer ao mesmo tempo sem apagar o trabalho um do outro.
 
