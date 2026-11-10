@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { useState } from "react";
 import { ArrowLeft, Bus, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -111,7 +112,12 @@ function Vans() {
           </li>
         ))}
         {vans.length === 0 && (
-          <p className="text-center text-lg text-muted-foreground">Nenhuma van cadastrada.</p>
+          <li>
+            <EstadoVazio
+              titulo="Nenhuma van cadastrada"
+              texto='Toque em "Adicionar van", no alto da tela. Com a van cadastrada, você escolhe qual faz cada linha.'
+            />
+          </li>
         )}
       </ul>
 

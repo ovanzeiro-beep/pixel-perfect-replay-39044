@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { useState } from "react";
 import {
   Bell,
@@ -161,9 +162,25 @@ function Viagens() {
             </ul>
           </section>
         ))}
-        {lista.length === 0 && (
-          <p className="py-6 text-center text-lg text-muted-foreground">Nenhuma viagem por aqui.</p>
-        )}
+        {lista.length === 0 &&
+          (linhas.length === 0 ? (
+            <EstadoVazio
+              titulo="Ainda não há viagens"
+              texto="As viagens aparecem quando você cria uma linha: o trajeto que a van faz, com os dias e os horários."
+              acao={{ rotulo: "Criar minha primeira linha", para: "/vanzeiro/linhas" }}
+            />
+          ) : aba === "proximas" ? (
+            <EstadoVazio
+              titulo="Nenhuma viagem nos próximos dias"
+              texto="Confira se as suas linhas estão ativas e com os dias da semana marcados."
+              acao={{ rotulo: "Ver minhas linhas", para: "/vanzeiro/linhas" }}
+            />
+          ) : (
+            <EstadoVazio
+              titulo="Nenhuma viagem anterior ainda"
+              texto="Depois que você encerrar uma viagem, ela aparece aqui."
+            />
+          ))}
       </div>
 
       {aberta && <FichaViagem v={aberta} onFechar={() => abrir()} />}

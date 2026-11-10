@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Copy, MessageCircle, Receipt, Search, Share2, Undo2, Wallet, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { Financeiro } from "@/components/app/Financeiro";
 import { BotaoGrande, Campo, Confirmar, Painel, campoClasse } from "@/components/app/Formulario";
 import {
@@ -319,7 +320,28 @@ function Cobrancas() {
           </li>
         ))}
         {lista.length === 0 && (
-          <p className="py-6 text-center text-lg text-muted-foreground">Ninguém encontrado.</p>
+          <li>
+            {passageiros.length === 0 ? (
+              <EstadoVazio
+                titulo="Ainda não há cobranças"
+                texto="Cadastre os seus passageiros e as cobranças aparecem aqui, com quem deve e quanto."
+                acao={{ rotulo: "Cadastrar passageiros", para: "/vanzeiro/passageiros" }}
+              />
+            ) : (
+              <EstadoVazio
+                titulo="Ninguém com esse filtro ou busca"
+                texto="Tente outro filtro ou limpe a busca."
+                acao={{
+                  rotulo: "Limpar filtros",
+                  aoTocar: () => {
+                    setFiltro("todos");
+                    setLinhaId("");
+                    setBusca("");
+                  },
+                }}
+              />
+            )}
+          </li>
         )}
       </ul>
 

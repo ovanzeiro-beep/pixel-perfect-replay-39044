@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, Pencil, Plus, Repeat, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { BotaoGrande, Campo, Confirmar, Painel, campoClasse } from "@/components/app/Formulario";
 import { ICONE_CATEGORIA } from "@/components/app/categorias";
 import { useFrota, salvarGasto, excluirGasto } from "@/data/repositorio";
@@ -177,9 +178,18 @@ function Gastos() {
             </ul>
           </section>
         ))}
-        {meses.length === 0 && (
-          <p className="py-6 text-center text-lg text-muted-foreground">Nenhum gasto encontrado.</p>
-        )}
+        {meses.length === 0 &&
+          (gastos.length === 0 ? (
+            <EstadoVazio
+              titulo="Nenhum gasto lançado ainda"
+              texto='Toque em "Lançar gasto", no alto da tela, para registrar diesel, manutenção, pedágio e outros. O lucro do mês passa a contar com eles.'
+            />
+          ) : (
+            <EstadoVazio
+              titulo="Nenhum gasto com esse filtro"
+              texto="Tente outra categoria ou van."
+            />
+          ))}
       </div>
 
       {formAberto && <FormGasto g={editando} onFechar={fechar} />}

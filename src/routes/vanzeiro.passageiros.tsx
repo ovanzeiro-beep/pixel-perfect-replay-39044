@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { useMemo, useState } from "react";
 import {
   CheckCircle2,
@@ -77,7 +78,11 @@ const vencTexto = (p: Passageiro) =>
       : p.formaPagamento === "mensal"
         ? `Dia ${p.vencimento}`
         : "";
-const CONVITE = { nao_enviado: "Não enviado", enviado: "Enviado", no_app: "No app" } as const;
+const CONVITE = {
+  nao_enviado: "Sem convite",
+  enviado: "Convite enviado",
+  no_app: "No app",
+} as const;
 const mapa = (p: Passageiro) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.endereco}, ${p.numero} - ${p.bairro}, ${p.cidade} - PR`)}`;
 const sugestao = (l: Linha | undefined, f: FormaPagamento) =>
@@ -214,13 +219,13 @@ function Passageiros() {
             ativo={fConv === "aceito"}
             onClick={() => setFConv(fConv === "aceito" ? "" : "aceito")}
           >
-            Convite aceito
+            No app
           </Chip>
           <Chip
             ativo={fConv === "pendente"}
             onClick={() => setFConv(fConv === "pendente" ? "" : "pendente")}
           >
-            Convite pendente
+            Ainda não entrou
           </Chip>
         </div>
       </div>
@@ -254,9 +259,28 @@ function Passageiros() {
           </li>
         ))}
         {lista.length === 0 && (
-          <p className="py-6 text-center text-lg text-muted-foreground">
-            Nenhum passageiro encontrado.
-          </p>
+          <li>
+            {passageiros.length === 0 ? (
+              <EstadoVazio
+                titulo="Você ainda não cadastrou passageiros"
+                texto='Toque em "Novo passageiro", no alto da tela, para começar. Você pode convidar cada um pelo WhatsApp depois.'
+              />
+            ) : (
+              <EstadoVazio
+                titulo="Nenhum passageiro com esse filtro ou busca"
+                texto="Tente outro filtro ou limpe a busca."
+                acao={{
+                  rotulo: "Limpar filtros",
+                  aoTocar: () => {
+                    setBusca("");
+                    setFLinha("");
+                    setFPag("");
+                    setFConv("");
+                  },
+                }}
+              />
+            )}
+          </li>
         )}
       </ul>
 

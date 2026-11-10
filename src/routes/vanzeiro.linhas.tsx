@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EstadoVazio } from "@/components/app/EstadoVazio";
 import { useState } from "react";
 import {
   ArrowDown,
@@ -163,7 +164,12 @@ function Linhas() {
           </li>
         ))}
         {linhas.length === 0 && (
-          <p className="text-center text-lg text-muted-foreground">Nenhuma linha cadastrada.</p>
+          <li>
+            <EstadoVazio
+              titulo="Nenhuma linha cadastrada"
+              texto='Uma linha é o trajeto que a van faz: os dias, os horários e as cidades. Toque em "Nova linha", no alto da tela, para criar a primeira. É dela que nascem as viagens.'
+            />
+          </li>
         )}
       </ul>
 

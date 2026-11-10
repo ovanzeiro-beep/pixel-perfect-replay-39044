@@ -149,6 +149,19 @@ function Inicio() {
       ) : (
         <section className="rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg">
           <p className="text-lg font-bold">Nenhuma viagem agendada.</p>
+          {linhas.length === 0 && (
+            <>
+              <p className="mt-1 opacity-90">
+                As viagens aparecem quando você cria uma linha (o trajeto, os dias e os horários).
+              </p>
+              <Link
+                to="/vanzeiro/linhas"
+                className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-accent text-lg font-bold text-accent-foreground"
+              >
+                Criar minha primeira linha
+              </Link>
+            </>
+          )}
         </section>
       )}
 

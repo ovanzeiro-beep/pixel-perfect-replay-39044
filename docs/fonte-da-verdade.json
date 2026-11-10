@@ -3208,6 +3208,91 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 27,
+      "titulo": "Extra: legibilidade e telas vazias",
+      "status": "concluida",
+      "objetivo": "Cores de texto com contraste de leitura, telas vazias que dizem o que fazer e vocabulário único do estado do convite.",
+      "checks": [
+        {
+          "d": "Verde escurecido para leitura",
+          "tipo": "contem",
+          "arquivo": "src/styles.css",
+          "regex": "--success: oklch\\(0\\.48"
+        },
+        {
+          "d": "Vermelho escurecido para leitura",
+          "tipo": "contem",
+          "arquivo": "src/styles.css",
+          "regex": "--destructive: oklch\\(0\\.52"
+        },
+        {
+          "d": "Laranja escurecido para leitura",
+          "tipo": "contem",
+          "arquivo": "src/styles.css",
+          "regex": "--accent-strong: oklch\\(0\\.5 "
+        },
+        {
+          "d": "Teste que guarda o contraste do tema",
+          "tipo": "arquivo",
+          "arquivo": "src/test/contraste.test.ts"
+        },
+        {
+          "d": "Componente de tela vazia com orientação",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/EstadoVazio.tsx"
+        },
+        {
+          "d": "Viagens vazias levam a criar a linha",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "Criar minha primeira linha"
+        },
+        {
+          "d": "Passageiros: limpar filtros",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Limpar filtros"
+        },
+        {
+          "d": "Convite: 'Convite enviado' e 'Sem convite'",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Sem convite"
+        },
+        {
+          "d": "Convite: filtro 'Ainda não entrou'",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Ainda não entrou"
+        },
+        {
+          "d": "Testes das telas vazias",
+          "tipo": "arquivo",
+          "arquivo": "src/test/telas-vazias.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
