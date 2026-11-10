@@ -56,6 +56,13 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Pix com o valor e avisos de vencimento
+
+- [ ] Mais → Meu perfil → **Chave Pix**: digite seu CPF, celular, e-mail ou chave aleatória. O app diz como reconheceu ("Reconhecida como celular…"). Se for um número que pode ser CPF ou celular, ele pergunta.
+- [ ] Dinheiro → **Cobrar** um devedor: a mensagem do WhatsApp traz o **Pix copia e cola** no fim. **Cole esse código no app do seu banco** e confira: o **valor já vem preenchido** e o nome do recebedor é o seu.
+- [ ] Passageiro (em Pagamentos ou na tela inicial): **Copiar Pix com o valor** funciona do mesmo jeito.
+- [ ] Um dia antes de uma cobrança semanal ou mensal vencer: o passageiro vê "Seu pagamento vence amanhã" e o vanzeiro vê "cobranças vencem nos próximos 2 dias".
+
 ## Pagar na hora da viagem
 
 - [ ] Passageiros → abra um que paga **Por viagem** → editar: ligue **Paga na hora da viagem** e salve. Na lista, aparece "· paga na hora".

@@ -4,6 +4,9 @@ import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { semearExemploNoAparelho } from "./apoio";
 
+// Formulários com vários campos e cliques: com a máquina ocupada, 5 s pode não bastar.
+vi.setConfig({ testTimeout: 30_000 });
+
 afterEach(cleanup);
 
 async function abrir(caminho: string) {

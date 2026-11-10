@@ -60,6 +60,7 @@ describe("a ajuda cita só botões que existem nas telas", () => {
     "Salvar backup",
     "Restaurar de um backup",
     "Copiar chave Pix",
+    "Copiar Pix com o valor",
     "Avisar que paguei",
     "Falar com o vanzeiro",
     "Avisar: chegando",

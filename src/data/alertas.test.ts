@@ -114,7 +114,7 @@ describe("CNH", () => {
 
 describe("pagamentos atrasados", () => {
   const cobr = (cs: Cobranca[]) =>
-    gerarAlertas(base({ cobrancas: cs })).find((a) => a.tipo === "cobranca");
+    gerarAlertas(base({ cobrancas: cs })).find((a) => a.id === "cobrancas");
 
   it("resume quantos estão atrasados, quanto e o mais antigo", () => {
     const a = cobr([
@@ -482,5 +482,84 @@ describe("alerta de backup", () => {
     );
     expect(tudo.map((a) => a.tipo)).toEqual(["cobranca", "backup", "lotacao"]);
     expect(contarAtencao(tudo)).toBe(2);
+  });
+});
+
+describe("cobranças que vão vencer", () => {
+  // AGORA = 09/11/2026
+  const avencer = (venc: string, o: Partial<Cobranca> = {}) =>
+    cob({ pid: "a", vencimento: venc, valor: 150, ...o });
+
+  it("passageiro: avisa quando o pagamento vence hoje ou amanhã, com o total", () => {
+    const hoje = gerarAvisosPassageiro({
+      pid: "a",
+      cobrancas: [avencer("2026-11-09")],
+      viagens: [],
+      agora: AGORA,
+    });
+    expect(hoje).toHaveLength(1);
+    expect(hoje[0]).toMatchObject({ id: "vence", destino: "/passageiro/pagamentos" });
+    expect(hoje[0]!.titulo).toMatch(/^Seu pagamento vence hoje: R\$\s150,00$/);
+    const amanha = gerarAvisosPassageiro({
+      pid: "a",
+      cobrancas: [avencer("2026-11-10"), avencer("2026-11-10", { id: "x2", valor: 50 })],
+      viagens: [],
+      agora: AGORA,
+    });
+    expect(amanha[0]!.titulo).toMatch(/vence amanhã: R\$\s200,00/);
+  });
+
+  it("passageiro: não avisa de longe, de atrasada, de paga, cancelada, de outro passageiro nem de viagem avulsa", () => {
+    const quase = (o: Partial<Cobranca>) =>
+      gerarAvisosPassageiro({
+        pid: "a",
+        cobrancas: [avencer("2026-11-10", o)],
+        viagens: [],
+        agora: AGORA,
+      });
+    expect(quase({ vencimento: "2026-11-12" })).toEqual([]);
+    expect(
+      quase({ pagamentos: [{ valor: 150, data: "2026-11-09", forma: "pix", recibo: 1 }] }),
+    ).toEqual([]);
+    expect(quase({ cancelada: "erro" })).toEqual([]);
+    expect(quase({ pid: "b" })).toEqual([]);
+    expect(quase({ tipo: "viagem" })).toEqual([]);
+    // atrasada vira o aviso de atraso, não o de vencimento
+    const atrasada = gerarAvisosPassageiro({
+      pid: "a",
+      cobrancas: [avencer("2026-11-01")],
+      viagens: [],
+      agora: AGORA,
+    });
+    expect(atrasada.map((x) => x.id)).toEqual(["atraso"]);
+  });
+
+  it("vanzeiro: um alerta com quantas cobranças vencem nos próximos 2 dias, o total e quem é o primeiro", () => {
+    const r = gerarAlertas(
+      base({
+        cobrancas: [
+          avencer("2026-11-11"),
+          cob({ pid: "b", vencimento: "2026-11-10", valor: 90 }),
+          avencer("2026-11-20", { id: "longe" }),
+        ],
+      }),
+    );
+    const a = r.find((x) => x.id === "vencem")!;
+    expect(a).toMatchObject({
+      tipo: "cobranca",
+      nivel: "info",
+      titulo: "2 cobranças vencem nos próximos 2 dias",
+      destino: { to: "/vanzeiro/dinheiro" },
+    });
+    expect(a.detalhe).toMatch(/R\$\s240,00 a receber\. A primeira é de Beto, amanhã\./);
+  });
+
+  it("vanzeiro: nada a avisar sem vencimento próximo; cobrança de viagem avulsa não conta", () => {
+    expect(
+      gerarAlertas(base({ cobrancas: [avencer("2026-11-10", { tipo: "viagem" })] })).some(
+        (x) => x.id === "vencem",
+      ),
+    ).toBe(false);
+    expect(gerarAlertas(base()).some((x) => x.id === "vencem")).toBe(false);
   });
 });

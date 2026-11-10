@@ -30,6 +30,7 @@ import {
   type Forma,
   type Recibo,
 } from "@/data/cobrancas";
+import { pixComValor } from "@/lib/pix";
 import { linkWhatsApp } from "@/lib/validacao";
 import { compartilharTexto } from "@/lib/compartilhar";
 
@@ -90,6 +91,7 @@ function Dinheiro() {
 
 function useCobrar() {
   const { chavePix, cobrancas } = useFrota();
+  const vanzeiro = useVanzeiro();
   const [semPix, setSemPix] = useState(false);
   const hoje = isoDe(new Date());
   const cobrar = (p: Passageiro) => {
@@ -103,7 +105,7 @@ function useCobrar() {
       return;
     }
     window.open(
-      `${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(mensagemCobrar(primeiro(p.nome), r.total, r.refs, chavePix))}`,
+      `${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(mensagemCobrar(primeiro(p.nome), r.total, r.refs, chavePix, pixComValor(chavePix, r.total, vanzeiro)))}`,
       "_blank",
     );
   };

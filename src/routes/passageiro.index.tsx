@@ -15,6 +15,7 @@ import { brl, resumoPassageiro } from "@/data/cobrancas";
 import { isoDe } from "@/data/cobrancas";
 import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
 import type { MinhaViagem } from "@/data/repositorio";
+import { pixComValor } from "@/lib/pix";
 import { linkWhatsApp } from "@/lib/validacao";
 import { prazoViagem } from "@/data/alertas";
 import { PrazoEncerrado } from "@/components/app/PrazoEncerrado";
@@ -279,7 +280,8 @@ function InicioPassageiro() {
     toast.success(vai ? "Confirmado! Você vai." : "Registrado. Você não vai.");
   };
 
-  const pix = chavePix || "— Pix não configurado —";
+  const codigoPix =
+    chavePix && resumo.total > 0 ? pixComValor(chavePix, resumo.total, vanzeiro) : null;
 
   return (
     <div className="px-5 pb-6 pt-6 space-y-5">
@@ -402,6 +404,18 @@ function InicioPassageiro() {
                   : `${brl(p.valor)}/mês`}
             </span>
           </div>
+          {chavePix && resumo.total > 0 && codigoPix && (
+            <button
+              onClick={() => {
+                navigator.clipboard
+                  ?.writeText(codigoPix)
+                  .then(() => toast.success("Pix copiado! O valor já vem preenchido."));
+              }}
+              className="flex w-full min-h-12 items-center justify-center rounded-xl bg-primary font-bold text-primary-foreground"
+            >
+              Copiar Pix com o valor ({brl(resumo.total)})
+            </button>
+          )}
           {chavePix ? (
             <button
               onClick={() => {

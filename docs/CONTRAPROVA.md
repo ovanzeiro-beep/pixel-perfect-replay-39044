@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:07 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:34 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -29,3 +29,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:07 UTC.
 | 22 — Pronto para o banco: tipos neutros, testes de tela e falha ao gravar (passos 4, 5, 7 e 8) | concluida | 14/14 | OK |
 | 23 — Extra: avisos de que a van está chegando (sem banco) | concluida | 10/10 | OK |
 | 24 — Extra: pagar na hora da viagem | concluida | 12/12 | OK |
+| 25 — Extra: Pix com valor e avisos de vencimento | concluida | 13/13 | OK |

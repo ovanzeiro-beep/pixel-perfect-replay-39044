@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) e pagar na hora da viagem (24) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) e Pix com valor e avisos de vencimento (25) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -39,6 +39,7 @@
 | 22 | Extra: pronto para o banco (passos 4, 5, 7 e 8) | Tipos neutros, testes das telas da viagem e dos cadastros, aviso de falha ao gravar e sincronia entre janelas | **Concluída** |
 | 23 | Extra: avisos de que a van está chegando | WhatsApp pronto (chegando e grupo), paradas que faltam para o passageiro; mapa ao vivo e push em [`VAN_AO_VIVO.md`](VAN_AO_VIVO.md) | **Concluída** |
 | 24 | Extra: pagar na hora da viagem | Passageiro que paga na hora: ao embarcar o app pergunta como pagou e já gera o recibo; desfazer tira tudo junto | **Concluída** |
+| 25 | Extra: Pix com valor e avisos de vencimento | Pix copia e cola com o valor, chave reconhecida (CPF, celular, e-mail), aviso "vence amanhã" para o passageiro e o vanzeiro | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -211,3 +212,11 @@ Veja [`PUBLICACAO.md`](PUBLICACAO.md): como publicar no Lovable, o que conferir 
 - **Desfazer:** "Desfazer última marcação" remove a marcação, a cobrança, o pagamento e o recibo, juntos.
 - **Resumo da viagem:** mostra "Recebido na hora". O valor entra no "Recebido" dos relatórios como qualquer pagamento.
 - **Ainda não faz:** quem entra só na volta (extra) ainda não tem a pergunta de pagamento; e o app não confirma Pix sozinho (isso depende de banco e de um provedor de pagamento).
+
+## Extra: Pix com valor e avisos de vencimento
+
+- **Pix copia e cola.** O app monta o código do Pix (BR Code do Banco Central) com a chave, o valor e o nome e a cidade do vanzeiro. O passageiro cola no app do banco e o **valor já vem preenchido**. O CRC é conferido contra o exemplo oficial do manual do Banco Central.
+- **Chave Pix reconhecida.** Em Meu perfil o app descobre se é CPF, CNPJ, celular, e-mail ou chave aleatória e guarda do jeito que o Pix exige (celular como `+55…`). Número que pode ser CPF ou celular: o app **pergunta**. Formato desconhecido: avisa e deixa salvar, mas **não gera o código** (melhor sem código do que um código errado).
+- **Onde aparece.** Mensagem de **Cobrar** do vanzeiro (código no fim) e botão **Copiar Pix com o valor** para o passageiro (Pagamentos e tela inicial).
+- **Avisos de vencimento.** Passageiro: "Seu pagamento vence hoje/amanhã: R$ …" (cobranças semanais e mensais). Vanzeiro: "N cobranças vencem nos próximos 2 dias". Cobrança de viagem avulsa não gera esse aviso.
+- **Ainda não faz:** o app não sabe sozinho que o Pix caiu (confirmação automática depende de banco e de um provedor de pagamento) e o aviso só aparece se o app for aberto.

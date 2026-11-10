@@ -7,6 +7,7 @@ import { usePassageiroId } from "@/data/sessao";
 import { ListaRecibos } from "@/components/app/ListaRecibos";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 import { brl, dataBR, estadoCob, nomeEstado, aberto, isoDe } from "@/data/cobrancas";
+import { pixComValor } from "@/lib/pix";
 import { linkWhatsApp } from "@/lib/validacao";
 
 const COR_STATUS: Record<string, string> = {
@@ -35,6 +36,16 @@ function Pagamentos() {
 
   const pix = chavePix || "(Pix não configurado pelo vanzeiro)";
 
+  const codigoPix =
+    chavePix && totalAberto > 0 ? pixComValor(chavePix, totalAberto, vanzeiro) : null;
+  const copiarPixComValor = () => {
+    if (!codigoPix) return;
+    navigator.clipboard
+      ?.writeText(codigoPix)
+      .then(() =>
+        toast.success("Pix copiado! Cole no app do seu banco: o valor já vem preenchido."),
+      );
+  };
   const copiarPix = () => {
     if (!chavePix) {
       toast.error("Pix ainda não configurado.");
@@ -105,6 +116,14 @@ function Pagamentos() {
           >
             <Copy className="h-4 w-4" /> Copiar chave Pix
           </button>
+          {codigoPix && (
+            <button
+              onClick={copiarPixComValor}
+              className="flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-primary font-bold text-primary-foreground"
+            >
+              <Copy className="h-4 w-4" /> Copiar Pix com o valor ({brl(totalAberto)})
+            </button>
+          )}
           {totalAberto > 0 && (
             <button
               onClick={avisarPagou}

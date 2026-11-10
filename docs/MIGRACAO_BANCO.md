@@ -66,6 +66,7 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 | Dono dos dados | Um aparelho = um vanzeiro | Todo registro pertence a um vanzeiro. Passageiro só enxerga o que é dele (hoje garantido na tela; no banco, na política de acesso). |
 | Login | `src/data/sessao.ts` (simulado: papel + passageiro) | Login real (Google). Só o módulo de sessão muda; os hooks `useSessao`/`usePassageiroId` continuam. |
 | Convite | Link `/convite/:idDoPassageiro` (só funciona no aparelho do vanzeiro) | Token de convite aleatório e com validade, guardado no banco. A tela `/convite/$passageiroId` passa a validar o token. |
+| Pix | O Pix copia e cola é montado no aparelho (`src/lib/pix.ts`) a partir da chave guardada e do valor da cobrança; não depende de banco. A **chave** deve ser guardada já normalizada (celular como `+55…`, CPF/CNPJ só dígitos). Confirmação automática do pagamento exige provedor de pagamento (fora desta fase). |
 | Dinheiro | Número com 2 casas | Guardar em centavos (inteiro) ou `numeric(12,2)`; nunca ponto flutuante. |
 | Datas | Texto `AAAA-MM-DD` e `HH:MM` (sem fuso) | Manter como data e hora locais do vanzeiro (`date` e `time`), **sem fuso**: a van roda no horário local. |
 | Perfil do vanzeiro | `Estado.perfil` (preenchido no primeiro acesso, salvo no aparelho) | Registro do usuário logado (nome, cidade, telefone, e-mail). |
