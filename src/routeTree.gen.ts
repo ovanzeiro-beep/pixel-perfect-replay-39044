@@ -17,11 +17,13 @@ import { Route as VanzeiroRouteImport } from './routes/vanzeiro'
 import { Route as ConvitePassageiroIdRouteImport } from './routes/convite.$passageiroId'
 import { Route as IdaViagemIdRouteImport } from './routes/ida.$viagemId'
 import { Route as PassageiroIndexRouteImport } from './routes/passageiro.index'
+import { Route as PassageiroAjudaRouteImport } from './routes/passageiro.ajuda'
 import { Route as PassageiroConviteRouteImport } from './routes/passageiro.convite'
 import { Route as PassageiroPagamentosRouteImport } from './routes/passageiro.pagamentos'
 import { Route as PassageiroPerfilRouteImport } from './routes/passageiro.perfil'
 import { Route as PassageiroViagensRouteImport } from './routes/passageiro.viagens'
 import { Route as VanzeiroIndexRouteImport } from './routes/vanzeiro.index'
+import { Route as VanzeiroAjudaRouteImport } from './routes/vanzeiro.ajuda'
 import { Route as VanzeiroDinheiroRouteImport } from './routes/vanzeiro.dinheiro'
 import { Route as VanzeiroGastosRouteImport } from './routes/vanzeiro.gastos'
 import { Route as VanzeiroHistoricoRouteImport } from './routes/vanzeiro.historico'
@@ -74,6 +76,11 @@ const PassageiroIndexRoute = PassageiroIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PassageiroRoute,
 } as any)
+const PassageiroAjudaRoute = PassageiroAjudaRouteImport.update({
+  id: '/ajuda',
+  path: '/ajuda',
+  getParentRoute: () => PassageiroRoute,
+} as any)
 const PassageiroConviteRoute = PassageiroConviteRouteImport.update({
   id: '/convite',
   path: '/convite',
@@ -97,6 +104,11 @@ const PassageiroViagensRoute = PassageiroViagensRouteImport.update({
 const VanzeiroIndexRoute = VanzeiroIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => VanzeiroRoute,
+} as any)
+const VanzeiroAjudaRoute = VanzeiroAjudaRouteImport.update({
+  id: '/ajuda',
+  path: '/ajuda',
   getParentRoute: () => VanzeiroRoute,
 } as any)
 const VanzeiroDinheiroRoute = VanzeiroDinheiroRouteImport.update({
@@ -163,10 +175,12 @@ export interface FileRoutesByFullPath {
   '/vanzeiro': typeof VanzeiroRouteWithChildren
   '/convite/$passageiroId': typeof ConvitePassageiroIdRoute
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/ajuda': typeof PassageiroAjudaRoute
   '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/ajuda': typeof VanzeiroAjudaRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
   '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
@@ -187,10 +201,12 @@ export interface FileRoutesByTo {
   '/perfil': typeof PerfilRoute
   '/convite/$passageiroId': typeof ConvitePassageiroIdRoute
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/ajuda': typeof PassageiroAjudaRoute
   '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/ajuda': typeof VanzeiroAjudaRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
   '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
@@ -214,10 +230,12 @@ export interface FileRoutesById {
   '/vanzeiro': typeof VanzeiroRouteWithChildren
   '/convite/$passageiroId': typeof ConvitePassageiroIdRoute
   '/ida/$viagemId': typeof IdaViagemIdRoute
+  '/passageiro/ajuda': typeof PassageiroAjudaRoute
   '/passageiro/convite': typeof PassageiroConviteRoute
   '/passageiro/pagamentos': typeof PassageiroPagamentosRoute
   '/passageiro/perfil': typeof PassageiroPerfilRoute
   '/passageiro/viagens': typeof PassageiroViagensRoute
+  '/vanzeiro/ajuda': typeof VanzeiroAjudaRoute
   '/vanzeiro/dinheiro': typeof VanzeiroDinheiroRoute
   '/vanzeiro/gastos': typeof VanzeiroGastosRoute
   '/vanzeiro/historico': typeof VanzeiroHistoricoRoute
@@ -242,10 +260,12 @@ export interface FileRouteTypes {
     | '/vanzeiro'
     | '/convite/$passageiroId'
     | '/ida/$viagemId'
+    | '/passageiro/ajuda'
     | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
+    | '/vanzeiro/ajuda'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
     | '/vanzeiro/historico'
@@ -266,10 +286,12 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/convite/$passageiroId'
     | '/ida/$viagemId'
+    | '/passageiro/ajuda'
     | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
+    | '/vanzeiro/ajuda'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
     | '/vanzeiro/historico'
@@ -292,10 +314,12 @@ export interface FileRouteTypes {
     | '/vanzeiro'
     | '/convite/$passageiroId'
     | '/ida/$viagemId'
+    | '/passageiro/ajuda'
     | '/passageiro/convite'
     | '/passageiro/pagamentos'
     | '/passageiro/perfil'
     | '/passageiro/viagens'
+    | '/vanzeiro/ajuda'
     | '/vanzeiro/dinheiro'
     | '/vanzeiro/gastos'
     | '/vanzeiro/historico'
@@ -379,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassageiroIndexRouteImport
       parentRoute: typeof PassageiroRoute
     }
+    '/passageiro/ajuda': {
+      id: '/passageiro/ajuda'
+      path: '/ajuda'
+      fullPath: '/passageiro/ajuda'
+      preLoaderRoute: typeof PassageiroAjudaRouteImport
+      parentRoute: typeof PassageiroRoute
+    }
     '/passageiro/convite': {
       id: '/passageiro/convite'
       path: '/convite'
@@ -412,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/vanzeiro/'
       preLoaderRoute: typeof VanzeiroIndexRouteImport
+      parentRoute: typeof VanzeiroRoute
+    }
+    '/vanzeiro/ajuda': {
+      id: '/vanzeiro/ajuda'
+      path: '/ajuda'
+      fullPath: '/vanzeiro/ajuda'
+      preLoaderRoute: typeof VanzeiroAjudaRouteImport
       parentRoute: typeof VanzeiroRoute
     }
     '/vanzeiro/dinheiro': {
@@ -495,6 +533,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface PassageiroRouteChildren {
+  PassageiroAjudaRoute: typeof PassageiroAjudaRoute
   PassageiroConviteRoute: typeof PassageiroConviteRoute
   PassageiroPagamentosRoute: typeof PassageiroPagamentosRoute
   PassageiroPerfilRoute: typeof PassageiroPerfilRoute
@@ -503,6 +542,7 @@ interface PassageiroRouteChildren {
 }
 
 const PassageiroRouteChildren: PassageiroRouteChildren = {
+  PassageiroAjudaRoute: PassageiroAjudaRoute,
   PassageiroConviteRoute: PassageiroConviteRoute,
   PassageiroPagamentosRoute: PassageiroPagamentosRoute,
   PassageiroPerfilRoute: PassageiroPerfilRoute,
@@ -515,6 +555,7 @@ const PassageiroRouteWithChildren = PassageiroRoute._addFileChildren(
 )
 
 interface VanzeiroRouteChildren {
+  VanzeiroAjudaRoute: typeof VanzeiroAjudaRoute
   VanzeiroDinheiroRoute: typeof VanzeiroDinheiroRoute
   VanzeiroGastosRoute: typeof VanzeiroGastosRoute
   VanzeiroHistoricoRoute: typeof VanzeiroHistoricoRoute
@@ -530,6 +571,7 @@ interface VanzeiroRouteChildren {
 }
 
 const VanzeiroRouteChildren: VanzeiroRouteChildren = {
+  VanzeiroAjudaRoute: VanzeiroAjudaRoute,
   VanzeiroDinheiroRoute: VanzeiroDinheiroRoute,
   VanzeiroGastosRoute: VanzeiroGastosRoute,
   VanzeiroHistoricoRoute: VanzeiroHistoricoRoute,

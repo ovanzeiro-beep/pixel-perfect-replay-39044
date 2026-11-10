@@ -54,7 +54,7 @@ function Tres({ l }: { l: Linha3 }) {
   return (
     <li className="py-3">
       <p className="font-extrabold">{l.nome}</p>
-      <div className="mt-1 grid grid-cols-3 gap-2 text-sm">
+      <div className="mt-1 grid grid-cols-[repeat(3,minmax(0,1fr))] break-words gap-2 text-sm">
         <div>
           <p className="text-muted-foreground">Recebeu</p>
           <p className="font-bold text-success">{brl(l.recebido)}</p>
@@ -162,7 +162,7 @@ function Relatorios() {
       </div>
 
       {preset === "outro" && (
-        <div className="grid grid-cols-2 gap-3 rounded-3xl bg-card p-4 shadow-sm">
+        <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] break-words gap-3 rounded-3xl bg-card p-4 shadow-sm">
           <label className="block text-sm font-bold">
             De
             <input
@@ -302,7 +302,7 @@ function Relatorios() {
                         · {c.abastecimentos} abastecimentos
                       </span>
                     </p>
-                    <div className="mt-1 grid grid-cols-3 gap-2 text-sm">
+                    <div className="mt-1 grid grid-cols-[repeat(3,minmax(0,1fr))] break-words gap-2 text-sm">
                       <div>
                         <p className="text-muted-foreground">Litros</p>
                         <p className="font-bold">{num(c.litros)} L</p>

@@ -28,11 +28,11 @@ export const Route = createFileRoute("/vanzeiro/vans")({
 
 function Situacao({ s }: { s: Van["situacao"] }) {
   return s === "rodando" ? (
-    <span className="rounded-full bg-success/15 px-3 py-1 text-sm font-bold text-success">
+    <span className="shrink-0 rounded-full bg-success/15 px-3 py-1 text-sm font-bold text-success">
       Rodando
     </span>
   ) : (
-    <span className="rounded-full bg-accent/25 px-3 py-1 text-sm font-bold text-accent-strong">
+    <span className="shrink-0 rounded-full bg-accent/25 px-3 py-1 text-sm font-bold text-accent-strong">
       Em manutenção
     </span>
   );
@@ -71,11 +71,11 @@ function Vans() {
               className="w-full rounded-3xl bg-card p-5 text-left shadow-sm"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Bus className="h-7 w-7" />
                   </span>
-                  <div>
+                  <div className="min-w-0 break-words">
                     <p className="text-xl font-extrabold">{v.apelido}</p>
                     <p className="text-muted-foreground">
                       {v.modelo}

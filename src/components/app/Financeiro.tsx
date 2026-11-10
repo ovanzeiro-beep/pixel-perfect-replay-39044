@@ -78,7 +78,7 @@ export function Financeiro() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] break-words gap-3">
         <div className="rounded-3xl bg-success/10 p-4">
           <p className="text-sm font-bold text-muted-foreground">Recebido no mês</p>
           <p className="text-xl font-extrabold text-success">{brl(r.recebido)}</p>
@@ -178,7 +178,7 @@ export function Financeiro() {
           {pl.map((l) => (
             <li key={l.id || "gerais"} className="py-3">
               <p className="font-extrabold">{l.nome}</p>
-              <div className="mt-1 grid grid-cols-3 gap-2 text-sm">
+              <div className="mt-1 grid grid-cols-[repeat(3,minmax(0,1fr))] break-words gap-2 text-sm">
                 <div>
                   <p className="text-muted-foreground">Recebeu</p>
                   <p className="font-bold text-success">{brl(l.recebido)}</p>

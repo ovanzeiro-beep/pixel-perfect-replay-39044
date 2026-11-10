@@ -150,7 +150,7 @@ function Linhas() {
                 {l.paradas.join(" → ") || "Trajeto não informado"}
               </p>
               <p className="mt-2 text-base">
-                <span className="text-muted-foreground">Van </span>
+                <span className="text-muted-foreground">Veículo </span>
                 <b>{van(l.vanId)?.apelido ?? "—"}</b>
                 <span className="text-muted-foreground"> · Motorista </span>
                 <b>{mot(l.motoristaId) || "—"}</b>
