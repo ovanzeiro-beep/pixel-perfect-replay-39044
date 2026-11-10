@@ -25,6 +25,8 @@ export type DetalhePassageiro = {
   emergenciaTelefone: string;
   observacoes: string;
   convite: "nao_enviado" | "enviado" | "no_app";
+  /** Paga a viagem na hora (só vale para quem paga por viagem): ao embarcar, o app pergunta como pagou e já gera o recibo. */
+  pagaNaHora?: boolean;
   ultimoPagamento: string;
 };
 

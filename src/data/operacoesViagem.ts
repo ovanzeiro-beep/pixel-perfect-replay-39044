@@ -79,11 +79,17 @@ export const opIniciarIda = (aj: Ajuste, ordem: string[], agora: number): Ajuste
   aj.ida || aj.cancelada
     ? null
     : { ...aj, ida: { ordem, marcas: [], fase: "paradas", inicio: agora } };
-export const opMarcarEmbarque = (aj: Ajuste, pid: string, r: Marca["r"], cobrou: number) =>
+export const opMarcarEmbarque = (
+  aj: Ajuste,
+  pid: string,
+  r: Marca["r"],
+  cobrou: number,
+  pagou?: Marca["pagou"],
+) =>
   comIda(aj, (ida) =>
     ida.marcas.some((m) => m.pid === pid)
       ? null
-      : { ...ida, marcas: [...ida.marcas, { pid, r, cobrou }] },
+      : { ...ida, marcas: [...ida.marcas, { pid, r, cobrou, ...(pagou ? { pagou } : {}) }] },
   );
 /** Desfaz a última marcação e volta para a fase de paradas. Devolve também qual marcação foi desfeita. */
 export function opDesfazerMarcacao(aj: Ajuste): { ajuste: Ajuste; desfeita: Marca } | null {

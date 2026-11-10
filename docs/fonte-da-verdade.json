@@ -2900,6 +2900,106 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 24,
+      "titulo": "Extra: pagar na hora da viagem",
+      "status": "concluida",
+      "objetivo": "Quem paga na hora da viagem: ao embarcar o app pergunta como pagou e já gera cobrança paga e recibo; desfazer tira tudo junto.",
+      "checks": [
+        {
+          "d": "Passageiro tem a opção 'paga na hora'",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "pagaNaHora\\?: boolean"
+        },
+        {
+          "d": "Marcação guarda como pagou",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "pagou\\?: \\{ forma"
+        },
+        {
+          "d": "Contrato: embarque aceita o pagamento na hora",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "pagou\\?: Forma"
+        },
+        {
+          "d": "Dados: embarque + cobrança + pagamento + recibo juntos",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "pagar\\(comCobranca"
+        },
+        {
+          "d": "Dados: desfazer tira pagamento e recibo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "desfazerPagamento\\(e\\.cobrancas, pagou\\.numero\\)"
+        },
+        {
+          "d": "Cadastro: chave 'Paga na hora da viagem'",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Paga na hora da viagem"
+        },
+        {
+          "d": "Ida: pergunta como pagou",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "pagou a viagem\\?"
+        },
+        {
+          "d": "Ida: dinheiro, Pix ou depois",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Paga depois"
+        },
+        {
+          "d": "Resumo: recebido na hora",
+          "tipo": "contem",
+          "arquivo": "src/components/app/ResumoViagem.tsx",
+          "regex": "Recebido na hora"
+        },
+        {
+          "d": "Teste: pagar na hora (dados)",
+          "tipo": "contem",
+          "arquivo": "src/data/viagemOperacoes.test.ts",
+          "regex": "pagar na hora da viagem"
+        },
+        {
+          "d": "Teste: pagar na hora (tela)",
+          "tipo": "contem",
+          "arquivo": "src/test/viagem-fluxo.test.tsx",
+          "regex": "passageiro que paga na hora"
+        },
+        {
+          "d": "Teste: cadastro da opção",
+          "tipo": "contem",
+          "arquivo": "src/test/cadastros-fluxo.test.tsx",
+          "regex": "passageiro que paga na hora \\(cadastro\\)"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

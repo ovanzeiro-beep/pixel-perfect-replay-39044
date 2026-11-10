@@ -734,20 +734,30 @@ const viagemExiste = (viagemId: string) => {
   );
 };
 
+/** Mudança no dinheiro que acompanha a mudança da viagem (tudo vai na mesma gravação). */
+type MudancaNoDinheiro = (e: Estado) => { cobrancas: Cobranca[]; recibos?: Recibo[] };
+
 function mudarViagem(
   viagemId: string,
   f: (aj: Ajuste) => Ajuste | null,
-  cobranca?: PedidoCobranca,
+  dinheiro?: PedidoCobranca | MudancaNoDinheiro,
 ): boolean {
   if (!viagemExiste(viagemId)) return false;
   const novo = f(estado.ajustes[viagemId] ?? vaziaDaViagem());
   if (!novo) return false;
   let cobrancas = estado.cobrancas;
-  if (cobranca) {
+  let recibos = estado.recibos;
+  if (typeof dinheiro === "function") {
+    const r = dinheiro(estado);
+    cobrancas = r.cobrancas;
+    recibos = r.recibos ?? recibos;
+  } else if (dinheiro) {
     cobrancas =
-      cobrancasComViagem(cobrancas, cobranca.pid, cobranca.valor, cobranca.linhaId) ?? cobrancas;
+      cobrancasComViagem(cobrancas, dinheiro.pid, dinheiro.valor, dinheiro.linhaId) ?? cobrancas;
   }
-  set(comAberto({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: novo }, cobrancas }));
+  set(
+    comAberto({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: novo }, cobrancas, recibos }),
+  );
   return true;
 }
 const vaziaDaViagem = (): Ajuste => ({ respostas: {}, espera: [], extras: [] });
@@ -819,22 +829,46 @@ export function trocarVanOuMotoristaDaViagem(
 // --- O vanzeiro: a ida
 export const iniciarIda = (viagemId: string, ordem: string[]) =>
   mudarViagem(viagemId, (aj) => opIniciarIda(aj, ordem, Date.now()));
-/** Marca embarcou / não apareceu. Quem paga por viagem e embarcou já recebe a cobrança, na mesma gravação. */
+/**
+ * Marca embarcou / não apareceu. Quem paga por viagem e embarcou já recebe a cobrança, na mesma gravação.
+ * Com `pagou` (dinheiro ou Pix), quem pagou na hora também já tem a cobrança quitada e o recibo, tudo junto.
+ */
 export function marcarEmbarque(
   viagemId: string,
   pid: string,
   r: "embarcou" | "faltou",
-): { ok: boolean; cobrou: number } {
+  pagou?: Forma,
+): { ok: boolean; cobrou: number; recibo?: Recibo } {
   const p = passageiroPorId(pid);
   const cobrou = r === "embarcou" && p?.formaPagamento === "por_viagem" ? p.valor : 0;
+  const hoje = isoDe(new Date());
+  const numero = estado.recibos.reduce((m, x) => Math.max(m, x.numero), 0) + 1;
+  const pagarAgora = cobrou > 0 && pagou ? pagou : undefined;
+  let recibo: Recibo | undefined;
+  const dinheiro: PedidoCobranca | MudancaNoDinheiro | undefined = !cobrou
+    ? undefined
+    : pagarAgora
+      ? (e) => {
+          const comCobranca = cobrancasComViagem(e.cobrancas, pid, cobrou, linhaIdDe(viagemId));
+          const nova = comCobranca?.at(-1);
+          if (!comCobranca || !nova) return { cobrancas: e.cobrancas };
+          const paga = pagar(comCobranca, pid, cobrou, pagarAgora, hoje, numero, [nova.id]);
+          recibo = paga.recibo ?? undefined;
+          return {
+            cobrancas: paga.cobs,
+            recibos: paga.recibo ? [...e.recibos, paga.recibo] : e.recibos,
+          };
+        }
+      : { pid, valor: cobrou, linhaId: linhaIdDe(viagemId) };
   const ok = mudarViagem(
     viagemId,
-    (aj) => opMarcarEmbarque(aj, pid, r, cobrou),
-    cobrou ? { pid, valor: cobrou, linhaId: linhaIdDe(viagemId) } : undefined,
+    (aj) =>
+      opMarcarEmbarque(aj, pid, r, cobrou, pagarAgora ? { forma: pagarAgora, numero } : undefined),
+    dinheiro,
   );
-  return { ok, cobrou: ok ? cobrou : 0 };
+  return { ok, cobrou: ok ? cobrou : 0, ...(ok && recibo ? { recibo } : {}) };
 }
-/** Desfaz a última marcação da ida e a cobrança dela, na mesma gravação. */
+/** Desfaz a última marcação da ida, a cobrança dela e, se pagou na hora, o pagamento e o recibo, na mesma gravação. */
 export function desfazerUltimaMarcacaoDaIda(viagemId: string): {
   ok: boolean;
   cobrancaAchada: boolean;
@@ -842,13 +876,25 @@ export function desfazerUltimaMarcacaoDaIda(viagemId: string): {
   const aj = estado.ajustes[viagemId];
   const desfeito = aj ? opDesfazerMarcacao(aj) : null;
   if (!desfeito) return { ok: false, cobrancaAchada: true };
-  const { cobrou, pid } = desfeito.desfeita;
-  const cobrancaAchada = !cobrou || cobrancasComViagem(estado.cobrancas, pid, -cobrou) !== null;
-  const ok = mudarViagem(
-    viagemId,
-    (a) => opDesfazerMarcacao(a)?.ajuste ?? null,
-    cobrou ? { pid, valor: -cobrou } : undefined,
-  );
+  const { cobrou, pid, pagou } = desfeito.desfeita;
+  let cobrancaAchada = true;
+  const dinheiro: PedidoCobranca | MudancaNoDinheiro | undefined = !cobrou
+    ? undefined
+    : pagou
+      ? (e) => {
+          // Tira o pagamento e o recibo; a cobrança volta a ficar em aberto e então é removida.
+          const semPagamento = desfazerPagamento(e.cobrancas, pagou.numero);
+          const tirada = cobrancasComViagem(semPagamento, pid, -cobrou);
+          cobrancaAchada = tirada !== null;
+          return {
+            cobrancas: tirada ?? semPagamento,
+            recibos: e.recibos.filter((x) => x.numero !== pagou.numero),
+          };
+        }
+      : { pid, valor: -cobrou };
+  if (cobrou && !pagou)
+    cobrancaAchada = cobrancasComViagem(estado.cobrancas, pid, -cobrou) !== null;
+  const ok = mudarViagem(viagemId, (a) => opDesfazerMarcacao(a)?.ajuste ?? null, dinheiro);
   return { ok, cobrancaAchada };
 }
 export const reordenarFaltamNaIda = (viagemId: string, faltam: string[]) =>

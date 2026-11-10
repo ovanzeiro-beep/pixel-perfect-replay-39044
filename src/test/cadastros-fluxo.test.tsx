@@ -134,3 +134,47 @@ describe("dinheiro", () => {
     expect(document.body.textContent).toMatch(/R\$\s?\d/);
   });
 });
+
+describe("passageiro que paga na hora (cadastro)", () => {
+  it("a opção só aparece para quem paga por viagem, liga e desliga, e vai junto no cadastro", async () => {
+    const { estado } = await abrir("/vanzeiro/passageiros");
+    await clicar(/Novo passageiro/);
+    const chave = await screen.findByRole("switch", { name: /Paga na hora da viagem/ });
+    expect(chave).toHaveAttribute("aria-checked", "false");
+    await act(async () => {
+      fireEvent.click(chave);
+    });
+    expect(screen.getByRole("switch", { name: /Paga na hora/ })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+
+    // Trocar para mensal esconde a opção (e ela não vale mais).
+    await clicar(/^Mensal$/);
+    expect(screen.queryByRole("switch", { name: /Paga na hora/ })).toBeNull();
+    await clicar(/^Por viagem$/);
+    expect(await screen.findByRole("switch", { name: /Paga na hora/ })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("switch", { name: /Paga na hora/ }));
+    });
+    await act(async () => {
+      fireEvent.change((await screen.findAllByLabelText(/^Nome/))[0]!, {
+        target: { value: "Zé Paga Na Hora" },
+      });
+    });
+    await digitar(/Telefone \(com DDD\)/, "43999991111");
+    await digitar(/Valor \(R\$\)/, "30");
+    const antes = estado().passageiros.length;
+    await clicar(/Salvar passageiro/);
+    await waitFor(() => expect(estado().passageiros.length).toBe(antes + 1));
+    expect(estado().passageiros.at(-1)).toMatchObject({
+      nome: "Zé Paga Na Hora",
+      formaPagamento: "por_viagem",
+      pagaNaHora: true,
+    });
+  });
+});

@@ -50,6 +50,7 @@ import {
 } from "@/data/repositorio";
 import { horarioNaParada, ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
 import { textoChegando, textoSaida } from "@/data/avisosVan";
+import { brl } from "@/data/cobrancas";
 import { compartilharTexto } from "@/lib/compartilhar";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
@@ -135,6 +136,7 @@ function Conteudo({
 }) {
   const { vans } = useFrota();
   const [faltou, setFaltou] = useState<Passageiro | null>(null);
+  const [pagando, setPagando] = useState<Passageiro | null>(null);
   const [novaParada, setNovaParada] = useState(false);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -157,15 +159,20 @@ function Conteudo({
     const r = await compartilharTexto(textoSaida({ linha: nomeLinha, quem }), "Aviso da van");
     if (r === "whatsapp") toast.success("Abrindo o WhatsApp com o aviso");
   };
-  const marcar = async (p: Passageiro, r: "embarcou" | "faltou") => {
-    const { ok, cobrou } = await marcarEmbarque(v.id, p.id, r);
+  const marcar = async (p: Passageiro, r: "embarcou" | "faltou", pagou?: "dinheiro" | "pix") => {
+    const { ok, cobrou, recibo } = await marcarEmbarque(v.id, p.id, r, pagou);
     if (!ok) return;
     toast.success(
-      r === "embarcou"
-        ? `${primeiro(p.nome)} embarcou${cobrou ? " · cobrança da viagem lançada" : ""}`
-        : `${primeiro(p.nome)} não apareceu`,
+      r === "faltou"
+        ? `${primeiro(p.nome)} não apareceu`
+        : recibo
+          ? `${primeiro(p.nome)} embarcou · pagou ${brl(recibo.valor)} (recibo nº ${String(recibo.numero).padStart(4, "0")})`
+          : `${primeiro(p.nome)} embarcou${cobrou ? " · cobrança da viagem lançada" : ""}`,
     );
   };
+  // Quem paga na hora: ao embarcar, pergunta como pagou (ou deixa para depois).
+  const aoEmbarcar = (p: Passageiro) =>
+    p.pagaNaHora && p.formaPagamento === "por_viagem" ? setPagando(p) : marcar(p, "embarcou");
   const desfazer = async () => {
     const { ok, cobrancaAchada } = await desfazerUltimaMarcacaoDaIda(v.id);
     if (!ok) return;
@@ -271,7 +278,7 @@ function Conteudo({
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => marcar(prox, "embarcou")}
+                  onClick={() => aoEmbarcar(prox)}
                   className="flex min-h-20 flex-col items-center justify-center rounded-2xl bg-success text-xl font-extrabold text-success-foreground"
                 >
                   <Check className="h-7 w-7" /> Embarcou
@@ -433,6 +440,49 @@ function Conteudo({
             toast.success(`Parada de ${minutos} minutos`);
           }}
         />
+      )}
+
+      {pagando && (
+        <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">
+          <div className="w-full max-w-md space-y-3 rounded-3xl bg-card p-6">
+            <h3 className="text-xl font-extrabold">{primeiro(pagando.nome)} pagou a viagem?</h3>
+            <p className="text-3xl font-extrabold text-primary">{brl(pagando.valor)}</p>
+            <BotaoGrande
+              variante="destaque"
+              onClick={() => {
+                void marcar(pagando, "embarcou", "dinheiro");
+                setPagando(null);
+              }}
+            >
+              Pagou em dinheiro
+            </BotaoGrande>
+            <BotaoGrande
+              variante="destaque"
+              onClick={() => {
+                void marcar(pagando, "embarcou", "pix");
+                setPagando(null);
+              }}
+            >
+              Pagou no Pix
+            </BotaoGrande>
+            <BotaoGrande
+              variante="contorno"
+              onClick={() => {
+                void marcar(pagando, "embarcou");
+                setPagando(null);
+              }}
+            >
+              Paga depois
+            </BotaoGrande>
+            <button
+              type="button"
+              onClick={() => setPagando(null)}
+              className="min-h-12 w-full text-base font-bold text-muted-foreground underline"
+            >
+              Voltar
+            </button>
+          </div>
+        </div>
       )}
 
       {faltou && (

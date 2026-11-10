@@ -52,6 +52,7 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
       "Em Dinheiro → Cobranças você vê quanto cada passageiro deve.",
       "Quando receber, toque em Marcar pagamento. O app quita primeiro as cobranças mais antigas e gera o recibo.",
       "O recibo pode ser compartilhado com o passageiro pelo WhatsApp.",
+      "Quem paga na hora da viagem: no cadastro do passageiro (Por viagem), ligue Paga na hora da viagem. Ao tocar em Embarcou, o app pergunta Pagou em dinheiro, Pagou no Pix ou Paga depois, e já gera o recibo.",
       "Cadastre a sua chave Pix em Mais → Meu perfil. Ela vai junto nas mensagens de cobrança.",
     ],
   },

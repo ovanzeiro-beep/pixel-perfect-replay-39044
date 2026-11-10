@@ -163,3 +163,116 @@ describe("o vanzeiro marca respostas respeitando a lotação", () => {
     expect(aj(v.id).respostas[ids.at(-1)!]).toBe("vai");
   });
 });
+
+describe("pagar na hora da viagem", () => {
+  const caso = () => {
+    const v = viagens().find((x) => x.data >= dias(3) && !x.ajuste.ida && porViagem(x))!;
+    const p = porViagem(v)!;
+    s.iniciarIda(v.id, v.passageiroIds);
+    return { v, p };
+  };
+  const recibos = () => s.obterEstado().recibos;
+
+  it("embarcou e pagou: marca, cobrança, pagamento e recibo numa operação só; nada fica em aberto", () => {
+    const { v, p } = caso();
+    const antesAberto = totalCobrancas(p.id);
+    const antesRecibos = recibos().length;
+    const numero = recibos().reduce((m, r) => Math.max(m, r.numero), 0) + 1;
+    const r = s.marcarEmbarque(v.id, p.id, "embarcou", "dinheiro");
+    expect(r.ok).toBe(true);
+    expect(r.cobrou).toBe(p.valor);
+    expect(r.recibo).toMatchObject({ numero, pid: p.id, valor: p.valor, forma: "dinheiro" });
+    expect(aj(v.id).ida!.marcas).toEqual([
+      { pid: p.id, r: "embarcou", cobrou: p.valor, pagou: { forma: "dinheiro", numero } },
+    ]);
+    expect(recibos()).toHaveLength(antesRecibos + 1);
+    expect(totalCobrancas(p.id)).toBeCloseTo(antesAberto); // a viagem entrou já paga
+    const cob = s
+      .obterEstado()
+      .cobrancas.filter((c) => c.pid === p.id && c.tipo === "viagem")
+      .at(-1)!;
+    expect(cob.pagamentos).toEqual([
+      { valor: p.valor, data: expect.any(String), forma: "dinheiro", recibo: numero },
+    ]);
+  });
+
+  it("Pix também vale, e dois pagamentos seguidos geram recibos com números crescentes", () => {
+    const { v, p } = caso();
+    const outro = s
+      .obterEstado()
+      .passageiros.find(
+        (x) => x.id !== p.id && v.passageiroIds.includes(x.id) && x.formaPagamento === "por_viagem",
+      );
+    const a = s.marcarEmbarque(v.id, p.id, "embarcou", "pix");
+    expect(a.recibo?.forma).toBe("pix");
+    if (outro) {
+      const b = s.marcarEmbarque(v.id, outro.id, "embarcou", "dinheiro");
+      expect(b.recibo!.numero).toBe(a.recibo!.numero + 1);
+    }
+  });
+
+  it("'paga depois' (sem informar o pagamento) só cobra, como antes", () => {
+    const { v, p } = caso();
+    const antes = totalCobrancas(p.id);
+    const antesRecibos = recibos().length;
+    const r = s.marcarEmbarque(v.id, p.id, "embarcou");
+    expect(r.recibo).toBeUndefined();
+    expect(aj(v.id).ida!.marcas[0]!.pagou).toBeUndefined();
+    expect(recibos()).toHaveLength(antesRecibos);
+    expect(totalCobrancas(p.id)).toBeCloseTo(antes + p.valor);
+  });
+
+  it("quem não paga por viagem não gera cobrança nem recibo, mesmo se informarem pagamento", () => {
+    const v = viagens().find(
+      (x) => x.data >= dias(3) && !x.ajuste.ida && x.passageiroIds.length >= 1,
+    )!;
+    const naoViagem = s
+      .obterEstado()
+      .passageiros.find((x) => v.passageiroIds.includes(x.id) && x.formaPagamento !== "por_viagem");
+    if (!naoViagem) return;
+    s.iniciarIda(v.id, v.passageiroIds);
+    const antesRecibos = recibos().length;
+    const r = s.marcarEmbarque(v.id, naoViagem.id, "embarcou", "pix");
+    expect(r).toMatchObject({ ok: true, cobrou: 0 });
+    expect(r.recibo).toBeUndefined();
+    expect(recibos()).toHaveLength(antesRecibos);
+  });
+
+  it("'não apareceu' ignora o pagamento: nada é cobrado nem recebido", () => {
+    const { v, p } = caso();
+    const antesRecibos = recibos().length;
+    const r = s.marcarEmbarque(v.id, p.id, "faltou", "dinheiro");
+    expect(r).toMatchObject({ ok: true, cobrou: 0 });
+    expect(recibos()).toHaveLength(antesRecibos);
+  });
+
+  it("desfazer tira a marcação, o pagamento, o recibo e a cobrança, tudo junto", () => {
+    const { v, p } = caso();
+    const antes = totalCobrancas(p.id);
+    const antesRecibos = recibos().length;
+    const antesCobrancas = s.obterEstado().cobrancas.length;
+    s.marcarEmbarque(v.id, p.id, "embarcou", "dinheiro");
+    expect(s.desfazerUltimaMarcacaoDaIda(v.id)).toEqual({ ok: true, cobrancaAchada: true });
+    expect(aj(v.id).ida!.marcas).toEqual([]);
+    expect(recibos()).toHaveLength(antesRecibos);
+    expect(s.obterEstado().cobrancas).toHaveLength(antesCobrancas);
+    expect(totalCobrancas(p.id)).toBeCloseTo(antes);
+  });
+
+  it("marcar duas vezes a mesma pessoa não gera um segundo recibo", () => {
+    const { v, p } = caso();
+    s.marcarEmbarque(v.id, p.id, "embarcou", "pix");
+    const antes = recibos().length;
+    expect(s.marcarEmbarque(v.id, p.id, "embarcou", "pix")).toMatchObject({ ok: false, cobrou: 0 });
+    expect(recibos()).toHaveLength(antes);
+  });
+
+  it("o recibo entra nos números do mês (recebido) como qualquer outro pagamento", async () => {
+    const { v, p } = caso();
+    const { recebidoNoMes } = await import("./cobrancas");
+    const hoje = new Date().toISOString().slice(0, 10);
+    const antes = recebidoNoMes(s.obterEstado().cobrancas, hoje);
+    s.marcarEmbarque(v.id, p.id, "embarcou", "pix");
+    expect(recebidoNoMes(s.obterEstado().cobrancas, hoje)).toBeCloseTo(antes + p.valor);
+  });
+});
