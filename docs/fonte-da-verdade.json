@@ -3705,6 +3705,76 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 34,
+      "titulo": "Usabilidade e organização das telas",
+      "status": "concluida",
+      "objetivo": "Telas organizadas e fáceis: atalhos à mão, listas curtas, filtros à vista, valores sem quebrar e textos certos.",
+      "checks": [
+        {
+          "d": "Viagens: mostrar mais dias",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.viagens.tsx",
+          "regex": "Mostrar mais dias"
+        },
+        {
+          "d": "Gastos: meses anteriores recolhidos",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.gastos.tsx",
+          "regex": "Mostrar meses anteriores"
+        },
+        {
+          "d": "Relatórios: aviso claro no prejuízo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.relatorios.tsx",
+          "regex": "gastos passaram do que você recebeu"
+        },
+        {
+          "d": "Passageiros: filtros que quebram linha",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "flex flex-wrap gap-2"
+        },
+        {
+          "d": "Singular nos dias de atraso",
+          "tipo": "contem",
+          "arquivo": "src/data/cobrancas.ts",
+          "regex": "=== 1 \\? \\\"dia\\\""
+        },
+        {
+          "d": "Testes de organização das telas",
+          "tipo": "contem",
+          "arquivo": "src/test/telas-principais.test.tsx",
+          "regex": "organização das telas \\(usabilidade\\)"
+        },
+        {
+          "d": "Relatório de usabilidade",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "Usabilidade e organização das telas \\(etapa 34\\)"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

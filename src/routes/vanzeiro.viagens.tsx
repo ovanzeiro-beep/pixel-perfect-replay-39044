@@ -96,6 +96,7 @@ function Viagens() {
   const { linhas, vans, motoristas } = useFrota();
   const viagens = useViagens();
   const [aba, setAba] = useState<"proximas" | "anteriores">("proximas");
+  const [diasMostrados, setDiasMostrados] = useState(7);
   const agora = new Date();
 
   const lista =
@@ -127,41 +128,50 @@ function Viagens() {
       </div>
 
       <div className="mt-4 space-y-5">
-        {Object.entries(grupos).map(([data, vs]) => (
-          <section key={data}>
-            <h2 className="mb-2 text-lg font-extrabold text-muted-foreground">
-              {rotuloDia(data, agora)}
-            </h2>
-            <ul className="space-y-3">
-              {vs.map((v) => (
-                <li key={v.id}>
-                  <button
-                    onClick={() => abrir(v.id)}
-                    className="w-full rounded-3xl bg-card p-4 text-left shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-lg font-extrabold leading-tight">{nomeLinha(v.linhaId)}</p>
-                      <span
-                        className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${SITUACAO[v.situacao].cls}`}
-                      >
-                        {SITUACAO[v.situacao].nome}
-                      </span>
-                    </div>
-                    <p className="mt-1 flex items-center gap-2 text-base">
-                      <Clock className="h-4 w-4" /> Saída {v.saida || "—"}
-                    </p>
-                    <p className="flex items-center gap-2 text-base text-muted-foreground">
-                      <Bus className="h-4 w-4" />{" "}
-                      {vans.find((x) => x.id === v.vanId)?.apelido ?? "Sem van"} ·{" "}
-                      {motoristas.find((m) => m.id === v.motoristaId)?.nome ?? "Sem motorista"}
-                    </p>
-                    <Barra v={v} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+        {Object.entries(grupos)
+          .slice(0, diasMostrados)
+          .map(([data, vs]) => (
+            <section key={data}>
+              <h2 className="mb-2 text-lg font-extrabold text-muted-foreground">
+                {rotuloDia(data, agora)}
+              </h2>
+              <ul className="space-y-3">
+                {vs.map((v) => (
+                  <li key={v.id}>
+                    <button
+                      onClick={() => abrir(v.id)}
+                      className="w-full rounded-3xl bg-card p-4 text-left shadow-sm"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-lg font-extrabold leading-tight">
+                          {nomeLinha(v.linhaId)}
+                        </p>
+                        <span
+                          className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${SITUACAO[v.situacao].cls}`}
+                        >
+                          {SITUACAO[v.situacao].nome}
+                        </span>
+                      </div>
+                      <p className="mt-1 flex items-center gap-2 text-base">
+                        <Clock className="h-4 w-4" /> Saída {v.saida || "—"}
+                      </p>
+                      <p className="flex items-center gap-2 text-base text-muted-foreground">
+                        <Bus className="h-4 w-4" />{" "}
+                        {vans.find((x) => x.id === v.vanId)?.apelido ?? "Sem van"} ·{" "}
+                        {motoristas.find((m) => m.id === v.motoristaId)?.nome ?? "Sem motorista"}
+                      </p>
+                      <Barra v={v} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        {Object.keys(grupos).length > diasMostrados && (
+          <BotaoGrande variante="contorno" onClick={() => setDiasMostrados((n) => n + 7)}>
+            Mostrar mais dias
+          </BotaoGrande>
+        )}
         {lista.length === 0 &&
           (linhas.length === 0 ? (
             <EstadoVazio

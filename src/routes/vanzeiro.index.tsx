@@ -165,6 +165,31 @@ function Inicio() {
         </section>
       )}
 
+      <section>
+        <h2 className="mb-3 text-xl font-extrabold text-primary">Atalhos</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {(
+            [
+              { to: "/vanzeiro/passageiros", label: "Novo passageiro", icon: UserPlus },
+              { to: "/vanzeiro/dinheiro", label: "Marcar pagamento", icon: Wallet },
+              { to: "/vanzeiro/gastos", label: "Lançar gasto", icon: Fuel },
+            ] as const
+          ).map((a) => (
+            <Link
+              key={a.label}
+              to={a.to}
+              search={(a.to === "/vanzeiro/gastos" ? { novo: true } : {}) as never}
+              className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm"
+            >
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                <a.icon className="h-7 w-7" />
+              </span>
+              <span className="text-sm leading-tight">{a.label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <Alertas />
 
       <section className="rounded-3xl bg-card p-5 shadow-sm">
@@ -200,7 +225,9 @@ function Inicio() {
                 <div>
                   <p className="font-bold">{p.nome}</p>
                   <p className="text-sm text-destructive">
-                    {c.diasAtraso ? `há ${c.diasAtraso} dias` : "a vencer"}
+                    {c.diasAtraso
+                      ? `há ${c.diasAtraso} ${c.diasAtraso === 1 ? "dia" : "dias"}`
+                      : "a vencer"}
                   </p>
                 </div>
                 <span className="font-bold">{brl(c.valor)}</span>
@@ -242,31 +269,6 @@ function Inicio() {
           Ainda falta receber no mês:{" "}
           <span className="font-bold text-foreground">{brl(faltaReceber)}</span>
         </p>
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-xl font-extrabold text-primary">Atalhos</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {(
-            [
-              { to: "/vanzeiro/passageiros", label: "Novo passageiro", icon: UserPlus },
-              { to: "/vanzeiro/dinheiro", label: "Marcar pagamento", icon: Wallet },
-              { to: "/vanzeiro/gastos", label: "Lançar gasto", icon: Fuel },
-            ] as const
-          ).map((a) => (
-            <Link
-              key={a.label}
-              to={a.to}
-              search={(a.to === "/vanzeiro/gastos" ? { novo: true } : {}) as never}
-              className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3 text-center font-bold shadow-sm"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                <a.icon className="h-7 w-7" />
-              </span>
-              <span className="text-sm leading-tight">{a.label}</span>
-            </Link>
-          ))}
-        </div>
       </section>
     </div>
   );

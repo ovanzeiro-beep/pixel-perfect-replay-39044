@@ -44,6 +44,7 @@ function Gastos() {
   const { novo } = Route.useSearch();
   const navigate = useNavigate({ from: "/vanzeiro/gastos" });
   const [cat, setCat] = useState<Categoria | "">("");
+  const [mesesMostrados, setMesesMostrados] = useState(3);
   const [vanId, setVanId] = useState("");
   const [editando, setEditando] = useState<Gasto | null>(null);
   const [criando, setCriando] = useState(false);
@@ -111,10 +112,10 @@ function Gastos() {
       </div>
 
       <div className="mt-5 space-y-6">
-        {meses.map((m) => (
+        {meses.slice(0, mesesMostrados).map((m) => (
           <section key={m.mes}>
             <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-xl font-extrabold capitalize">{nomeMes(m.mes)}</h2>
+              <h2 className="text-xl font-extrabold">{nomeMes(m.mes)}</h2>
               <p className="text-lg font-extrabold text-destructive">{brl(m.total)}</p>
             </div>
             <ul className="space-y-2">
@@ -178,6 +179,11 @@ function Gastos() {
             </ul>
           </section>
         ))}
+        {meses.length > mesesMostrados && (
+          <BotaoGrande variante="contorno" onClick={() => setMesesMostrados((n) => n + 3)}>
+            Mostrar meses anteriores ({meses.length - mesesMostrados})
+          </BotaoGrande>
+        )}
         {meses.length === 0 &&
           (gastos.length === 0 ? (
             <EstadoVazio

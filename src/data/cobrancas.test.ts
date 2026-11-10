@@ -94,3 +94,20 @@ describe("cobranças", () => {
     expect(brl(1234.56).replace(/\s/g, " ")).toBe("R$ 1.234,56");
   });
 });
+
+describe("texto de atraso no singular e no plural", () => {
+  it("1 dia, 2 dias", async () => {
+    const { nomeEstado } = await import("./cobrancas");
+    const c = {
+      id: "c",
+      pid: "p",
+      tipo: "viagem" as const,
+      ref: "",
+      vencimento: "2026-11-09",
+      valor: 10,
+      pagamentos: [],
+    };
+    expect(nomeEstado(c, "2026-11-10")).toBe("Atrasada 1 dia");
+    expect(nomeEstado(c, "2026-11-11")).toBe("Atrasada 2 dias");
+  });
+});

@@ -92,7 +92,7 @@ export function nomeEstado(c: Cobranca, hoje: string) {
   const parte = pago(c) > 0 ? " · paga em parte" : "";
   return (
     (e === "atrasada"
-      ? `Atrasada ${diasEntre(c.vencimento, hoje)} dias`
+      ? `Atrasada ${diasEntre(c.vencimento, hoje)} ${diasEntre(c.vencimento, hoje) === 1 ? "dia" : "dias"}`
       : c.vencimento === hoje
         ? "Vence hoje"
         : `Vence ${ddmm(c.vencimento)}`) + parte

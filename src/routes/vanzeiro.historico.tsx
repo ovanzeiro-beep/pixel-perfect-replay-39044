@@ -62,7 +62,7 @@ function Historico() {
       </Link>
       <h1 className="text-3xl font-extrabold text-primary">Histórico de viagens</h1>
 
-      <div className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1">
+      <div className="mt-4 flex flex-wrap gap-2">
         <button className={chip(linhaId === "")} onClick={() => setLinhaId("")}>
           Todas as linhas
         </button>

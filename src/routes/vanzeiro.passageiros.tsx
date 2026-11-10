@@ -128,11 +128,11 @@ function Pagamento({ p }: { p: Passageiro }) {
 
 function Convite({ p }: { p: Passageiro }) {
   return p.convite === "no_app" ? (
-    <span className="inline-flex items-center gap-1 text-sm font-bold text-success">
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-bold text-success">
       <CheckCircle2 className="h-5 w-5" /> No app
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 text-sm font-bold text-muted-foreground">
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-bold text-muted-foreground">
       <Clock className="h-5 w-5" /> {CONVITE[p.convite]}
     </span>
   );
@@ -227,7 +227,7 @@ function Passageiros() {
       </div>
 
       <div className="mt-3 space-y-2">
-        <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+        <div className="flex flex-wrap gap-2">
           <Chip ativo={!fLinha} onClick={() => setFLinha("")}>
             Todas as linhas
           </Chip>
@@ -241,7 +241,7 @@ function Passageiros() {
             </Chip>
           ))}
         </div>
-        <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+        <div className="flex flex-wrap gap-2">
           <Chip
             ativo={fPag === "em_dia"}
             onClick={() => setFPag(fPag === "em_dia" ? "" : "em_dia")}

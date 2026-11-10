@@ -311,3 +311,44 @@ describe("tela de linhas", () => {
     expect((estado().pausas ?? []).some((z) => z.linhaId === l.id)).toBe(false);
   });
 });
+
+describe("organização das telas (usabilidade)", () => {
+  it("Início: os atalhos vêm logo depois da próxima viagem, antes dos alertas", async () => {
+    await abrir("/vanzeiro");
+    const atalhos = await screen.findByRole("heading", { name: "Atalhos" });
+    const proxima = await screen.findByText("Próxima viagem");
+    const devendo = await screen.findByRole("heading", { name: "Quem está devendo" });
+    expect(
+      proxima.compareDocumentPosition(atalhos) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      atalhos.compareDocumentPosition(devendo) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("Viagens: mostra uma semana de cada vez, com botão para ver mais dias", async () => {
+    await abrir("/vanzeiro/viagens");
+    const dias = () => document.querySelectorAll("main h2, section > h2").length;
+    await screen.findAllByText(/Saída/);
+    const antes = dias();
+    await clicar("Mostrar mais dias");
+    await waitFor(() => expect(dias()).toBeGreaterThan(antes));
+  });
+
+  it("Gastos: meses antigos ficam recolhidos e o nome do mês não tem 'De' maiúsculo", async () => {
+    await abrir("/vanzeiro/gastos");
+    expect((await screen.findAllByRole("heading", { level: 2 })).length).toBeGreaterThan(0);
+    // "capitalize" do CSS põe maiúscula em toda palavra ("Novembro De 2026"); o nome do mês já vem certo.
+    for (const h of screen.getAllByText(/ de \d{4}$/))
+      expect(h.className).not.toMatch(/capitalize/);
+    expect(screen.getAllByText(/ de \d{4}$/).length).toBe(3);
+    await clicar(/Mostrar meses anteriores/);
+    await waitFor(() => expect(screen.getAllByText(/ de \d{4}$/).length).toBeGreaterThan(3));
+  });
+
+  it("Passageiros: todos os filtros ficam à vista (não rolam para o lado)", async () => {
+    await abrir("/vanzeiro/passageiros");
+    await screen.findByRole("button", { name: "Todas as linhas" });
+    expect(document.querySelector("main .overflow-x-auto, .overflow-x-auto")).toBeNull();
+  });
+});

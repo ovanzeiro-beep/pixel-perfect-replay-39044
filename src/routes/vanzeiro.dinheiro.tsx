@@ -235,7 +235,7 @@ function Cobrancas() {
         <Copy className="h-5 w-5" /> Copiar chave Pix
       </BotaoGrande>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="flex flex-wrap gap-2">
         {FILTROS.map((f) => (
           <button
             key={f.id}
@@ -284,20 +284,21 @@ function Cobrancas() {
                       {r.total > 0 ? brl(r.total) : "Em dia"}
                     </p>
                   </div>
-                  <p className="mt-1 text-base text-muted-foreground">
-                    {r.qtd === 0
-                      ? "Nenhuma cobrança em aberto"
-                      : `${r.qtd} ${r.qtd === 1 ? "cobrança em aberto" : "cobranças em aberto"}`}
-                    {r.diasAtraso > 0 && (
-                      <span className="font-bold text-destructive">
-                        {" "}
-                        · atrasado há {r.diasAtraso} dias
-                      </span>
-                    )}
-                    {r.cor === "amarelo" && (
-                      <span className="font-bold text-accent-strong"> · vence em breve</span>
-                    )}
-                  </p>
+                  {/* Quem está em dia já diz "Em dia" ao lado do nome: sem segunda linha, a lista fica mais curta. */}
+                  {r.qtd > 0 && (
+                    <p className="mt-1 text-base text-muted-foreground">
+                      {`${r.qtd} ${r.qtd === 1 ? "cobrança em aberto" : "cobranças em aberto"}`}
+                      {r.diasAtraso > 0 && (
+                        <span className="font-bold text-destructive">
+                          {" "}
+                          · atrasado há {r.diasAtraso} {r.diasAtraso === 1 ? "dia" : "dias"}
+                        </span>
+                      )}
+                      {r.cor === "amarelo" && (
+                        <span className="font-bold text-accent-strong"> · vence em breve</span>
+                      )}
+                    </p>
+                  )}
                 </button>
                 {r.total > 0 && (
                   <div className="mt-3 grid grid-cols-2 gap-2">

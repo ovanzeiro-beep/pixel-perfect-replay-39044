@@ -183,3 +183,25 @@ Nada bloqueia. Estes itens deixam a troca mais segura, e podem ser feitos antes 
 ## Cobertura do contrato (etapa 33)
 
 A conferência final achou que a **suíte de contrato** (o que um banco precisa passar) chamava diretamente só 22 das 55 operações do contrato; as outras só eram testadas pelas telas e por testes do mock. Agora **todas as 55** são chamadas pela suíte de contrato, com o comportamento combinado: o que devolvem, quando recusam (`false`/`null`) e o que não podem apagar. Um teste impede a volta do problema: **operação nova no contrato sem teste de contrato falha a suíte**. Para conferir, estraguei de propósito 7 regras do mock (pausar linha, desfazer entrega, repetir fase, prazo de confirmação, pedido de chamada, limite de dias de aviso, convite) e a suíte pegou todas.
+
+## Usabilidade e organização das telas (etapa 34)
+
+Revisão tela por tela, no tamanho de celular (390 px), das 20 telas dos dois papéis. O que estava confuso ou desorganizado e foi corrigido:
+
+| Problema visto | Correção |
+| --- | --- |
+| **Início:** os atalhos (Novo passageiro, Marcar pagamento, Lançar gasto) ficavam no fim, depois de quatro telas de rolagem | Atalhos logo abaixo da próxima viagem |
+| **Viagens:** lista de 5.400 px com todas as viagens das próximas semanas | Mostra 7 dias; botão "Mostrar mais dias" (a lista caiu para 2.800 px) |
+| **Gastos:** todos os meses desde o começo numa lista de 5.600 px; "Novembro De 2026" com "De" maiúsculo | Mostra 3 meses; botão "Mostrar meses anteriores"; mês escrito certo (3.100 px) |
+| **Relatórios:** "R$ 2.485,00" quebrava em duas linhas no cartão; "O lucro é -24% do que você recebeu" | Recebido e Gastos lado a lado, Lucro em destaque embaixo; frase clara quando fica no prejuízo |
+| **Filtros** (passageiros, dinheiro, relatórios, histórico): chips que rolavam para o lado e escondiam opções ("Últimos 3 meses", "Ainda…") | Os chips passam para a linha de baixo: todas as opções à vista |
+| **Passageiros:** selo "No app" / "Sem convite" quebrava em duas linhas | Selo numa linha só |
+| **Dinheiro:** quem está em dia aparecia com dois "em dia" (ao lado do nome e embaixo) | Só um; a lista ficou mais curta |
+| **Textos:** "há 1 dias", "Atrasada 1 dias" | "há 1 dia", "Atrasada 1 dia" |
+
+As telas do passageiro foram revisadas e já estavam limpas (um assunto por cartão, botões grandes, cores consistentes).
+
+### Ainda pode melhorar (decisão sua)
+- **Início:** com muitos alertas, a lista de alertas ocupa uma tela inteira antes das viagens da semana. Opção: mostrar só os 2 mais urgentes.
+- **Meu perfil:** junta dados, Pix, tamanho da letra, backup e "começar do zero" na mesma tela (2.500 px). Opção: separar em "Meus dados" e "Backup e segurança".
+- **Viagens:** o selo "Agendada" aparece em todas as viagens; só "Lotada", "Cancelada" e "Em andamento" dizem algo diferente.

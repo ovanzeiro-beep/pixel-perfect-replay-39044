@@ -150,7 +150,7 @@ function Relatorios() {
       </Link>
       <h1 className="text-3xl font-extrabold text-primary print:hidden">Relatórios</h1>
 
-      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 print:hidden">
+      <div className="flex flex-wrap gap-2 print:hidden">
         {PRESETS.map((p) => (
           <button key={p.id} className={chip(preset === p.id)} onClick={() => setPreset(p.id)}>
             {p.nome}
@@ -195,25 +195,25 @@ function Relatorios() {
           <p className="text-lg font-bold text-muted-foreground print:hidden">
             {nomePeriodo(periodo)}
           </p>
-          <div className="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2 text-center">
+          <div className="grid grid-cols-2 gap-2 text-center">
             <div className="rounded-2xl bg-success/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Recebido</p>
-              <p className="break-words text-base font-extrabold text-success">
+              <p className="whitespace-nowrap text-lg font-extrabold text-success">
                 {brl(dados.rel.recebido)}
               </p>
             </div>
             <div className="rounded-2xl bg-destructive/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Gastos</p>
-              <p className="break-words text-base font-extrabold text-destructive">
+              <p className="whitespace-nowrap text-lg font-extrabold text-destructive">
                 {brl(dados.rel.gastos)}
               </p>
             </div>
             <div
-              className={`rounded-2xl p-3 ${dados.rel.lucro >= 0 ? "bg-success/15" : "bg-destructive/15"}`}
+              className={`col-span-2 rounded-2xl p-3 ${dados.rel.lucro >= 0 ? "bg-success/15" : "bg-destructive/15"}`}
             >
               <p className="text-sm font-bold text-muted-foreground">Lucro</p>
               <p
-                className={`break-words text-base font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
+                className={`whitespace-nowrap text-2xl font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
               >
                 {brl(dados.rel.lucro)}
               </p>
@@ -221,7 +221,9 @@ function Relatorios() {
           </div>
           {dados.rel.margem !== null && (
             <p className="-mt-2 text-center text-sm text-muted-foreground">
-              O lucro é {dados.rel.margem}% do que você recebeu.
+              {dados.rel.margem < 0
+                ? "Neste período os gastos passaram do que você recebeu."
+                : `O lucro é ${dados.rel.margem}% do que você recebeu.`}
             </p>
           )}
 
