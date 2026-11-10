@@ -14,6 +14,7 @@ import {
 } from "@/data/repositorio";
 import { BackupDados } from "@/components/app/BackupDados";
 import { DadosDoVanzeiro } from "@/components/app/DadosDoVanzeiro";
+import { TamanhoDaLetra } from "@/components/app/TamanhoDaLetra";
 import { guardarCopiaDeSeguranca, zerarAlteracoes } from "@/data/backup";
 import { definirModoDemo, useModoDemo } from "@/lib/modoDemo";
 
@@ -63,6 +64,7 @@ function PerfilVanzeiro() {
           Salvar chave Pix
         </BotaoGrande>
       </div>
+      <TamanhoDaLetra />
       <BackupDados />
       <div className="mt-4 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
         <h2 className="text-lg font-extrabold text-primary">Dados de teste e recomeço</h2>

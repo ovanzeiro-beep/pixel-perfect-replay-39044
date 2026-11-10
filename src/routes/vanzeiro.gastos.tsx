@@ -130,7 +130,7 @@ function Gastos() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex justify-between gap-2">
-                        <p className="font-extrabold">{g.categoria}</p>
+                        <p className="min-w-0 break-words font-extrabold">{g.categoria}</p>
                         <p className="shrink-0 font-extrabold">{brl(g.valor)}</p>
                       </div>
                       <p className="text-sm text-muted-foreground">

@@ -12,21 +12,21 @@ export type NavItem = {
 
 export function AppShell({ items }: { items: NavItem[] }) {
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b bg-card px-5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+    <div className="mx-auto flex min-h-[100dvh] max-w-md flex-col bg-background print:max-w-none">
+      <header className="sticky top-0 z-10 border-b bg-card px-5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] print:hidden">
         <Logo />
       </header>
       <main className="flex-1 pb-[calc(7rem+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t bg-card pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed inset-x-0 bottom-0 z-10 mx-auto max-w-md border-t bg-card pb-[env(safe-area-inset-bottom)] print:hidden">
         <ul className="flex">
           {items.map((it) => (
-            <li key={it.to} className="flex-1">
+            <li key={it.to} className="min-w-0 flex-1">
               <Link
                 to={it.to}
                 activeOptions={{ exact: it.exact ?? false }}
-                className="flex min-h-[68px] flex-col items-center justify-center gap-1 text-xs font-semibold text-muted-foreground"
+                className="flex min-h-[68px] min-w-0 flex-col items-center justify-center gap-1 px-0.5 text-[11px] font-semibold leading-tight text-muted-foreground"
                 activeProps={{ className: "text-primary [&_svg]:text-accent-strong" }}
               >
                 <span className="relative">
@@ -40,7 +40,7 @@ export function AppShell({ items }: { items: NavItem[] }) {
                     </span>
                   )}
                 </span>
-                {it.label}
+                <span className="max-w-full truncate">{it.label}</span>
               </Link>
             </li>
           ))}

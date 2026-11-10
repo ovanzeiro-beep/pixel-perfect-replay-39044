@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Fuel, Share2 } from "lucide-react";
+import { ArrowLeft, FileSpreadsheet, Fuel, Printer, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { brl, isoDe } from "@/data/cobrancas";
+import { brl, dataBR, isoDe } from "@/data/cobrancas";
 import { historicoViagens } from "@/data/historico";
+import {
+  csv,
+  linhasGastos,
+  linhasRecebimentos,
+  linhasResumo,
+  nomeDoArquivoExportado,
+  type TipoExportacao,
+} from "@/data/exportacao";
 import {
   PRESETS,
   combustivelPorVan,
@@ -20,7 +28,7 @@ import {
 } from "@/data/relatorios";
 import { useFrota, useVanzeiro } from "@/data/repositorio";
 import { campoClasse } from "@/components/app/Formulario";
-import { compartilharTexto } from "@/lib/compartilhar";
+import { compartilharTexto, salvarArquivo } from "@/lib/compartilhar";
 
 export const Route = createFileRoute("/vanzeiro/relatorios")({
   head: () => ({
@@ -76,6 +84,9 @@ function Relatorios() {
   const valido = periodoValido(periodo);
   const { de, ate } = periodo;
 
+  const linhaDoPassageiro = (pid: string) =>
+    passageiros.find((p) => p.id === pid)?.linhaIds[0] ?? "";
+
   const dados = useMemo(() => {
     if (!valido) return null;
     const intervalo = { de, ate };
@@ -98,18 +109,48 @@ function Relatorios() {
     if (r === "whatsapp") toast.success("Abrindo o WhatsApp com o relatório");
   };
 
+  const exportar = async (tipo: TipoExportacao) => {
+    if (!dados) return;
+    const ctx = { cobrancas, gastos, linhas, vans, passageiros, linhaDoPassageiro };
+    const linhasDoArquivo =
+      tipo === "recebimentos"
+        ? linhasRecebimentos(ctx, periodo)
+        : tipo === "gastos"
+          ? linhasGastos(ctx, periodo)
+          : linhasResumo(periodo, dados.rel, dados.ocupacao, dados.combustivel, vanzeiro.nome);
+    const r = await salvarArquivo(nomeDoArquivoExportado(tipo, periodo), csv(linhasDoArquivo), {
+      tipo: "text/csv;charset=utf-8",
+    });
+    if (r === "cancelado") return;
+    toast.success(
+      r === "compartilhado"
+        ? "Planilha enviada"
+        : "Planilha baixada. Abra no Excel ou no Planilhas Google.",
+    );
+  };
+
   return (
-    <div className="space-y-5 px-5 pb-8 pt-6">
+    <div className="space-y-5 px-5 pb-8 pt-6 print:max-w-none print:space-y-3 print:px-0 print:pt-0">
       <Toaster position="top-center" />
+      <div className="hidden print:block">
+        <p className="text-2xl font-extrabold">O Vanzeiro — Relatório</p>
+        <p className="text-lg">
+          {vanzeiro.nome}
+          {vanzeiro.cidade ? ` · ${vanzeiro.cidade} - ${vanzeiro.estado}` : ""}
+        </p>
+        <p className="text-lg font-bold">
+          {nomePeriodo(periodo)} ({dataBR(periodo.de)} a {dataBR(periodo.ate)})
+        </p>
+      </div>
       <Link
         to="/vanzeiro/mais"
-        className="inline-flex items-center gap-2 text-base font-semibold text-primary"
+        className="inline-flex items-center gap-2 text-base font-semibold text-primary print:hidden"
       >
         <ArrowLeft className="h-5 w-5" /> Voltar
       </Link>
-      <h1 className="text-3xl font-extrabold text-primary">Relatórios</h1>
+      <h1 className="text-3xl font-extrabold text-primary print:hidden">Relatórios</h1>
 
-      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 print:hidden">
         {PRESETS.map((p) => (
           <button key={p.id} className={chip(preset === p.id)} onClick={() => setPreset(p.id)}>
             {p.nome}
@@ -151,17 +192,19 @@ function Relatorios() {
         </p>
       ) : (
         <>
-          <p className="text-lg font-bold text-muted-foreground">{nomePeriodo(periodo)}</p>
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <p className="text-lg font-bold text-muted-foreground print:hidden">
+            {nomePeriodo(periodo)}
+          </p>
+          <div className="grid grid-cols-[repeat(3,minmax(0,1fr))] gap-2 text-center">
             <div className="rounded-2xl bg-success/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Recebido</p>
-              <p className="whitespace-nowrap text-base font-extrabold text-success">
+              <p className="break-words text-base font-extrabold text-success">
                 {brl(dados.rel.recebido)}
               </p>
             </div>
             <div className="rounded-2xl bg-destructive/10 p-3">
               <p className="text-sm font-bold text-muted-foreground">Gastos</p>
-              <p className="whitespace-nowrap text-base font-extrabold text-destructive">
+              <p className="break-words text-base font-extrabold text-destructive">
                 {brl(dados.rel.gastos)}
               </p>
             </div>
@@ -170,7 +213,7 @@ function Relatorios() {
             >
               <p className="text-sm font-bold text-muted-foreground">Lucro</p>
               <p
-                className={`whitespace-nowrap text-base font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
+                className={`break-words text-base font-extrabold ${dados.rel.lucro >= 0 ? "text-success" : "text-destructive"}`}
               >
                 {brl(dados.rel.lucro)}
               </p>
@@ -293,9 +336,43 @@ function Relatorios() {
             )}
           </section>
 
+          <section
+            aria-label="Exportar"
+            className="space-y-3 rounded-3xl bg-card p-5 shadow-sm print:hidden"
+          >
+            <h2 className="flex items-center gap-2 text-xl font-extrabold text-primary">
+              <FileSpreadsheet className="h-6 w-6 text-accent-strong" /> Exportar
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Planilhas (CSV) para o Excel ou o Planilhas Google, com o período escolhido acima. Bom
+              para mandar ao contador.
+            </p>
+            {(
+              [
+                ["recebimentos", "Planilha de recebimentos"],
+                ["gastos", "Planilha de gastos"],
+                ["resumo", "Planilha do resumo (van, linha, ocupação)"],
+              ] as const
+            ).map(([tipo, rotulo]) => (
+              <button
+                key={tipo}
+                onClick={() => void exportar(tipo)}
+                className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card px-3 text-center text-lg font-bold text-primary"
+              >
+                <FileSpreadsheet className="h-5 w-5 shrink-0" /> {rotulo}
+              </button>
+            ))}
+            <button
+              onClick={() => window.print()}
+              className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-card text-lg font-bold text-primary"
+            >
+              <Printer className="h-5 w-5" /> Imprimir ou salvar em PDF
+            </button>
+          </section>
+
           <button
             onClick={enviar}
-            className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-success text-lg font-extrabold text-success-foreground"
+            className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-success text-lg font-extrabold text-success-foreground print:hidden"
           >
             <Share2 className="h-6 w-6" /> Compartilhar relatório
           </button>
