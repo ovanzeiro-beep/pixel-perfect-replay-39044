@@ -2815,6 +2815,91 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 23,
+      "titulo": "Extra: avisos de que a van está chegando (sem banco)",
+      "status": "concluida",
+      "objetivo": "O vanzeiro avisa pelo WhatsApp que a van saiu ou está chegando, com a previsão da escala, e o passageiro vê quantas paradas faltam até a dele. Mapa ao vivo e push ficam documentados para a fase do banco.",
+      "checks": [
+        {
+          "d": "Textos dos avisos da van",
+          "tipo": "arquivo",
+          "arquivo": "src/data/avisosVan.ts"
+        },
+        {
+          "d": "Aviso 'chegando' sem inventar minutos",
+          "tipo": "contem",
+          "arquivo": "src/data/avisosVan.ts",
+          "regex": "horário combinado"
+        },
+        {
+          "d": "Ida: avisar o grupo que a van saiu",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Avisar o grupo que a van saiu"
+        },
+        {
+          "d": "Ida: avisar que está chegando",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Avisar: chegando"
+        },
+        {
+          "d": "Visão: quantas paradas faltam na ida",
+          "tipo": "contem",
+          "arquivo": "src/data/visaoPassageiro.ts",
+          "regex": "faltamParadasIda"
+        },
+        {
+          "d": "Passageiro vê quantas paradas faltam",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "para a sua"
+        },
+        {
+          "d": "Testes dos textos dos avisos",
+          "tipo": "arquivo",
+          "arquivo": "src/data/avisosVan.test.ts"
+        },
+        {
+          "d": "Teste: avisos pelo WhatsApp na ida",
+          "tipo": "contem",
+          "arquivo": "src/test/viagem-fluxo.test.tsx",
+          "regex": "avisos pelo WhatsApp durante a ida"
+        },
+        {
+          "d": "Teste: passageiro vê as paradas que faltam",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "a van está a caminho"
+        },
+        {
+          "d": "Análise: van ao vivo e push (fase do banco)",
+          "tipo": "arquivo",
+          "arquivo": "docs/VAN_AO_VIVO.md"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

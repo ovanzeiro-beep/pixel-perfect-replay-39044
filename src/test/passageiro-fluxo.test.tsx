@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { montarViagens } from "@/data/viagens";
@@ -281,5 +281,31 @@ describe("passageiro: depois do prazo", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe("passageiro: a van está a caminho", () => {
+  it("mostra quantas paradas faltam até a dele, e avisa quando a próxima é a dele", async () => {
+    let viagemId = "";
+    let terceiro = "";
+    let primeiroId = "";
+    const { store } = await abrir("/passageiro", (loja) => {
+      const e = loja.obterEstado();
+      const t = montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()).find(
+        (x) => !x.passada && !x.ajuste.cancelada && !x.ajuste.ida && x.vao.length >= 3,
+      )!;
+      viagemId = t.id;
+      primeiroId = t.vao[0]!;
+      terceiro = t.vao[2]!;
+      loja.iniciarIda(t.id, t.vao);
+      return terceiro;
+    });
+    expect(await screen.findByText(/A van está a caminho/)).toBeInTheDocument();
+    expect(screen.getByText("Faltam 2 paradas para a sua.")).toBeInTheDocument();
+
+    await act(async () => {
+      await store.marcarEmbarque(viagemId, primeiroId, "faltou");
+    });
+    expect(await screen.findByText("Faltam 1 parada para a sua.")).toBeInTheDocument();
   });
 });

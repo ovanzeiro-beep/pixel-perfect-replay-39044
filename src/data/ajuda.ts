@@ -28,6 +28,7 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
     passos: [
       "Em Viagens, toque na viagem do dia e depois em Iniciar viagem.",
       "A tela mostra a próxima parada. Toque em Google Maps ou Waze para navegar até o endereço.",
+      "Para avisar quem está esperando, toque em Avisar: chegando (abre o WhatsApp com a mensagem pronta para o próximo passageiro) ou em Avisar o grupo que a van saiu (manda a previsão de cada um de uma vez).",
       "Quando o passageiro entrar na van, toque em Embarcou. Se ele não apareceu, toque em Não apareceu.",
       "Depois da última parada, toque em Seguir para o destino e, ao chegar, em Chegamos ao destino!",
       "Na volta, marque quem foi entregue. No fim, toque em Encerrar viagem para guardar o resumo.",
@@ -111,6 +112,7 @@ export const AJUDA_PASSAGEIRO: TopicoAjuda[] = [
     passos: [
       "Cada viagem mostra o dia e o horário de saída.",
       "Também aparece o horário aproximado em que a van passa na sua parada.",
+      "Com a van a caminho, o cartão da viagem mostra quantas paradas faltam até a sua. O aviso de que ela está chegando vem do vanzeiro, pelo WhatsApp.",
       "Para qualquer dúvida, use Ligar ou WhatsApp, no fim da tela Início.",
     ],
   },

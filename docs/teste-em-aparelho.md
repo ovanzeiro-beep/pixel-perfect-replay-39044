@@ -56,6 +56,12 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Avisar que a van está chegando
+
+- [ ] Na ida, na próxima parada, toque em **Avisar: chegando**: abre o WhatsApp do passageiro com a mensagem pronta (com o horário combinado, sem "uns 5 minutos").
+- [ ] Toque em **Avisar o grupo que a van saiu**: abre o compartilhar (ou o WhatsApp) com a lista de quem ainda falta e o horário previsto de cada um. Quem já embarcou não aparece.
+- [ ] No celular do passageiro (se for o mesmo aparelho do teste): com a van a caminho, o cartão mostra "Faltam N paradas para a sua".
+
 ## Navegar com Waze ou Google Maps
 
 - [ ] Inicie uma viagem: na **próxima parada** aparecem os botões **Google Maps** e **Waze**. Toque em cada um: abre o app (ou o site) já com o endereço do passageiro.
