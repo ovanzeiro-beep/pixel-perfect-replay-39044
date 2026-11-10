@@ -4,12 +4,14 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens, responderViagemApp } from "@/data/repositorio";
+import { useFrota, useViagens, useVanzeiro, responderViagemApp } from "@/data/repositorio";
 import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
 import { prazoViagem } from "@/data/alertas";
+import { PrazoEncerrado } from "@/components/app/PrazoEncerrado";
 
 function MinhasViagens() {
   const { passageiros, linhas } = useFrota();
+  const vanzeiro = useVanzeiro();
   const passageiroId = usePassageiroId();
   const todasViagens = useViagens();
   const [aba, setAba] = useState<"proximas" | "anteriores">("proximas");
@@ -25,7 +27,10 @@ function MinhasViagens() {
     .sort((a, b) => b.data.localeCompare(a.data));
 
   const responder = (viagemId: string, vai: boolean) => {
-    responderViagemApp(p.id, viagemId, vai);
+    if (!responderViagemApp(p.id, viagemId, vai)) {
+      toast.error("O prazo para responder acabou. Fale com o vanzeiro.");
+      return;
+    }
     toast.success(vai ? "Confirmado!" : "Registrado.");
   };
 
@@ -94,7 +99,14 @@ function MinhasViagens() {
                       Lista de espera — posição {posEspera + 1}
                     </p>
                   )}
-                  {v.situacao !== "cancelada" && (
+                  {v.situacao !== "cancelada" && prazoViagem(v.data, new Date()).encerrado && (
+                    <PrazoEncerrado
+                      vanzeiro={vanzeiro}
+                      passageiro={p.nome}
+                      viagem={`${diaSemana(v.data)}, ${dataCurta(v.data)}`}
+                    />
+                  )}
+                  {v.situacao !== "cancelada" && !prazoViagem(v.data, new Date()).encerrado && (
                     <div className="flex gap-2">
                       <button
                         onClick={() => responder(v.id, true)}

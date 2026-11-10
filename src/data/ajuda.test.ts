@@ -61,6 +61,7 @@ describe("a ajuda cita só botões que existem nas telas", () => {
     "Restaurar de um backup",
     "Copiar chave Pix",
     "Avisar que paguei",
+    "Falar com o vanzeiro",
     "Google Maps",
     "Waze",
     "Instalar agora",

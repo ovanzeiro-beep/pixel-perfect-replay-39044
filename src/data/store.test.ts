@@ -264,3 +264,50 @@ describe("histórico de exemplo", () => {
     expect(depois.some((i) => JSON.stringify(i.ida).includes(`"${pid}"`))).toBe(false);
   });
 });
+
+describe("prazo de confirmação do passageiro", () => {
+  const PID = "p1";
+  const OUTRO = "p2";
+  const vazio: Ajuste = { respostas: {}, espera: [], extras: [] };
+  const comRelogio = (quando: string, f: () => void) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(quando));
+    try {
+      f();
+    } finally {
+      vi.useRealTimers();
+    }
+  };
+
+  it("antes do prazo o passageiro responde e a resposta é gravada", () => {
+    comRelogio("2026-11-10T12:00:00", () => {
+      s.ajustarViagem("l1_2026-11-11", vazio);
+      expect(s.responderViagemApp("p1", "l1_2026-11-11", true)).toBe(true);
+      expect(s.obterEstado().ajustes["l1_2026-11-11"]!.respostas[PID]).toBe("vai");
+      expect(s.responderViagemApp("p1", "l1_2026-11-11", false)).toBe(true);
+      expect(s.obterEstado().ajustes["l1_2026-11-11"]!.respostas[PID]).toBe("nao");
+    });
+  });
+
+  it("depois do prazo (20h da véspera) ele não muda mais, e nada é gravado", () => {
+    comRelogio("2026-11-10T20:00:00", () => {
+      s.ajustarViagem("l1_2026-11-11", { ...vazio, respostas: { p1: "vai" } });
+      expect(s.responderViagemApp("p1", "l1_2026-11-11", false)).toBe(false);
+      expect(s.obterEstado().ajustes["l1_2026-11-11"]!.respostas[PID]).toBe("vai");
+      expect(s.responderViagemApp("p2", "l1_2026-11-11", true)).toBe(false);
+      expect(s.obterEstado().ajustes["l1_2026-11-11"]!.respostas[OUTRO]).toBeUndefined();
+    });
+  });
+
+  it("o vanzeiro continua podendo ajustar a resposta depois do prazo", () => {
+    comRelogio("2026-11-10T21:00:00", () => {
+      s.ajustarViagem("l1_2026-11-11", { ...vazio, respostas: { p1: "nao" } });
+      s.ajustarViagem("l1_2026-11-11", { ...vazio, respostas: { p1: "vai" } });
+      expect(s.obterEstado().ajustes["l1_2026-11-11"]!.respostas[PID]).toBe("vai");
+    });
+  });
+
+  it("viagem que não existe devolve false", () => {
+    expect(s.responderViagemApp("p1", "l1_2099-01-01", true)).toBe(false);
+  });
+});

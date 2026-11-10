@@ -88,7 +88,8 @@ export interface Escrita {
   // --- Viagens
   /** Grava o ajuste de uma viagem (respostas, van/motorista da viagem, ida, volta, cancelamento). */
   ajustarViagem(viagemId: string, ajuste: Ajuste): void;
-  responderViagemApp(passageiroId: string, viagemId: string, vai: boolean): void;
+  /** Devolve `false` se o prazo de confirmação já acabou (o passageiro não muda mais; o vanzeiro ajusta em `ajustarViagem`). */
+  responderViagemApp(passageiroId: string, viagemId: string, vai: boolean): boolean;
   confirmarParadaApp(passageiroId: string, viagemId: string): void;
   responderVoltaApp(passageiroId: string, viagemId: string, naVan: boolean, motivo?: string): void;
 

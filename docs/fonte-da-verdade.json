@@ -2287,6 +2287,87 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 17,
+      "titulo": "Extra: regra do prazo de confirmação",
+      "status": "concluida",
+      "objetivo": "Depois do prazo (20h da véspera) o passageiro não muda mais a resposta pelo app; o vanzeiro continua podendo ajustar. A regra vale na gravação dos dados, não só na tela.",
+      "checks": [
+        {
+          "d": "Dados: resposta do passageiro recusada depois do prazo",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "prazoViagem\\(data, new Date\\(\\)\\)\\.encerrado\\) return false"
+        },
+        {
+          "d": "Contrato: devolve false depois do prazo",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "vai: boolean\\): boolean"
+        },
+        {
+          "d": "Tela de aviso do prazo encerrado",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/PrazoEncerrado.tsx"
+        },
+        {
+          "d": "Passageiro (viagens): sem botões depois do prazo",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.viagens.tsx",
+          "regex": "<PrazoEncerrado"
+        },
+        {
+          "d": "Passageiro (início): sem botões depois do prazo",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.index.tsx",
+          "regex": "<PrazoEncerrado"
+        },
+        {
+          "d": "Testes dos dados (antes, depois e vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/data/store.test.ts",
+          "regex": "prazo de confirmação do passageiro"
+        },
+        {
+          "d": "Teste da tela depois do prazo",
+          "tipo": "contem",
+          "arquivo": "src/test/passageiro-fluxo.test.tsx",
+          "regex": "passageiro: depois do prazo"
+        },
+        {
+          "d": "Regra registrada no guia do banco",
+          "tipo": "contem",
+          "arquivo": "docs/MIGRACAO_BANCO.md",
+          "regex": "Prazo de confirmação"
+        },
+        {
+          "d": "Ajuda explica o prazo ao motorista",
+          "tipo": "contem",
+          "arquivo": "src/data/ajuda.ts",
+          "regex": "Só o vanzeiro consegue mudar depois do prazo"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

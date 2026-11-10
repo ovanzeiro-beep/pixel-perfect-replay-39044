@@ -17,6 +17,7 @@ import { isoDe } from "@/data/cobrancas";
 import { diaSemana, dataCurta, horarioNaParada, type Viagem } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
 import { prazoViagem } from "@/data/alertas";
+import { PrazoEncerrado } from "@/components/app/PrazoEncerrado";
 import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 
 const MOTIVOS_VOLTA = [
@@ -271,7 +272,10 @@ function InicioPassageiro() {
 
   const responder = (vai: boolean) => {
     if (!proxima) return;
-    responderViagemApp(p.id, proxima.id, vai);
+    if (!responderViagemApp(p.id, proxima.id, vai)) {
+      toast.error("O prazo para responder acabou. Fale com o vanzeiro.");
+      return;
+    }
     toast.success(vai ? "Confirmado! Você vai." : "Registrado. Você não vai.");
   };
 
@@ -335,7 +339,18 @@ function InicioPassageiro() {
                   )}
 
                 {!proxima.passada &&
-                  (resposta === "sem" || resposta === "vai" || resposta === "nao") && (
+                  (resposta === "sem" || resposta === "vai" || resposta === "nao") &&
+                  prazoViagem(proxima.data, new Date()).encerrado && (
+                    <PrazoEncerrado
+                      vanzeiro={vanzeiro}
+                      passageiro={p.nome}
+                      viagem={`${diaSemana(proxima.data)}, ${dataCurta(proxima.data)}`}
+                    />
+                  )}
+
+                {!proxima.passada &&
+                  (resposta === "sem" || resposta === "vai" || resposta === "nao") &&
+                  !prazoViagem(proxima.data, new Date()).encerrado && (
                     <div className="flex gap-3">
                       <button
                         onClick={() => responder(true)}

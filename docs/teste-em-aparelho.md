@@ -67,6 +67,12 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] Motorista: Mais → **Como usar o app**. Os assuntos abrem e fecham ao tocar. Siga "Fazer uma viagem" com uma viagem de verdade e veja se cada passo bate com o que a tela mostra.
 - [ ] Passageiro: Meu perfil → **Como usar o app**. Peça a uma pessoa que nunca usou para tentar responder uma viagem **só lendo a ajuda**. Anote onde ela travou.
 
+## Prazo de confirmação
+
+- [ ] Passageiro, **antes do prazo** (até 20h da véspera): "Vou" e "Não vou" funcionam e dá para mudar a resposta.
+- [ ] Passageiro, **depois do prazo**: os botões somem, aparece "O prazo para responder acabou" e **Falar com o vanzeiro** abre o WhatsApp com a mensagem pronta.
+- [ ] Vanzeiro, **depois do prazo**: abra a viagem, toque no nome do passageiro e escolha Vai ou Não vai. Salva normalmente.
+
 ## Tamanho da letra
 
 - [ ] Perfil → **Tamanho da letra** → "Muito grande": a letra de todo o app aumenta na hora. Navegue por Viagens, Passageiros, Dinheiro, Gastos, Relatórios e Histórico: **nada corta nem aparece rolagem para o lado**.

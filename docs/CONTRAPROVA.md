@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:55 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 02:01 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -21,3 +21,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:55 UTC.
 | 14 — Extra: revisão de clareza das telas | concluida | 7/7 | OK |
 | 15 — Extra: navegar com Waze ou Google Maps | concluida | 10/10 | OK |
 | 16 — Extra: acabamento final (telas pequenas, textos, ajuda e segurança) | concluida | 13/13 | OK |
+| 17 — Extra: regra do prazo de confirmação | concluida | 9/9 | OK |
