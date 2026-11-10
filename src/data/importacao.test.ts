@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { csv } from "./exportacao";
+import type { Passageiro } from "./tipos";
 import {
   analisarImportacao,
   formatarTelefone,
   lerForma,
   lerTabela,
   lerValor,
+  linhasDePassageiros,
   mapearColunas,
   modeloDeImportacao,
   type Contexto,
@@ -172,5 +175,77 @@ describe("analisarImportacao", () => {
     const { itens } = analisar(modeloDeImportacao());
     expect(itens.length).toBeGreaterThan(0);
     expect(itens.filter((i) => i.situacao === "erro")).toEqual([]);
+  });
+});
+
+describe("exportar passageiros", () => {
+  const base = {
+    endereco: "Rua A",
+    numero: "10",
+    bairro: "Centro",
+    cidade: "Londrina",
+    referencia: "",
+    emergenciaNome: "",
+    emergenciaTelefone: "",
+    observacoes: 'diz "oi"; ok',
+    convite: "nao_enviado",
+    emAberto: 0,
+    ultimoPagamento: "",
+  };
+  const lista = [
+    {
+      ...base,
+      id: "p2",
+      nome: "Zé",
+      telefone: "(43) 99999-0002",
+      linhaIds: ["l1", "l2"],
+      formaPagamento: "semanal",
+      valor: 50,
+      vencimento: "sexta",
+      ativo: false,
+    },
+    {
+      ...base,
+      id: "p1",
+      nome: "Ana",
+      telefone: "(43) 99999-0003",
+      linhaIds: ["l1"],
+      formaPagamento: "mensal",
+      valor: 220.5,
+      vencimento: "10",
+      ativo: true,
+    },
+  ] as unknown as Passageiro[];
+
+  it("ordena por nome e usa as colunas da importação", () => {
+    const l = linhasDePassageiros(lista, ctx.linhas);
+    expect(l[0]!.slice(0, 3)).toEqual(["Nome", "Telefone", "Endereço"]);
+    expect(l.slice(1).map((r) => r[0])).toEqual(["Ana", "Zé"]);
+    expect(l[2]![7]).toBe("Manhã Centro / Tarde Escola");
+    expect(l[2]![14]).toBe("Inativo");
+  });
+
+  it("o arquivo exportado volta pela importação sem perder nada", () => {
+    const { itens, colunas } = analisarImportacao(
+      lerTabela(csv(linhasDePassageiros(lista, ctx.linhas))),
+      {
+        ...ctx,
+        existentes: [],
+      },
+    );
+    expect(colunas.ignoradas).toEqual(["Situação"]);
+    expect(itens.map((i) => i.situacao)).toEqual(["novo", "novo"]);
+    expect(itens[0]!.dados).toMatchObject({
+      nome: "Ana",
+      valor: 220.5,
+      vencimento: "10",
+      linhaIds: ["l1"],
+      observacoes: 'diz "oi"; ok',
+    });
+    expect(itens[1]!.dados).toMatchObject({
+      formaPagamento: "semanal",
+      vencimento: "sexta",
+      linhaIds: ["l1", "l2"],
+    });
   });
 });

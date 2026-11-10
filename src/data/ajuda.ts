@@ -10,7 +10,7 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
       "Cadastre a sua van em Mais → Vans e o motorista em Mais → Motoristas.",
       "Crie a sua linha em Mais → Linhas: nome, dias da semana, horário de saída e volta, cidades do trajeto e destino.",
       "Cadastre os passageiros em Passageiros → Novo passageiro e escolha a linha de cada um.",
-      "Já tem os passageiros numa planilha? Em Passageiros, toque em Importar de planilha, escolha o arquivo CSV (ou cole o texto copiado) e confira antes de importar.",
+      "Já tem os passageiros numa planilha? Em Passageiros, toque em Importar de planilha, escolha o arquivo CSV (ou cole o texto copiado) e confira antes de importar. Para levar a lista para o Excel (ou guardar uma cópia), toque em Exportar para planilha.",
       "Depois é só acompanhar as viagens na aba Início e na aba Viagens.",
     ],
   },

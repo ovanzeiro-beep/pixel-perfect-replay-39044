@@ -69,6 +69,7 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] Passageiros → **Importar de planilha** → **Baixar planilha de exemplo**. Abra no Excel ou Planilhas Google: colunas separadas e acentos certos.
 - [ ] Troque os nomes e telefones por passageiros de teste, salve como **CSV** e escolha o arquivo no app (ou cole o texto copiado da planilha).
 - [ ] A conferência mostra **quantos estão prontos, quantos já cadastrados e quantos precisam de correção**, com o motivo de cada linha.
+- [ ] Passageiros → **Exportar para planilha**: o arquivo abre no Excel com todos os passageiros, acentos certos e valores como número. Esse mesmo arquivo pode ser importado de volta.
 - [ ] Toque em **Importar N passageiros**: eles aparecem na lista, sem convite enviado. Importar **o mesmo arquivo de novo** não duplica ninguém.
 
 ## Leitura e telas vazias

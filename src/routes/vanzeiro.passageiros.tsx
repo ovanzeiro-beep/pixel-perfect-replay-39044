@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock,
   Copy,
+  Download,
   FileSpreadsheet,
   MapPin,
   MessageCircle,
@@ -19,6 +20,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { csv } from "@/data/exportacao";
+import { linhasDePassageiros } from "@/data/importacao";
+import { salvarArquivo } from "@/lib/compartilhar";
 import { linkConvite } from "@/lib/convite";
 import {
   useFrota,
@@ -162,6 +166,22 @@ function Passageiros() {
   const aberto = passageiros.find((p) => p.id === abertoId);
   const convidar = passageiros.find((p) => p.id === perguntarConvite);
 
+  const exportar = async () => {
+    const r = await salvarArquivo(
+      "vanzeiro-passageiros.csv",
+      csv(linhasDePassageiros(passageiros, linhas)),
+      {
+        tipo: "text/csv;charset=utf-8",
+      },
+    );
+    if (r === "cancelado") return;
+    toast.success(
+      r === "compartilhado"
+        ? "Planilha enviada"
+        : "Planilha baixada. Abra no Excel ou no Planilhas Google.",
+    );
+  };
+
   const enviarConvite = (p: Passageiro) => {
     const msg = mensagemConvite(p.nome.split(" (")[0]!, vanzeiro.nome, linkConvite(p.id));
     window.open(`${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(msg)}`, "_blank");
@@ -184,6 +204,15 @@ function Passageiros() {
         >
           <FileSpreadsheet className="h-5 w-5" /> Importar de planilha
         </button>
+        {passageiros.length > 0 && (
+          <button
+            type="button"
+            onClick={() => void exportar()}
+            className="flex min-h-12 w-full items-center justify-center gap-2 text-base font-bold text-primary underline"
+          >
+            <Download className="h-5 w-5" /> Exportar para planilha
+          </button>
+        )}
       </div>
 
       <div className="relative mt-4">

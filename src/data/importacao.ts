@@ -1,6 +1,6 @@
 // Importar passageiros de uma planilha (CSV) ou de um texto colado do Excel / Planilhas Google.
 // Tudo é conferido ANTES de gravar: o vanzeiro vê o que vai entrar, o que já existe e o que precisa de conserto.
-import { csv } from "./exportacao";
+import { csv, type Celula } from "./exportacao";
 import { telefoneValido } from "../lib/validacao";
 import type { FormaPagamento, Linha, Passageiro } from "./tipos";
 
@@ -404,3 +404,42 @@ export const modeloDeImportacao = () =>
       "Leva uma mala grande",
     ],
   ]);
+
+const FORMA_POR_EXTENSO: Record<FormaPagamento, string> = {
+  por_viagem: "Por viagem",
+  semanal: "Semanal",
+  mensal: "Mensal",
+};
+
+/**
+ * Passageiros em linhas de planilha, com as mesmas colunas da importação
+ * (o arquivo exportado pode ser importado de volta). A coluna "Situação" é só informativa.
+ */
+export function linhasDePassageiros(
+  passageiros: Passageiro[],
+  linhas: Pick<Linha, "id" | "nome">[],
+): Celula[][] {
+  const nomeDaLinha = (id: string) => linhas.find((l) => l.id === id)?.nome ?? "";
+  return [
+    [...Object.values(NOME_DO_CAMPO), "Situação"],
+    ...[...passageiros]
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
+      .map((p) => [
+        p.nome,
+        p.telefone,
+        p.endereco,
+        p.numero ?? "",
+        p.bairro ?? "",
+        p.cidade,
+        p.referencia ?? "",
+        p.linhaIds.map(nomeDaLinha).filter(Boolean).join(" / "),
+        FORMA_POR_EXTENSO[p.formaPagamento],
+        p.valor,
+        p.vencimento ?? "",
+        p.emergenciaNome ?? "",
+        p.emergenciaTelefone ?? "",
+        p.observacoes ?? "",
+        p.ativo ? "Ativo" : "Inativo",
+      ]),
+  ];
+}

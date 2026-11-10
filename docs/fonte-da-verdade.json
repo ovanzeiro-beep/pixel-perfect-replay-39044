@@ -3481,6 +3481,57 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 30,
+      "titulo": "Extra: exportar passageiros para planilha",
+      "status": "concluida",
+      "objetivo": "Baixar ou compartilhar a lista de passageiros em CSV, com as mesmas colunas da importação, para o Excel e para guardar cópia.",
+      "checks": [
+        {
+          "d": "Linhas da planilha de passageiros",
+          "tipo": "contem",
+          "arquivo": "src/data/importacao.ts",
+          "regex": "export function linhasDePassageiros"
+        },
+        {
+          "d": "Botão Exportar para planilha",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Exportar para planilha"
+        },
+        {
+          "d": "Arquivo exportado volta pela importação",
+          "tipo": "contem",
+          "arquivo": "src/data/importacao.test.ts",
+          "regex": "volta pela importação"
+        },
+        {
+          "d": "Testes da tela",
+          "tipo": "arquivo",
+          "arquivo": "src/test/importacao-fluxo.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
