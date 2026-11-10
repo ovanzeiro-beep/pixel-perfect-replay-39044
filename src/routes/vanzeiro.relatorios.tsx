@@ -144,7 +144,7 @@ function Relatorios() {
       </div>
       <Link
         to="/vanzeiro/mais"
-        className="inline-flex items-center gap-2 text-base font-semibold text-primary print:hidden"
+        className="inline-flex min-h-11 items-center gap-2 text-base font-semibold text-primary print:hidden"
       >
         <ArrowLeft className="h-5 w-5" /> Voltar
       </Link>

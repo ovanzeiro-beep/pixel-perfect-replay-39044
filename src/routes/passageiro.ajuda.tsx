@@ -22,7 +22,7 @@ export const Route = createFileRoute("/passageiro/ajuda")({
     <div className="px-5 pt-6">
       <Link
         to="/passageiro/perfil"
-        className="mb-4 inline-flex items-center gap-2 text-base font-semibold text-primary"
+        className="mb-4 inline-flex min-h-11 items-center gap-2 text-base font-semibold text-primary"
       >
         <ArrowLeft className="h-5 w-5" /> Voltar
       </Link>

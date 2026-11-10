@@ -175,6 +175,7 @@ function Passageiros() {
         <input
           className={`${campoClasse} pl-12`}
           placeholder="Buscar por nome"
+          aria-label="Buscar passageiro por nome"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />
