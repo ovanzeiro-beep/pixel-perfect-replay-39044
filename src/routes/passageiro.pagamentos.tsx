@@ -60,7 +60,7 @@ function Pagamentos() {
     <div className="px-5 pb-6 pt-6 space-y-5">
       <Toaster position="top-center" />
       <h1 className="text-3xl font-extrabold text-primary">Pagamentos</h1>
-      <AvisosPassageiro />
+      <AvisosPassageiro so="pagamento" />
 
       <div className="rounded-3xl bg-card p-5 shadow-sm space-y-4">
         {totalAberto > 0 ? (

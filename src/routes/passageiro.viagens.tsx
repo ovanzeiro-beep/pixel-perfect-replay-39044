@@ -7,7 +7,6 @@ import { usePassageiroId } from "@/data/sessao";
 import { useFrota, useViagens, responderViagemApp } from "@/data/repositorio";
 import { diaSemana, dataCurta, horarioNaParada } from "@/data/viagens";
 import { prazoViagem } from "@/data/alertas";
-import { AvisosPassageiro } from "@/components/app/AvisosPassageiro";
 
 function MinhasViagens() {
   const { passageiros, linhas } = useFrota();
@@ -34,9 +33,7 @@ function MinhasViagens() {
     <div className="px-5 pb-6 pt-6">
       <Toaster position="top-center" />
       <h1 className="text-3xl font-extrabold text-primary">Minhas viagens</h1>
-      <div className="mt-3">
-        <AvisosPassageiro />
-      </div>
+      <div className="mt-3"></div>
 
       <div className="mt-5 flex gap-2 rounded-2xl bg-muted p-1">
         <button
