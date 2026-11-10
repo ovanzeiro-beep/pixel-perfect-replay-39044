@@ -1,5 +1,5 @@
 // Regras das viagens: geração a partir das linhas, lotação e lista de espera.
-import type { Linha, Passageiro, Van } from "./store";
+import type { Linha, Passageiro, Van } from "./tipos";
 
 export type Resposta = "vai" | "nao" | "sem" | "espera";
 export type Ajuste = {

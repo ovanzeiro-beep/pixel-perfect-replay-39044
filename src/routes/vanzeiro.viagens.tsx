@@ -179,7 +179,6 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
   const [trocar, setTrocar] = useState(false);
   const [cancelar, setCancelar] = useState(false);
   const [avisarCancel, setAvisarCancel] = useState(false);
-  const [construcao, setConstrucao] = useState(false);
 
   const linha = linhas.find((l) => l.id === v.linhaId);
   const van = vans.find((x) => x.id === v.vanId);
@@ -474,18 +473,6 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
             })}
           </ul>
         </Painel>
-      )}
-
-      {construcao && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">
-          <div className="w-full max-w-md space-y-3 rounded-3xl bg-card p-6 text-center">
-            <p className="text-xl font-extrabold">Em construção</p>
-            <p className="text-lg text-muted-foreground">
-              Iniciar a viagem chega nas próximas etapas.
-            </p>
-            <BotaoGrande onClick={() => setConstrucao(false)}>Entendi</BotaoGrande>
-          </div>
-        </div>
       )}
     </Painel>
   );

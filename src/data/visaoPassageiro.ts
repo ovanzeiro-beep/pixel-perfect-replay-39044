@@ -1,7 +1,7 @@
 // O que UM passageiro pode ver. É a "fatia" do estado que pertence a ele: com banco, é isto (e só isto)
 // que o servidor entrega ao passageiro. Nenhum dado de outro passageiro entra aqui.
 import type { Cobranca, Recibo } from "./cobrancas";
-import type { Estado, Linha, Passageiro } from "./store";
+import type { Estado, Linha, Passageiro } from "./tipos";
 import {
   montarViagens,
   type Entrega,

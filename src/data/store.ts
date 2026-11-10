@@ -1,6 +1,7 @@
 // Guarda todos os dados do app. Ficam salvos no aparelho (localStorage) e "Restaurar exemplo" volta ao início.
 import { useMemo, useSyncExternalStore } from "react";
 import { prazoViagem } from "./alertas";
+import { marcarNaoSalvou } from "./gravacao";
 import {
   opCancelarViagem,
   opChamadaNaParada,
@@ -40,8 +41,6 @@ import {
   passageiros as passageirosIniciais,
   detalhesPassageiros,
   cobrancasEmAberto,
-  type DetalhePassageiro,
-  type FormaPagamento,
   detalheVazio,
   exemploViagens,
   cobrancasExemplo,
@@ -77,17 +76,17 @@ import {
   type StatusVolta,
 } from "./viagens";
 import { semearHistorico } from "./historico";
+import {
+  DIAS,
+  TIPOS_LINHA,
+  type Estado,
+  type Linha,
+  type Motorista,
+  type Passageiro,
+  type PerfilVanzeiro,
+  type Van,
+} from "./tipos";
 
-export const TIPOS_LINHA = ["Visita", "Faculdade", "Escolar", "Excursão", "Outro"] as const;
-export const DIAS = [
-  { id: "seg", curto: "Seg" },
-  { id: "ter", curto: "Ter" },
-  { id: "qua", curto: "Qua" },
-  { id: "qui", curto: "Qui" },
-  { id: "sex", curto: "Sex" },
-  { id: "sab", curto: "Sáb" },
-  { id: "dom", curto: "Dom" },
-] as const;
 const DIA_NOME: Record<string, string> = {
   segunda: "seg",
   terça: "ter",
@@ -96,84 +95,6 @@ const DIA_NOME: Record<string, string> = {
   sexta: "sex",
   sábado: "sab",
   domingo: "dom",
-};
-
-export type Linha = {
-  id: string;
-  nome: string;
-  tipo: (typeof TIPOS_LINHA)[number];
-  frequencia: "semanal" | "unica";
-  dias: string[];
-  data: string;
-  saida: string;
-  volta: string;
-  paradas: string[];
-  destino: string;
-  vanId: string;
-  motoristaId: string;
-  valorViagem: number | null;
-  valorMensal: number | null;
-  ativa: boolean;
-  observacoes: string;
-};
-export type Passageiro = {
-  id: string;
-  nome: string;
-  telefone: string;
-  endereco: string;
-  cidade: string;
-  linhaIds: string[];
-  formaPagamento: FormaPagamento;
-  valor: number;
-  emAberto: number;
-  ativo: boolean;
-} & DetalhePassageiro;
-export const estaDevendo = (p: Passageiro) => p.emAberto > 0;
-
-export type Van = {
-  id: string;
-  apelido: string;
-  modelo: string;
-  placa: string;
-  lugares: number;
-  ano: number | null;
-  cor: string;
-  motoristaId: string;
-  situacao: "rodando" | "manutencao";
-  observacoes: string;
-};
-export type Motorista = {
-  id: string;
-  nome: string;
-  telefone: string;
-  cnh: string;
-  cnhValidade: string;
-  proprio: boolean;
-  vanId?: string;
-};
-
-/** Dados do próprio vanzeiro (quem usa o app). `configurado` fica falso até o primeiro acesso ser concluído. */
-export type PerfilVanzeiro = {
-  nome: string;
-  cidade: string;
-  estado: string;
-  telefone: string;
-  email: string;
-  configurado: boolean;
-};
-
-export type Estado = {
-  perfil: PerfilVanzeiro;
-  vans: Van[];
-  motoristas: Motorista[];
-  linhas: Linha[];
-  passageiros: Passageiro[];
-  ajustes: Record<string, Ajuste>;
-  cobrancas: Cobranca[];
-  recibos: Recibo[];
-  chavePix: string;
-  gastos: Gasto[];
-  alertasDispensados: Record<string, string>;
 };
 
 const perfilDoExemplo = (): PerfilVanzeiro => ({
@@ -470,6 +391,7 @@ export function iniciarPersistencia(): () => void {
   const armazem = armazenamentoLocal();
   if (!armazem) {
     set(criarEstadoVazio());
+    marcarNaoSalvou(true);
     marcarProntos();
     return () => {};
   }
@@ -489,26 +411,48 @@ export function iniciarPersistencia(): () => void {
   }
   marcarProntos();
   let timer: ReturnType<typeof setTimeout> | undefined;
+  // `sujo`: há mudança ainda não guardada. Sem ela, uma janela parada (com dado velho) não sobrescreve a outra.
+  let sujo = false;
+  // Mudança que veio de outra janela do app: só mostra, não guarda de volta (evita um ficar "devolvendo" ao outro).
+  let aplicandoDeFora = false;
   const gravarAgora = () => {
     clearTimeout(timer);
     timer = undefined;
-    gravar(armazem, estado);
+    if (!sujo) return;
+    sujo = false;
+    marcarNaoSalvou(!gravar(armazem, estado));
     salvarMeta();
   };
   const aoOcultar = () => {
     if (document.visibilityState === "hidden") gravarAgora();
   };
   const desassinar = assinar(() => {
+    if (aplicandoDeFora) return;
+    sujo = true;
     registrarAlteracao();
     clearTimeout(timer);
     timer = setTimeout(gravarAgora, 250);
   });
+  // O app instalado e o navegador (ou duas abas) compartilham os mesmos dados: quando um muda, o outro acompanha.
+  const aoMudarDeFora = (e: StorageEvent) => {
+    if (e.key !== CHAVE) return;
+    const novo = ler(armazem, ehEstado);
+    if (!novo) return;
+    aplicandoDeFora = true;
+    try {
+      set(normalizarEstado(novo));
+    } finally {
+      aplicandoDeFora = false;
+    }
+  };
   window.addEventListener("pagehide", gravarAgora);
+  window.addEventListener("storage", aoMudarDeFora);
   document.addEventListener("visibilitychange", aoOcultar);
   return () => {
     if (timer) gravarAgora();
     desassinar();
     window.removeEventListener("pagehide", gravarAgora);
+    window.removeEventListener("storage", aoMudarDeFora);
     document.removeEventListener("visibilitychange", aoOcultar);
     persistenciaAtiva = false;
   };

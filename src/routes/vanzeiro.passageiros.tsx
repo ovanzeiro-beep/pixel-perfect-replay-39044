@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { type FormaPagamento } from "@/data/exemplo";
 import { linkConvite } from "@/lib/convite";
 import {
   useFrota,
@@ -26,6 +25,7 @@ import {
   excluirPassageiro,
   estaDevendo,
   DIAS,
+  type FormaPagamento,
   type Passageiro,
   type Linha,
   useVanzeiro,

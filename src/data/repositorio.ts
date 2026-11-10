@@ -11,13 +11,21 @@
  */
 import * as mock from "./store";
 import { escrever } from "./gravacao";
-import type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van } from "./store";
+import type {
+  Estado,
+  FormaPagamento,
+  Linha,
+  Motorista,
+  Passageiro,
+  PerfilVanzeiro,
+  Van,
+} from "./tipos";
 import type { Forma, Recibo } from "./cobrancas";
 import type { Gasto } from "./financeiro";
 import type { StatusVolta, Viagem } from "./viagens";
 import type { ConvitePreview, VisaoPassageiro } from "./visaoPassageiro";
 
-export type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van };
+export type { Estado, FormaPagamento, Linha, Motorista, Passageiro, PerfilVanzeiro, Van };
 export type {
   ConvitePreview,
   MinhaIda,
@@ -26,7 +34,7 @@ export type {
   VisaoPassageiro,
 } from "./visaoPassageiro";
 // Regras e listas de domínio (não são acesso a dados): continuam saindo do mesmo lugar para as telas.
-export { TIPOS_LINHA, DIAS, estaDevendo } from "./store";
+export { TIPOS_LINHA, DIAS, estaDevendo } from "./tipos";
 
 /** Novo cadastro (sem `id`) ou edição (com `id`). */
 type Salvar<T, Fora extends PropertyKey = never> = Omit<T, Fora | "id"> & {

@@ -72,10 +72,10 @@ Feita em 10/11/2026 sobre a `main` (etapa 18, `08215df`). Objetivo: achar erros,
 - [x] P0-2 Operações pequenas de viagem no contrato, no mock e nas telas. *(feito, etapa 20)*
 - [x] P0-4 Operação única "embarque + cobrança" (e a equivalente da volta). *(feito, etapa 20)*
 - [x] P0-3 Contrato assíncrono, com estados de salvando e erro nas telas. *(feito, etapa 21)*
-- [ ] P1-6 Tipos em `tipos.ts`.
-- [ ] P1-7 Testes de tela da viagem (ida, volta, resumo), do financeiro e dos cadastros.
-- [ ] P1-8 Aviso quando não conseguir gravar e sincronia entre janelas (modo demonstração).
-- [ ] Rodar `npm run conferir` e a suíte de contrato contra o mock já no formato final.
+- [x] P1-6 Tipos em `tipos.ts`. *(feito, etapa 22)*
+- [x] P1-7 Testes de tela da viagem (ida, volta, resumo), do financeiro e dos cadastros. *(feito, etapa 22)*
+- [x] P1-8 Aviso quando não conseguir gravar e sincronia entre janelas (modo demonstração). *(feito, etapa 22)*
+- [x] Rodar `npm run conferir` e a suíte de contrato contra o mock já no formato final. *(feito, etapa 22: 23 de 23 etapas OK)*
 
 **No dia do banco (com o Lovable)**
 - [ ] Decidir os pontos da seção "Decisões suas" abaixo.
@@ -128,3 +128,9 @@ Os passos 1 a 3 e 6 são os de maior risco e os que mais valem fazer **antes** d
 - **Bug achado e corrigido no caminho:** em conta nova (sem os dados de exemplo), uma viagem sem registro gravado **não aceitava a resposta do passageiro** (a gravação era descartada). Agora a viagem é reconhecida pela linha e pelo dia, e o registro nasce na primeira escrita (há teste).
 - **Falta:** passo 6 (contrato assíncrono), passos 4, 5, 7 e 8 (tipos neutros, testes de tela, falha ao gravar, contraprova final) e a tela "Qual é o seu nome?" (P0-5, com o login real).
 - **Etapa 21 (feita):** passo 6. Todas as escritas do contrato devolvem `Promise`; as telas esperam o resultado; falha vira aviso ("Não foi possível salvar") e há indicador "Salvando…"; formulários de dinheiro e de passageiro não deixam clicar duas vezes. Uma regra de lint (`no-misused-promises`) impede esquecer o `await` numa condição.
+- **Etapa 22 (feita):** passos 4, 5, 7 e 8.
+  - **Tipos neutros:** `src/data/tipos.ts` guarda os tipos e as regras de domínio. O mock, o futuro banco e as telas usam os mesmos. Testes impedem que módulos de dados importem o store e que telas importem os dados de exemplo (uma tela importava `FormaPagamento` do arquivo de exemplo).
+  - **Testes de tela:** viagem completa (ida, parada, quem fica na parada, volta, entrega em outro lugar, desfazer, encerrar), resumo com dinheiro, financeiro, vans, motoristas, gastos e pagamento. Cobertura geral de linhas 67% → 79%; `VoltaViagem` 2% → 76%, `ParadaCaminho` 3% → 76%, `ResumoViagem` 0% → 72%, `Financeiro` 0% → 89%.
+  - **Falha ao guardar neste aparelho:** o app avisa "Seus dados não estão sendo salvos" (com atalho para backup). **Duas janelas** (app instalado e navegador) agora acompanham uma à outra, e uma janela parada não sobrescreve a outra.
+  - **Código morto removido:** dois avisos "Em construção" que nunca apareciam.
+- **Falta só o que depende do banco:** P0-5 (login real, convite com token, fim da tela "Qual é o seu nome?"), P1-9 a P1-11 (prazo no servidor, offline, LGPD) e os itens "No dia do banco".

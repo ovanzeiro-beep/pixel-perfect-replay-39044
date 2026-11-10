@@ -2,7 +2,7 @@
 // Tudo fica no aparelho; o arquivo é que pode ser guardado fora (WhatsApp, Drive, Arquivos).
 import { useSyncExternalStore } from "react";
 import { armazenamentoLocal } from "./persistencia";
-import type { Estado } from "./store";
+import type { Estado } from "./tipos";
 
 export const FORMATO_BACKUP = 1;
 export const APP_BACKUP = "o-vanzeiro";

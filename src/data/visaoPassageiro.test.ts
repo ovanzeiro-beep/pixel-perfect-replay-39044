@@ -1,7 +1,8 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { criarEstadoExemplo, type Estado } from "./store";
+import { criarEstadoExemplo } from "./store";
+import type { Estado } from "./tipos";
 import { montarViagens, type Ajuste } from "./viagens";
 import { previaDoConvite, visaoDoPassageiro } from "./visaoPassageiro";
 

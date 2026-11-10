@@ -1,5 +1,5 @@
 // Textos prontos para compartilhar (WhatsApp): a lista da viagem e o resumo da viagem concluída.
-import type { Linha, Motorista, Passageiro, Van } from "./store";
+import type { Linha, Motorista, Passageiro, Van } from "./tipos";
 import { brl } from "./cobrancas";
 import { diaSemana, dataCurta, horaDe, ordenarParadas, type Ida, type Viagem } from "./viagens";
 import { estatisticasIda } from "./historico";
