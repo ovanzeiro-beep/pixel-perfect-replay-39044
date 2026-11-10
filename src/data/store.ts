@@ -80,12 +80,14 @@ import {
   DIAS,
   TIPOS_LINHA,
   configDaCobranca,
+  estaPausada,
   type ConfigCobranca,
   type Estado,
   type Linha,
   type Motorista,
   type Passageiro,
   type PerfilVanzeiro,
+  type Pausa,
   type Van,
 } from "./tipos";
 
@@ -337,7 +339,13 @@ function normalizarEstado(lido: Estado): Estado {
   };
   return comAberto({
     ...base,
-    cobrancas: gerarPeriodicas(base.cobrancas, base.passageiros, isoDe(new Date())),
+    cobrancas: gerarPeriodicas(
+      base.cobrancas,
+      base.passageiros,
+      isoDe(new Date()),
+      0,
+      base.pausas ?? [],
+    ),
   });
 }
 
@@ -603,8 +611,8 @@ export function excluirPassageiro(id: string) {
 export function useViagens() {
   const e = useFrota();
   return useMemo(
-    () => montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date()),
-    [e.linhas, e.passageiros, e.vans, e.ajustes],
+    () => montarViagens(e.linhas, e.passageiros, e.vans, e.ajustes, new Date(), e.pausas ?? []),
+    [e.linhas, e.passageiros, e.vans, e.ajustes, e.pausas],
   );
 }
 export function ajustarViagem(id: string, aj: Ajuste) {
@@ -692,6 +700,37 @@ export function dispensarAlerta(id: string, assinatura: string) {
 export function restaurarAlertas() {
   set({ ...estado, alertasDispensados: {} });
 }
+const ehData = (s: unknown): s is string => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
+
+/**
+ * Cria ou edita um período sem viagem (férias, feriado, van na oficina). Devolve `false` se os dados não servem:
+ * datas inválidas, fim antes do começo, mais de um ano, ou linha que não existe.
+ */
+export function salvarPausa(p: Omit<Pausa, "id"> & { id?: string | undefined }): boolean {
+  if (!ehData(p.de) || !ehData(p.ate) || p.ate < p.de) return false;
+  const dias = (Date.parse(p.ate) - Date.parse(p.de)) / 86400000;
+  if (dias > 366) return false;
+  if (p.linhaId && !estado.linhas.some((l) => l.id === p.linhaId)) return false;
+  const pausa: Pausa = {
+    id: p.id || novoId("pausa_"),
+    de: p.de,
+    ate: p.ate,
+    motivo: (p.motivo ?? "").trim().slice(0, 60),
+    ...(p.linhaId ? { linhaId: p.linhaId } : {}),
+    ...(p.suspenderPlanos ? { suspenderPlanos: true } : {}),
+  };
+  const atuais = estado.pausas ?? [];
+  const pausas =
+    p.id && atuais.some((x) => x.id === p.id)
+      ? atuais.map((x) => (x.id === p.id ? pausa : x))
+      : [...atuais, pausa];
+  set({ ...estado, pausas });
+  return true;
+}
+export function excluirPausa(id: string) {
+  set({ ...estado, pausas: (estado.pausas ?? []).filter((x) => x.id !== id) });
+}
+
 /** Guarda a configuração de cobrança (só os campos informados mudam). */
 export function salvarConfigCobranca(config: Partial<ConfigCobranca>) {
   const atual = configDaCobranca(estado);
@@ -743,10 +782,13 @@ type PedidoCobranca = { pid: string; valor: number; linhaId?: string | undefined
 const viagemExiste = (viagemId: string) => {
   const [linhaId, data] = viagemId.split("_");
   const linha = estado.linhas.find((l) => l.id === linhaId);
+  const ajuste = estado.ajustes[viagemId];
+  // Dia em pausa (férias, feriado) não tem viagem, a menos que ela já tenha acontecido.
+  if (data && estaPausada(estado.pausas, linhaId ?? "", data) && !ajuste?.ida) return false;
   return (
     !!linha &&
     !!data &&
-    (!!estado.ajustes[viagemId] || datasDaLinha(linha, new Date()).includes(data))
+    (!!ajuste || datasDaLinha(linha, new Date(), estado.pausas, estado.ajustes).includes(data))
   );
 };
 

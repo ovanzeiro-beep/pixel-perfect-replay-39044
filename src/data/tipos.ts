@@ -94,6 +94,24 @@ export type PerfilVanzeiro = {
   configurado: boolean;
 };
 
+/** Período sem viagem (férias, feriado, van na oficina). Vale para uma linha ou, sem `linhaId`, para todas. */
+export type Pausa = {
+  id: string;
+  /** Primeiro e último dia, "AAAA-MM-DD" (os dois entram). */
+  de: string;
+  ate: string;
+  /** Uma linha só; vazio: todas as linhas. */
+  linhaId?: string;
+  motivo: string;
+  /** Não cobrar o plano semanal e mensal que venceria dentro do período. */
+  suspenderPlanos?: boolean;
+};
+/** O dia `data` está dentro de alguma pausa que vale para essa linha? */
+export const estaPausada = (pausas: Pausa[] | undefined, linhaId: string, data: string) =>
+  (pausas ?? []).some(
+    (p) => data >= p.de && data <= p.ate && (!p.linhaId || p.linhaId === linhaId),
+  );
+
 /** Como o vanzeiro quer que a cobrança funcione. Cada campo tem um padrão, então dados antigos continuam valendo. */
 export type ConfigCobranca = {
   /** Quantos dias antes de vencer o app avisa (o passageiro e o vanzeiro). De 1 a 7. */
@@ -130,4 +148,6 @@ export type Estado = {
   alertasDispensados: Record<string, string>;
   /** Configuração de cobrança (opcional: sem ela valem os padrões). */
   configCobranca?: Partial<ConfigCobranca>;
+  /** Períodos sem viagem (opcional: sem eles, todas as viagens rodam). */
+  pausas?: Pausa[];
 };

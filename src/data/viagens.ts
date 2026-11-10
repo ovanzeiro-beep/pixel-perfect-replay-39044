@@ -1,5 +1,5 @@
 // Regras das viagens: geração a partir das linhas, lotação e lista de espera.
-import type { Linha, Passageiro, Van } from "./tipos";
+import { estaPausada, type Linha, type Passageiro, type Pausa, type Van } from "./tipos";
 
 export type Resposta = "vai" | "nao" | "sem" | "espera";
 export type Ajuste = {
@@ -184,14 +184,24 @@ export const doIso = (s: string) => {
 export const vazio = (): Ajuste => ({ respostas: {}, espera: [], extras: [] });
 export const idViagem = (linhaId: string, data: string) => `${linhaId}_${data}`;
 
-/** Dias (de -7 a +13 a partir de hoje) em que cada linha ativa tem viagem. */
-export function datasDaLinha(l: Linha, hoje: Date): string[] {
+/**
+ * Dias (de -7 a +13 a partir de hoje) em que cada linha ativa tem viagem.
+ * Dias dentro de uma pausa ficam de fora, exceto viagem que já aconteceu (tem ida registrada): essa nunca some.
+ */
+export function datasDaLinha(
+  l: Linha,
+  hoje: Date,
+  pausas?: Pausa[],
+  ajustes?: Record<string, Ajuste>,
+): string[] {
   if (!l.ativa) return [];
   const out: string[] = [];
   for (let i = -7; i <= 13; i++) {
     const d = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + i);
     const s = iso(d);
-    if (l.frequencia === "unica" ? l.data === s : l.dias.includes(COD[d.getDay()]!)) out.push(s);
+    if (!(l.frequencia === "unica" ? l.data === s : l.dias.includes(COD[d.getDay()]!))) continue;
+    if (estaPausada(pausas, l.id, s) && !ajustes?.[idViagem(l.id, s)]?.ida) continue;
+    out.push(s);
   }
   return out;
 }
@@ -252,6 +262,7 @@ export function montarViagens(
   vans: Van[],
   ajustes: Record<string, Ajuste>,
   agora: Date,
+  pausas: Pausa[] = [],
 ): Viagem[] {
   const hojeIso = iso(agora);
   const hhmm = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
@@ -260,7 +271,7 @@ export function montarViagens(
     const daLinha = passageiros
       .filter((p) => p.ativo && p.linhaIds.includes(l.id))
       .map((p) => p.id);
-    for (const data of datasDaLinha(l, agora)) {
+    for (const data of datasDaLinha(l, agora, pausas, ajustes)) {
       const id = idViagem(l.id, data);
       const ajuste = ajustes[id] ?? vazio();
       const vanId = ajuste.vanId ?? l.vanId;

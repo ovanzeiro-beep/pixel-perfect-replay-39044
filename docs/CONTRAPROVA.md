@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 12:10 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 12:40 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -32,3 +32,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 12:10 UTC.
 | 25 — Extra: Pix com valor e avisos de vencimento | concluida | 13/13 | OK |
 | 26 — Extra: configurar cobrança e cobrar todos os atrasados | concluida | 13/13 | OK |
 | 27 — Extra: legibilidade e telas vazias | concluida | 10/10 | OK |
+| 28 — Extra: férias e feriados (pausar linhas) | concluida | 14/14 | OK |

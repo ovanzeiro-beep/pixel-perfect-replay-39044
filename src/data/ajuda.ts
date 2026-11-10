@@ -43,6 +43,7 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
       "Se a van lotar, quem confirmar depois entra na lista de espera e sobe sozinho quando abrir uma vaga.",
       "Em Viagens, o botão Compartilhar lista da viagem manda a lista de passageiros pelo WhatsApp.",
       "Para cancelar um dia, abra a viagem e toque em Cancelar viagem.",
+      "Para parar por vários dias (férias escolares, feriado, van na oficina), use Mais → Férias e feriados → Nova pausa. As viagens desses dias somem, ninguém precisa confirmar e o passageiro é avisado.",
     ],
   },
   {
@@ -107,6 +108,7 @@ export const AJUDA_PASSAGEIRO: TopicoAjuda[] = [
       "Se precisar mudar depois do prazo, toque em Falar com o vanzeiro: ele consegue ajustar a sua resposta.",
       "Se a van estiver cheia, você entra na lista de espera (o cartão mostra a sua posição) e sobe quando abrir uma vaga.",
       "Para mudar a resposta, toque no outro botão.",
+      "Se a van vai parar (férias, feriado), a tela inicial avisa “Sem viagens até …” e você não precisa responder nesses dias.",
     ],
   },
   {

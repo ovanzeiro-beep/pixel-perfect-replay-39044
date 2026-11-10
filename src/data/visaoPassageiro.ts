@@ -3,6 +3,7 @@
 import type { Cobranca, Recibo } from "./cobrancas";
 import { configDaCobranca, type Estado, type Linha, type Passageiro } from "./tipos";
 import {
+  iso,
   montarViagens,
   type Entrega,
   type Ida,
@@ -61,6 +62,8 @@ export type VisaoPassageiro = {
   chavePix: string;
   /** Quantos dias antes de vencer o app avisa este passageiro (escolha do vanzeiro). */
   diasDeAviso: number;
+  /** Períodos sem viagem (férias, feriado) das linhas dele que ainda não acabaram. */
+  pausas: { de: string; ate: string; motivo: string }[];
 };
 
 function minhaIda(ida: Ida, pid: string): MinhaIda {
@@ -108,6 +111,7 @@ export function visaoDoPassageiro(estado: Estado, pid: string, agora: Date): Vis
       recibos: [],
       chavePix: "",
       diasDeAviso: configDaCobranca({}).diasDeAviso,
+      pausas: [],
     };
   const viagens = montarViagens(
     estado.linhas,
@@ -115,6 +119,7 @@ export function visaoDoPassageiro(estado: Estado, pid: string, agora: Date): Vis
     estado.vans,
     estado.ajustes,
     agora,
+    estado.pausas ?? [],
   )
     .filter((v) => v.passageiroIds.includes(pid))
     .map((v): MinhaViagem => {
@@ -144,6 +149,9 @@ export function visaoDoPassageiro(estado: Estado, pid: string, agora: Date): Vis
     recibos: estado.recibos.filter((r) => r.pid === pid),
     chavePix: estado.chavePix,
     diasDeAviso: configDaCobranca(estado).diasDeAviso,
+    pausas: (estado.pausas ?? [])
+      .filter((z) => z.ate >= iso(agora) && (!z.linhaId || eu.linhaIds.includes(z.linhaId)))
+      .map(({ de, ate, motivo }) => ({ de, ate, motivo })),
   };
 }
 
