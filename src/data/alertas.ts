@@ -296,6 +296,7 @@ export function gerarAvisosPassageiro({
   viagens,
   agora,
   diasDeAviso = 2,
+  pausas = [],
 }: {
   pid: string;
   cobrancas: Cobranca[];
@@ -304,6 +305,8 @@ export function gerarAvisosPassageiro({
   agora: Date;
   /** Quantos dias antes de vencer avisar (configuração do vanzeiro). */
   diasDeAviso?: number;
+  /** Períodos sem viagem das linhas dele (veja `VisaoPassageiro.pausas`). */
+  pausas?: { de: string; ate: string; motivo: string }[];
 }): AvisoPassageiro[] {
   const hoje = isoDe(agora);
   const out: AvisoPassageiro[] = [];
@@ -346,6 +349,22 @@ export function gerarAvisosPassageiro({
             ? `Seu pagamento vence amanhã: ${brl(total)}`
             : `Seu pagamento vence em ${faltam} dias: ${brl(total)}`,
       detalhe: "Pague pelo Pix e avise o vanzeiro. Você pode copiar o Pix já com o valor.",
+    });
+  }
+
+  for (const z of pausas) {
+    if (z.ate < hoje || diasEntre(hoje, z.de) > 14) continue;
+    const agoraEm = z.de <= hoje;
+    const motivo = z.motivo ? ` (${z.motivo})` : "";
+    out.push({
+      id: `pausa_${z.de}_${z.ate}`,
+      nivel: "info",
+      titulo: agoraEm
+        ? `Sem viagens até ${dataBR(z.ate)}${motivo}`
+        : `Sem viagens de ${dataBR(z.de)} a ${dataBR(z.ate)}${motivo}`,
+      detalhe: agoraEm
+        ? "A van volta às viagens depois dessa data. Você não precisa responder nesses dias."
+        : "Nesses dias não há viagem e você não precisa responder.",
     });
   }
 

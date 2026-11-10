@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) configuração de cobrança (26) e legibilidade e telas vazias (27) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) configuração de cobrança (26) legibilidade e telas vazias (27) e férias e feriados (28) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -42,6 +42,7 @@
 | 25 | Extra: Pix com valor e avisos de vencimento | Pix copia e cola com o valor, chave reconhecida (CPF, celular, e-mail), aviso "vence amanhã" para o passageiro e o vanzeiro | **Concluída** |
 | 26 | Extra: configurar cobrança e cobrar todos os atrasados | Dias de aviso, texto da mensagem, "paga na hora" como padrão e cobrança em sequência | **Concluída** |
 | 27 | Extra: legibilidade e telas vazias | Cores com contraste de leitura, telas vazias com orientação e vocabulário único do convite | **Concluída** |
+| 28 | Extra: férias e feriados | Pausar uma linha ou todas por período; viagens somem, passageiro é avisado, plano pode deixar de ser cobrado | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -239,3 +240,12 @@ Veja [`PUBLICACAO.md`](PUBLICACAO.md): como publicar no Lovable, o que conferir 
 - **Telas vazias com orientação.** Viagens, Início, Passageiros, Dinheiro, Gastos, Linhas e Vans agora dizem **por que** estão vazias e **o que fazer** (ex.: "As viagens aparecem quando você cria uma linha", com o botão "Criar minha primeira linha"). Quando é um **filtro ou busca** que escondeu tudo, a mensagem é outra e há "Limpar filtros".
 - **Convite com um vocabulário só.** Etiquetas: **No app**, **Convite enviado**, **Sem convite**. Filtros: **No app** e **Ainda não entrou** (antes eram cinco nomes para três situações).
 - **Mantido de propósito:** "Cobranças" (do lado do vanzeiro) e "Pagamentos" (do lado do passageiro) ficam como estão: cada um fala do próprio ponto de vista.
+
+## Extra: férias e feriados
+
+- **Mais → Férias e feriados → Nova pausa:** primeiro e último dia (os dois entram), **todas as linhas ou uma só**, motivo (Férias escolares, Feriado, Van na oficina ou texto próprio) e a opção **"Não cobrar o plano semanal e mensal"**. Antes de salvar o app diz quantas viagens das próximas semanas deixam de aparecer.
+- **Efeito:** as viagens dos dias pausados **somem** da lista (Viagens, Início), ninguém precisa confirmar presença e o passageiro não consegue responder (a viagem não existe). **Viagem que já aconteceu nunca some**, mesmo dentro de uma pausa, e o histórico fica intacto.
+- **Passageiro:** vê na tela inicial "Sem viagens até 31/01 (Férias escolares)" ou, se faltar até 14 dias, "Sem viagens de … a …". Só as pausas das linhas dele.
+- **Cobrança:** com a opção ligada, o plano semanal e mensal com vencimento dentro do período **não é gerado** (e a previsão de "vence nos próximos 7 dias" também respeita). Cobrança por viagem some sozinha, porque não há viagem.
+- **Lista:** Em andamento, Próximas e Passadas; dá para editar e excluir (com confirmação). Excluir devolve as viagens.
+- **Limites:** no máximo 1 ano por pausa; as viagens são geradas para as próximas 2 semanas, então a pausa "aparece" no efeito conforme os dias chegam.

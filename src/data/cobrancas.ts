@@ -1,4 +1,5 @@
 // Regras das cobranças: situação, pagamentos (quitando as mais antigas primeiro), recibos e mensagens.
+import type { Pausa } from "./tipos";
 export type Forma = "dinheiro" | "pix";
 export type Pagto = { valor: number; data: string; forma: Forma; recibo: number };
 export type TipoCobranca = "viagem" | "semana" | "mes";
@@ -23,6 +24,7 @@ export type Recibo = {
 };
 type PassageiroCob = {
   id: string;
+  linhaIds?: string[];
   formaPagamento: string;
   valor: number;
   vencimento: string;
@@ -173,10 +175,21 @@ export function gerarPeriodicas(
   passageiros: PassageiroCob[],
   hoje: string,
   frente = 0,
+  /** Pausas que suspendem o plano: quem tem linha em pausa nesse vencimento não é cobrado. */
+  pausas: Pausa[] = [],
 ): Cobranca[] {
   const existe = new Set(cobs.map((c) => c.id));
   const novas: Cobranca[] = [];
+  const suspensa = (p: PassageiroCob, venc: string) =>
+    pausas.some(
+      (z) =>
+        z.suspenderPlanos &&
+        venc >= z.de &&
+        venc <= z.ate &&
+        (!z.linhaId || (p.linhaIds ?? []).includes(z.linhaId)),
+    );
   const add = (p: PassageiroCob, tipo: TipoCobranca, venc: string, ref: string) => {
+    if (suspensa(p, venc)) return;
     const id = idCobranca(p.id, tipo, venc);
     if (existe.has(id)) return;
     existe.add(id);
@@ -218,8 +231,13 @@ export const recebidoNoMes = (cobs: Cobranca[], hoje: string) =>
     0,
   );
 /** Em aberto que vence nos próximos 7 dias + semanais/mensais que ainda vão ser cobradas nesse prazo. */
-export const venceEm7Dias = (cobs: Cobranca[], hoje: string, passageiros: PassageiroCob[] = []) =>
-  gerarPeriodicas(cobs, passageiros, hoje, 7)
+export const venceEm7Dias = (
+  cobs: Cobranca[],
+  hoje: string,
+  passageiros: PassageiroCob[] = [],
+  pausas: Pausa[] = [],
+) =>
+  gerarPeriodicas(cobs, passageiros, hoje, 7, pausas)
     .filter(
       (c) =>
         aberto(c) > 0 && diasEntre(hoje, c.vencimento) >= 0 && diasEntre(hoje, c.vencimento) <= 7,

@@ -29,6 +29,7 @@ const ACESSO: Record<string, "publica" | Papel> = {
   "/ida/$viagemId": "vanzeiro",
   "/vanzeiro/ajuda": "vanzeiro",
   "/vanzeiro/cobranca": "vanzeiro",
+  "/vanzeiro/pausas": "vanzeiro",
   "/passageiro": "passageiro",
   "/passageiro/ajuda": "passageiro",
   "/passageiro/": "passageiro",

@@ -13,6 +13,7 @@ import * as mock from "./store";
 import { escrever } from "./gravacao";
 import type {
   ConfigCobranca,
+  Pausa,
   Estado,
   FormaPagamento,
   Linha,
@@ -33,6 +34,7 @@ export type {
   Linha,
   Motorista,
   Passageiro,
+  Pausa,
   PerfilVanzeiro,
   Van,
 };
@@ -44,7 +46,14 @@ export type {
   VisaoPassageiro,
 } from "./visaoPassageiro";
 // Regras e listas de domínio (não são acesso a dados): continuam saindo do mesmo lugar para as telas.
-export { TIPOS_LINHA, DIAS, estaDevendo, configDaCobranca, CONFIG_COBRANCA_PADRAO } from "./tipos";
+export {
+  TIPOS_LINHA,
+  DIAS,
+  estaDevendo,
+  estaPausada,
+  configDaCobranca,
+  CONFIG_COBRANCA_PADRAO,
+} from "./tipos";
 
 /** Novo cadastro (sem `id`) ou edição (com `id`). */
 type Salvar<T, Fora extends PropertyKey = never> = Omit<T, Fora | "id"> & {
@@ -208,6 +217,9 @@ export interface EscritaDoMock {
   desfazerRecibo(numero: number): void;
   cancelarCob(cobrancaId: string, motivo: string): void;
   salvarChavePix(chave: string): void;
+  /** Cria ou edita um período sem viagem (férias, feriado). `false`: datas inválidas, mais de um ano ou linha inexistente. */
+  salvarPausa(pausa: Omit<Pausa, "id"> & { id?: string | undefined }): boolean;
+  excluirPausa(id: string): void;
   /** Configuração de cobrança: dias de aviso antes de vencer, texto da mensagem de cobrança e "paga na hora" como padrão. */
   salvarConfigCobranca(config: Partial<ConfigCobranca>): void;
   salvarGasto(gasto: Salvar<Gasto>): void;
@@ -286,6 +298,8 @@ export const repositorio: Repositorio = {
   cancelarCob: escrever(mock.cancelarCob),
   salvarChavePix: escrever(mock.salvarChavePix),
   salvarConfigCobranca: escrever(mock.salvarConfigCobranca),
+  salvarPausa: escrever(mock.salvarPausa),
+  excluirPausa: escrever(mock.excluirPausa),
   salvarGasto: escrever(mock.salvarGasto),
   excluirGasto: escrever(mock.excluirGasto),
   dispensarAlerta: escrever(mock.dispensarAlerta),
@@ -351,6 +365,8 @@ export const {
   cancelarCob,
   salvarChavePix,
   salvarConfigCobranca,
+  salvarPausa,
+  excluirPausa,
   salvarGasto,
   excluirGasto,
   dispensarAlerta,

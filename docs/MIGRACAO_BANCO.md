@@ -41,6 +41,8 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 **Dinheiro:** `lancarCobranca`, `marcarPagamento`, `desfazerRecibo`, `cancelarCob`, `salvarChavePix`, `salvarConfigCobranca`, `salvarGasto`, `excluirGasto`.
 
+**Férias e feriados:** `salvarPausa`, `excluirPausa`.
+
 **Alertas:** `dispensarAlerta`, `restaurarAlertas`.
 
 Regras de negócio que a implementação nova **precisa manter** (já cobertas por testes):
@@ -95,6 +97,7 @@ Fonte: tipos em `src/data/store.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.
 | **viagem_respostas** | viagem, passageiro, resposta (vai/não/sem/espera), ordem de confirmação |
 | **viagem_ida / viagem_volta** | marcações de embarque, paradas, chamada e entregas. Podem ser tabelas próprias ou um `jsonb` por viagem (é o formato de `Ida` e `Volta` em `viagens.ts`) |
 | **alertas_dispensados** | alerta, assinatura |
+| **pausas** | vanzeiro, de, até, linha (vazio: todas), motivo, suspender planos (sim/não). Dia dentro de uma pausa **não tem viagem** (exceto viagem que já aconteceu); com banco a regra vale no servidor (resposta do passageiro em dia pausado é recusada). |
 
 ## Ver a van ao vivo e notificações
 

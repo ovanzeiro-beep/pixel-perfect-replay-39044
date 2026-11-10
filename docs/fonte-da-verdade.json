@@ -3293,6 +3293,115 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 28,
+      "titulo": "Extra: férias e feriados (pausar linhas)",
+      "status": "concluida",
+      "objetivo": "Pausar uma linha ou todas por um período: as viagens somem, o passageiro é avisado e o plano pode deixar de ser cobrado. Viagem já feita nunca some.",
+      "checks": [
+        {
+          "d": "Tipo da pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "export type Pausa"
+        },
+        {
+          "d": "Regra: dia dentro da pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "export const estaPausada"
+        },
+        {
+          "d": "Datas da linha respeitam a pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "estaPausada\\(pausas, l\\.id, s\\)"
+        },
+        {
+          "d": "Viagem que já aconteceu nunca some",
+          "tipo": "contem",
+          "arquivo": "src/data/viagens.ts",
+          "regex": "\\?\\.ida\\) continue"
+        },
+        {
+          "d": "Dados: salvar pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function salvarPausa"
+        },
+        {
+          "d": "Dados: viagem em dia de pausa não existe",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "Dia em pausa"
+        },
+        {
+          "d": "Contrato: salvar e excluir pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "excluirPausa\\(id: string\\)"
+        },
+        {
+          "d": "Plano suspenso na pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/cobrancas.ts",
+          "regex": "suspenderPlanos"
+        },
+        {
+          "d": "Passageiro: aviso de pausa",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "Sem viagens até"
+        },
+        {
+          "d": "Visão: pausas das linhas dele",
+          "tipo": "contem",
+          "arquivo": "src/data/visaoPassageiro.ts",
+          "regex": "pausas"
+        },
+        {
+          "d": "Tela Férias e feriados",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/vanzeiro.pausas.tsx"
+        },
+        {
+          "d": "Menu: Férias e feriados",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "Férias e feriados"
+        },
+        {
+          "d": "Testes de pausas (dados)",
+          "tipo": "arquivo",
+          "arquivo": "src/data/pausas.test.ts"
+        },
+        {
+          "d": "Testes de pausas (tela)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/pausas-fluxo.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

@@ -56,6 +56,14 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Férias e feriados
+
+- [ ] Mais → **Férias e feriados** → **Nova pausa**: escolha o primeiro e o último dia, "Todas as linhas" (ou uma só) e o motivo. O app diz **quantas viagens somem**. Salve.
+- [ ] Em **Viagens**, os dias da pausa **não aparecem mais**; na tela inicial também não há viagem nesses dias.
+- [ ] Como passageiro: a tela inicial mostra **"Sem viagens até …"** com o motivo, e não pede resposta nesses dias.
+- [ ] Ligue "Não cobrar o plano semanal e mensal" numa pausa: quem tem vencimento dentro do período **não recebe cobrança**.
+- [ ] **Excluir** a pausa: as viagens voltam. Uma viagem que **já aconteceu** nunca some por causa de pausa.
+
 ## Leitura e telas vazias
 
 - [ ] **Com sol forte** (ou o brilho no máximo, ao ar livre): as palavras "Em dia", "Devendo", os valores em verde e vermelho e os avisos laranja **dão para ler sem esforço**.

@@ -59,6 +59,7 @@ describe("visão do passageiro: só o que é dele", () => {
       recibos: [],
       chavePix: "",
       diasDeAviso: 2,
+      pausas: [],
     });
   });
 

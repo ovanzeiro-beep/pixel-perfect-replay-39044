@@ -32,6 +32,7 @@ import { Route as VanzeiroLinhasRouteImport } from './routes/vanzeiro.linhas'
 import { Route as VanzeiroMaisRouteImport } from './routes/vanzeiro.mais'
 import { Route as VanzeiroMotoristasRouteImport } from './routes/vanzeiro.motoristas'
 import { Route as VanzeiroPassageirosRouteImport } from './routes/vanzeiro.passageiros'
+import { Route as VanzeiroPausasRouteImport } from './routes/vanzeiro.pausas'
 import { Route as VanzeiroPerfilRouteImport } from './routes/vanzeiro.perfil'
 import { Route as VanzeiroRelatoriosRouteImport } from './routes/vanzeiro.relatorios'
 import { Route as VanzeiroVansRouteImport } from './routes/vanzeiro.vans'
@@ -152,6 +153,11 @@ const VanzeiroPassageirosRoute = VanzeiroPassageirosRouteImport.update({
   path: '/passageiros',
   getParentRoute: () => VanzeiroRoute,
 } as any)
+const VanzeiroPausasRoute = VanzeiroPausasRouteImport.update({
+  id: '/pausas',
+  path: '/pausas',
+  getParentRoute: () => VanzeiroRoute,
+} as any)
 const VanzeiroPerfilRoute = VanzeiroPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/pausas': typeof VanzeiroPausasRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
   '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/pausas': typeof VanzeiroPausasRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
   '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/vanzeiro/mais': typeof VanzeiroMaisRoute
   '/vanzeiro/motoristas': typeof VanzeiroMotoristasRoute
   '/vanzeiro/passageiros': typeof VanzeiroPassageirosRoute
+  '/vanzeiro/pausas': typeof VanzeiroPausasRoute
   '/vanzeiro/perfil': typeof VanzeiroPerfilRoute
   '/vanzeiro/relatorios': typeof VanzeiroRelatoriosRoute
   '/vanzeiro/vans': typeof VanzeiroVansRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
+    | '/vanzeiro/pausas'
     | '/vanzeiro/perfil'
     | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
+    | '/vanzeiro/pausas'
     | '/vanzeiro/perfil'
     | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/vanzeiro/mais'
     | '/vanzeiro/motoristas'
     | '/vanzeiro/passageiros'
+    | '/vanzeiro/pausas'
     | '/vanzeiro/perfil'
     | '/vanzeiro/relatorios'
     | '/vanzeiro/vans'
@@ -520,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VanzeiroPassageirosRouteImport
       parentRoute: typeof VanzeiroRoute
     }
+    '/vanzeiro/pausas': {
+      id: '/vanzeiro/pausas'
+      path: '/pausas'
+      fullPath: '/vanzeiro/pausas'
+      preLoaderRoute: typeof VanzeiroPausasRouteImport
+      parentRoute: typeof VanzeiroRoute
+    }
     '/vanzeiro/perfil': {
       id: '/vanzeiro/perfil'
       path: '/perfil'
@@ -583,6 +602,7 @@ interface VanzeiroRouteChildren {
   VanzeiroMaisRoute: typeof VanzeiroMaisRoute
   VanzeiroMotoristasRoute: typeof VanzeiroMotoristasRoute
   VanzeiroPassageirosRoute: typeof VanzeiroPassageirosRoute
+  VanzeiroPausasRoute: typeof VanzeiroPausasRoute
   VanzeiroPerfilRoute: typeof VanzeiroPerfilRoute
   VanzeiroRelatoriosRoute: typeof VanzeiroRelatoriosRoute
   VanzeiroVansRoute: typeof VanzeiroVansRoute
@@ -600,6 +620,7 @@ const VanzeiroRouteChildren: VanzeiroRouteChildren = {
   VanzeiroMaisRoute: VanzeiroMaisRoute,
   VanzeiroMotoristasRoute: VanzeiroMotoristasRoute,
   VanzeiroPassageirosRoute: VanzeiroPassageirosRoute,
+  VanzeiroPausasRoute: VanzeiroPausasRoute,
   VanzeiroPerfilRoute: VanzeiroPerfilRoute,
   VanzeiroRelatoriosRoute: VanzeiroRelatoriosRoute,
   VanzeiroVansRoute: VanzeiroVansRoute,

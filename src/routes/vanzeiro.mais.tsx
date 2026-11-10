@@ -10,6 +10,7 @@ import {
   ChevronRight,
   CircleHelp,
   HandCoins,
+  CalendarOff,
 } from "lucide-react";
 
 const itens = [
@@ -18,6 +19,7 @@ const itens = [
   { to: "/vanzeiro/vans", label: "Vans", icon: Bus },
   { to: "/vanzeiro/motoristas", label: "Motoristas", icon: IdCard },
   { to: "/vanzeiro/linhas", label: "Linhas", icon: MapPinned },
+  { to: "/vanzeiro/pausas", label: "Férias e feriados", icon: CalendarOff },
   { to: "/vanzeiro/gastos", label: "Gastos", icon: Receipt },
   { to: "/vanzeiro/cobranca", label: "Configurar cobrança", icon: HandCoins },
   { to: "/vanzeiro/perfil", label: "Meu perfil", icon: User },

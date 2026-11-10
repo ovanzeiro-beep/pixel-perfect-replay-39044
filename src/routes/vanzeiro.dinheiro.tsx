@@ -137,7 +137,7 @@ function useCobrar() {
 }
 
 function Cobrancas() {
-  const { passageiros, linhas, cobrancas, chavePix } = useFrota();
+  const { passageiros, linhas, cobrancas, chavePix, pausas } = useFrota();
   const { p: abrirId } = Route.useSearch();
   const navigate = useNavigate({ from: "/vanzeiro/dinheiro" });
   const hoje = isoDe(new Date());
@@ -220,7 +220,7 @@ function Cobrancas() {
           <div className="rounded-3xl bg-accent/15 p-4">
             <p className="text-sm font-bold text-muted-foreground">Vence nos próximos 7 dias</p>
             <p className="text-xl font-extrabold text-accent-strong">
-              {brl(venceEm7Dias(cobrancas, hoje, passageiros))}
+              {brl(venceEm7Dias(cobrancas, hoje, passageiros, pausas ?? []))}
             </p>
           </div>
         </div>
