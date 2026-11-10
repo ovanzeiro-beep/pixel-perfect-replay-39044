@@ -85,4 +85,11 @@ describe("importar passageiros por planilha", () => {
     await colar("Nome;Telefone");
     expect(await screen.findByRole("alert")).toHaveTextContent(/Não encontrei passageiros/);
   });
+
+  it("oferece exportar a lista em planilha", async () => {
+    await abrir("/vanzeiro/passageiros");
+    expect(
+      await screen.findByRole("button", { name: /Exportar para planilha/ }),
+    ).toBeInTheDocument();
+  });
 });
