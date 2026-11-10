@@ -91,6 +91,8 @@ export type EntradaAlertas = {
   agora: Date;
   /** Quando foi o último backup e quantas alterações houve desde então. */
   backup?: { alteracoes: number; ultimoBackup: string | null };
+  /** Quantos dias antes de vencer avisar (configuração do vanzeiro). Padrão: 2. */
+  diasDeAviso?: number;
 };
 
 export function gerarAlertas({
@@ -101,6 +103,7 @@ export function gerarAlertas({
   viagens,
   agora,
   backup,
+  diasDeAviso = 2,
 }: EntradaAlertas): Alerta[] {
   const hoje = isoDe(agora);
   const nomePas = (id: string) => passageiros.find((p) => p.id === id)?.nome ?? "Passageiro";
@@ -167,7 +170,7 @@ export function gerarAlertas({
       !c.cancelada &&
       aberto(c) > 0 &&
       diasEntre(hoje, c.vencimento) >= 0 &&
-      diasEntre(hoje, c.vencimento) <= 2,
+      diasEntre(hoje, c.vencimento) <= diasDeAviso,
   );
   if (vencem.length) {
     const total = Math.round(vencem.reduce((s, c) => s + aberto(c), 0) * 100) / 100;
@@ -179,7 +182,7 @@ export function gerarAlertas({
         ? "hoje"
         : diasEntre(hoje, primeiroAVencer.vencimento) === 1
           ? "amanhã"
-          : "em 2 dias";
+          : `em ${diasEntre(hoje, primeiroAVencer.vencimento)} dias`;
     out.push({
       id: "vencem",
       tipo: "cobranca",
@@ -188,8 +191,8 @@ export function gerarAlertas({
       acao: "Ver cobranças",
       titulo:
         vencem.length === 1
-          ? "1 cobrança vence nos próximos 2 dias"
-          : `${vencem.length} cobranças vencem nos próximos 2 dias`,
+          ? `1 cobrança vence ${diasDeAviso === 1 ? "amanhã" : `nos próximos ${diasDeAviso} dias`}`
+          : `${vencem.length} cobranças vencem ${diasDeAviso === 1 ? "até amanhã" : `nos próximos ${diasDeAviso} dias`}`,
       detalhe: `${brl(total)} a receber. A primeira é de ${primeiro(nomePas(primeiroAVencer.pid))}, ${quando}.`,
       destino: { to: "/vanzeiro/dinheiro" },
     });
@@ -292,12 +295,15 @@ export function gerarAvisosPassageiro({
   cobrancas,
   viagens,
   agora,
+  diasDeAviso = 2,
 }: {
   pid: string;
   cobrancas: Cobranca[];
   /** As viagens do próprio passageiro (`MinhaViagem`), nunca as de outros. */
   viagens: MinhaViagem[];
   agora: Date;
+  /** Quantos dias antes de vencer avisar (configuração do vanzeiro). */
+  diasDeAviso?: number;
 }): AvisoPassageiro[] {
   const hoje = isoDe(agora);
   const out: AvisoPassageiro[] = [];
@@ -323,19 +329,22 @@ export function gerarAvisosPassageiro({
       !c.cancelada &&
       aberto(c) > 0 &&
       diasEntre(hoje, c.vencimento) >= 0 &&
-      diasEntre(hoje, c.vencimento) <= 1,
+      diasEntre(hoje, c.vencimento) <= diasDeAviso,
   );
   if (aVencer.length) {
     const total = Math.round(aVencer.reduce((s, c) => s + aberto(c), 0) * 100) / 100;
-    const venceHoje = aVencer.some((c) => c.vencimento === hoje);
+    const faltam = Math.min(...aVencer.map((c) => diasEntre(hoje, c.vencimento)));
     out.push({
       id: "vence",
       nivel: "atencao",
       destino: "/passageiro/pagamentos",
       acao: "Ver pagamentos",
-      titulo: venceHoje
-        ? `Seu pagamento vence hoje: ${brl(total)}`
-        : `Seu pagamento vence amanhã: ${brl(total)}`,
+      titulo:
+        faltam === 0
+          ? `Seu pagamento vence hoje: ${brl(total)}`
+          : faltam === 1
+            ? `Seu pagamento vence amanhã: ${brl(total)}`
+            : `Seu pagamento vence em ${faltam} dias: ${brl(total)}`,
       detalhe: "Pague pelo Pix e avise o vanzeiro. Você pode copiar o Pix já com o valor.",
     });
   }

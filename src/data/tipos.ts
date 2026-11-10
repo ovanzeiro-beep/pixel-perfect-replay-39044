@@ -94,6 +94,28 @@ export type PerfilVanzeiro = {
   configurado: boolean;
 };
 
+/** Como o vanzeiro quer que a cobrança funcione. Cada campo tem um padrão, então dados antigos continuam valendo. */
+export type ConfigCobranca = {
+  /** Quantos dias antes de vencer o app avisa (o passageiro e o vanzeiro). De 1 a 7. */
+  diasDeAviso: number;
+  /** Texto da mensagem de cobrança com {nome}, {valor}, {referencia} e {pix}. Vazio: texto padrão. */
+  textoCobranca: string;
+  /** Passageiros novos que pagam por viagem já vêm marcados como "paga na hora". */
+  pagaNaHoraPadrao: boolean;
+};
+export const CONFIG_COBRANCA_PADRAO: ConfigCobranca = {
+  diasDeAviso: 2,
+  textoCobranca: "",
+  pagaNaHoraPadrao: false,
+};
+/** A configuração de cobrança com os padrões nos campos que o vanzeiro ainda não mexeu. */
+export const configDaCobranca = (e: {
+  configCobranca?: Partial<ConfigCobranca> | undefined;
+}): ConfigCobranca => ({
+  ...CONFIG_COBRANCA_PADRAO,
+  ...e.configCobranca,
+});
+
 export type Estado = {
   perfil: PerfilVanzeiro;
   vans: Van[];
@@ -106,4 +128,6 @@ export type Estado = {
   chavePix: string;
   gastos: Gasto[];
   alertasDispensados: Record<string, string>;
+  /** Configuração de cobrança (opcional: sem ela valem os padrões). */
+  configCobranca?: Partial<ConfigCobranca>;
 };

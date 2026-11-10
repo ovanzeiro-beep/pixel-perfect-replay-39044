@@ -9,6 +9,7 @@ import {
   User,
   ChevronRight,
   CircleHelp,
+  HandCoins,
 } from "lucide-react";
 
 const itens = [
@@ -18,6 +19,7 @@ const itens = [
   { to: "/vanzeiro/motoristas", label: "Motoristas", icon: IdCard },
   { to: "/vanzeiro/linhas", label: "Linhas", icon: MapPinned },
   { to: "/vanzeiro/gastos", label: "Gastos", icon: Receipt },
+  { to: "/vanzeiro/cobranca", label: "Configurar cobrança", icon: HandCoins },
   { to: "/vanzeiro/perfil", label: "Meu perfil", icon: User },
   { to: "/vanzeiro/ajuda", label: "Como usar o app", icon: CircleHelp },
 ] as const;

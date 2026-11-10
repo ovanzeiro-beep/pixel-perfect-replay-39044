@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { contarAtencao, filtrarDispensados, gerarAlertas } from "./alertas";
 import { useBackupMeta } from "./backup";
-import { useFrota, useViagens } from "./repositorio";
+import { configDaCobranca, useFrota, useViagens } from "./repositorio";
 
 /** Alertas atuais do vanzeiro (sem os dispensados). Recalcula a cada minuto para o prazo andar sozinho. */
 export function useAlertas() {
-  const { motoristas, cobrancas, passageiros, linhas, alertasDispensados } = useFrota();
+  const { motoristas, cobrancas, passageiros, linhas, alertasDispensados, configCobranca } =
+    useFrota();
+  const diasDeAviso = configDaCobranca({ configCobranca }).diasDeAviso;
   const viagens = useViagens();
   const backup = useBackupMeta();
   const [agora, setAgora] = useState(() => new Date());
@@ -22,8 +24,19 @@ export function useAlertas() {
       viagens,
       agora,
       backup,
+      diasDeAviso,
     });
     const alertas = filtrarDispensados(todos, alertasDispensados);
     return { alertas, atencao: contarAtencao(alertas), dispensados: todos.length - alertas.length };
-  }, [motoristas, cobrancas, passageiros, linhas, viagens, agora, backup, alertasDispensados]);
+  }, [
+    motoristas,
+    cobrancas,
+    passageiros,
+    linhas,
+    viagens,
+    agora,
+    backup,
+    alertasDispensados,
+    diasDeAviso,
+  ]);
 }

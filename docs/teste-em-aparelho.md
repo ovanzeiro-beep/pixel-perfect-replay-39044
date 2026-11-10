@@ -56,6 +56,13 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Configurar cobrança e cobrar todos os atrasados
+
+- [ ] Mais → **Configurar cobrança**: mude para **5 dias**, edite o texto (use os botões `{nome}`, `{valor}`...) e veja o **exemplo** mudar. Salve.
+- [ ] Dinheiro → **Cobrar** um devedor: o WhatsApp abre com **o seu texto**.
+- [ ] Dinheiro → **Cobrar todos os atrasados (N)**: aparece a lista; toque em **Cobrar** em cada um, envie, volte; o contador "X de N avisados" sobe e o nome fica "Avisado ✓".
+- [ ] Ligue "Passageiro novo já paga na hora": ao cadastrar um passageiro novo "Por viagem", a opção já vem ligada.
+
 ## Pix com o valor e avisos de vencimento
 
 - [ ] Mais → Meu perfil → **Chave Pix**: digite seu CPF, celular, e-mail ou chave aleatória. O app diz como reconheceu ("Reconhecida como celular…"). Se for um número que pode ser CPF ou celular, ele pergunta.

@@ -13,10 +13,14 @@ const COR: Record<Nivel, string> = {
 /** Avisos do passageiro (pagamento atrasado, prazo para responder, viagem cancelada). Some quando está tudo em dia. */
 export function AvisosPassageiro({ so }: { so?: "pagamento" }) {
   const pid = usePassageiroId();
-  const { cobrancas, viagens } = usePassageiroVisao(pid);
-  const avisos = gerarAvisosPassageiro({ pid, cobrancas, viagens, agora: new Date() }).filter(
-    (a) => so !== "pagamento" || a.id === "atraso" || a.id === "vence",
-  );
+  const { cobrancas, viagens, diasDeAviso } = usePassageiroVisao(pid);
+  const avisos = gerarAvisosPassageiro({
+    pid,
+    cobrancas,
+    viagens,
+    agora: new Date(),
+    diasDeAviso,
+  }).filter((a) => so !== "pagamento" || a.id === "atraso" || a.id === "vence");
   if (avisos.length === 0) return null;
   return (
     <section aria-label="Avisos" className="space-y-2">

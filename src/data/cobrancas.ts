@@ -229,6 +229,21 @@ export const totalEmAberto = (cobs: Cobranca[]) => cobs.reduce((s, c) => s + abe
 
 export const juntarRefs = (refs: string[]) =>
   refs.length <= 1 ? (refs[0] ?? "") : `${refs.slice(0, -1).join(", ")} e ${refs[refs.length - 1]}`;
+/** Texto padrão da mensagem de cobrança. O vanzeiro pode trocar por um dele (veja `salvarConfigCobranca`). */
+export const TEXTO_COBRANCA_PADRAO =
+  "Olá, {nome}! Tudo bem? Passando pra lembrar do valor em aberto da van: {valor}, referente a {referencia}. Pix: {pix}. Obrigado!";
+
+/** Troca {nome}, {valor}, {referencia} e {pix} pelo que vale para aquele passageiro. */
+export const preencherTextoCobranca = (
+  modelo: string,
+  d: { nome: string; valor: string; referencia: string; pix: string },
+) =>
+  modelo
+    .replaceAll("{nome}", d.nome)
+    .replaceAll("{valor}", d.valor)
+    .replaceAll("{referencia}", d.referencia)
+    .replaceAll("{pix}", d.pix);
+
 export const mensagemCobrar = (
   nome: string,
   valor: number,
@@ -236,9 +251,15 @@ export const mensagemCobrar = (
   pix: string,
   /** Pix copia e cola com o valor já preenchido (opcional). */
   codigoPix?: string | null,
+  /** Texto escolhido pelo vanzeiro (vazio ou ausente: o padrão). */
+  modelo?: string,
 ) =>
-  `Olá, ${nome}! Tudo bem? Passando pra lembrar do valor em aberto da van: ${brl(valor)}, referente a ${juntarRefs(refs)}. Pix: ${pix}. Obrigado!` +
-  (codigoPix ? `\n\nPix copia e cola (já com o valor):\n${codigoPix}` : "");
+  preencherTextoCobranca(modelo?.trim() || TEXTO_COBRANCA_PADRAO, {
+    nome,
+    valor: brl(valor),
+    referencia: juntarRefs(refs),
+    pix,
+  }) + (codigoPix ? `\n\nPix copia e cola (já com o valor):\n${codigoPix}` : "");
 export const textoRecibo = (r: Recibo, vanzeiro: string, passageiro: string) =>
   [
     `RECIBO Nº ${String(r.numero).padStart(4, "0")}`,

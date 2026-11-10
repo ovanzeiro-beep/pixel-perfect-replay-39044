@@ -79,6 +79,8 @@ import { semearHistorico } from "./historico";
 import {
   DIAS,
   TIPOS_LINHA,
+  configDaCobranca,
+  type ConfigCobranca,
   type Estado,
   type Linha,
   type Motorista,
@@ -689,6 +691,20 @@ export function dispensarAlerta(id: string, assinatura: string) {
 }
 export function restaurarAlertas() {
   set({ ...estado, alertasDispensados: {} });
+}
+/** Guarda a configuração de cobrança (só os campos informados mudam). */
+export function salvarConfigCobranca(config: Partial<ConfigCobranca>) {
+  const atual = configDaCobranca(estado);
+  const dias = Math.round(Number(config.diasDeAviso ?? atual.diasDeAviso));
+  set({
+    ...estado,
+    configCobranca: {
+      ...atual,
+      ...config,
+      diasDeAviso: Math.min(7, Math.max(1, Number.isFinite(dias) ? dias : atual.diasDeAviso)),
+      textoCobranca: (config.textoCobranca ?? atual.textoCobranca).slice(0, 600),
+    },
+  });
 }
 export function salvarChavePix(chave: string) {
   set({ ...estado, chavePix: chave.trim() });

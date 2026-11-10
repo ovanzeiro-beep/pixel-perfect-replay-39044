@@ -65,6 +65,8 @@ describe("a ajuda cita só botões que existem nas telas", () => {
     "Falar com o vanzeiro",
     "Avisar: chegando",
     "Paga na hora da viagem",
+    "Cobrar todos os atrasados",
+    "Configurar cobrança",
     "Pagou em dinheiro",
     "Pagou no Pix",
     "Paga depois",

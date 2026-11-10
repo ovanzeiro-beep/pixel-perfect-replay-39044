@@ -1,7 +1,7 @@
 // O que UM passageiro pode ver. É a "fatia" do estado que pertence a ele: com banco, é isto (e só isto)
 // que o servidor entrega ao passageiro. Nenhum dado de outro passageiro entra aqui.
 import type { Cobranca, Recibo } from "./cobrancas";
-import type { Estado, Linha, Passageiro } from "./tipos";
+import { configDaCobranca, type Estado, type Linha, type Passageiro } from "./tipos";
 import {
   montarViagens,
   type Entrega,
@@ -59,6 +59,8 @@ export type VisaoPassageiro = {
   cobrancas: Cobranca[];
   recibos: Recibo[];
   chavePix: string;
+  /** Quantos dias antes de vencer o app avisa este passageiro (escolha do vanzeiro). */
+  diasDeAviso: number;
 };
 
 function minhaIda(ida: Ida, pid: string): MinhaIda {
@@ -98,7 +100,15 @@ function minhaIda(ida: Ida, pid: string): MinhaIda {
 export function visaoDoPassageiro(estado: Estado, pid: string, agora: Date): VisaoPassageiro {
   const eu = estado.passageiros.find((p) => p.id === pid);
   if (!eu)
-    return { eu: undefined, linhas: [], viagens: [], cobrancas: [], recibos: [], chavePix: "" };
+    return {
+      eu: undefined,
+      linhas: [],
+      viagens: [],
+      cobrancas: [],
+      recibos: [],
+      chavePix: "",
+      diasDeAviso: configDaCobranca({}).diasDeAviso,
+    };
   const viagens = montarViagens(
     estado.linhas,
     estado.passageiros,
@@ -133,6 +143,7 @@ export function visaoDoPassageiro(estado: Estado, pid: string, agora: Date): Vis
     cobrancas: estado.cobrancas.filter((c) => c.pid === pid),
     recibos: estado.recibos.filter((r) => r.pid === pid),
     chavePix: estado.chavePix,
+    diasDeAviso: configDaCobranca(estado).diasDeAviso,
   };
 }
 

@@ -39,7 +39,7 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 - *Parada no caminho:* `iniciarParada`, `marcarPresencasNaParada`, `pedirChamadaNaParada`, `encerrarParada`.
 - *Volta:* `marcarStatusNaVolta`, `iniciarEntregas`, `adicionarExtraNaVolta` (já lança a cobrança), `entregarNaVolta`, `desfazerEntregaNaVolta`, `reordenarEntregasDaVolta`.
 
-**Dinheiro:** `lancarCobranca`, `marcarPagamento`, `desfazerRecibo`, `cancelarCob`, `salvarChavePix`, `salvarGasto`, `excluirGasto`.
+**Dinheiro:** `lancarCobranca`, `marcarPagamento`, `desfazerRecibo`, `cancelarCob`, `salvarChavePix`, `salvarConfigCobranca`, `salvarGasto`, `excluirGasto`.
 
 **Alertas:** `dispensarAlerta`, `restaurarAlertas`.
 
@@ -66,6 +66,7 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 | Dono dos dados | Um aparelho = um vanzeiro | Todo registro pertence a um vanzeiro. Passageiro só enxerga o que é dele (hoje garantido na tela; no banco, na política de acesso). |
 | Login | `src/data/sessao.ts` (simulado: papel + passageiro) | Login real (Google). Só o módulo de sessão muda; os hooks `useSessao`/`usePassageiroId` continuam. |
 | Convite | Link `/convite/:idDoPassageiro` (só funciona no aparelho do vanzeiro) | Token de convite aleatório e com validade, guardado no banco. A tela `/convite/$passageiroId` passa a validar o token. |
+| Configuração de cobrança | `Estado.configCobranca` (dias de aviso de 1 a 7, texto da mensagem de cobrança com {nome} {valor} {referencia} {pix}, "paga na hora" como padrão). Com banco: colunas na tabela do vanzeiro; o passageiro só precisa saber os **dias de aviso** (`usePassageiroVisao` já entrega). Os avisos de vencimento continuam calculados na hora, não gravados. |
 | Pix | O Pix copia e cola é montado no aparelho (`src/lib/pix.ts`) a partir da chave guardada e do valor da cobrança; não depende de banco. A **chave** deve ser guardada já normalizada (celular como `+55…`, CPF/CNPJ só dígitos). Confirmação automática do pagamento exige provedor de pagamento (fora desta fase). |
 | Dinheiro | Número com 2 casas | Guardar em centavos (inteiro) ou `numeric(12,2)`; nunca ponto flutuante. |
 | Datas | Texto `AAAA-MM-DD` e `HH:MM` (sem fuso) | Manter como data e hora locais do vanzeiro (`date` e `time`), **sem fuso**: a van roda no horário local. |

@@ -24,6 +24,7 @@ import {
   desativarPassageiro,
   excluirPassageiro,
   estaDevendo,
+  configDaCobranca,
   DIAS,
   type FormaPagamento,
   type Passageiro,
@@ -450,6 +451,8 @@ function FormPassageiro({
   onFechar: () => void;
   onSalvo: (id: string, novo: boolean) => void;
 }) {
+  const { configCobranca } = useFrota();
+  const config = configDaCobranca({ configCobranca });
   const [f, setF] = useState({
     nome: pas?.nome ?? "",
     telefone: pas?.telefone ?? "",
@@ -462,7 +465,7 @@ function FormPassageiro({
     formaPagamento: pas?.formaPagamento ?? ("por_viagem" as FormaPagamento),
     valor: pas ? String(pas.valor) : "",
     vencimento: pas?.vencimento ?? "",
-    pagaNaHora: pas?.pagaNaHora ?? false,
+    pagaNaHora: pas ? (pas.pagaNaHora ?? false) : config.pagaNaHoraPadrao,
     emergenciaNome: pas?.emergenciaNome ?? "",
     emergenciaTelefone: pas?.emergenciaTelefone ?? "",
     observacoes: pas?.observacoes ?? "",
