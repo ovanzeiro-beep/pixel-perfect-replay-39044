@@ -8,6 +8,7 @@ import {
   Receipt,
   User,
   ChevronRight,
+  CircleHelp,
 } from "lucide-react";
 
 const itens = [
@@ -18,6 +19,7 @@ const itens = [
   { to: "/vanzeiro/linhas", label: "Linhas", icon: MapPinned },
   { to: "/vanzeiro/gastos", label: "Gastos", icon: Receipt },
   { to: "/vanzeiro/perfil", label: "Meu perfil", icon: User },
+  { to: "/vanzeiro/ajuda", label: "Como usar o app", icon: CircleHelp },
 ] as const;
 
 export const Route = createFileRoute("/vanzeiro/mais")({

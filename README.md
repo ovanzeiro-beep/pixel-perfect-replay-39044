@@ -10,7 +10,7 @@ Este projeto foi feito com [Lovable](https://lovable.dev) e continua conectado a
 
 ## O que o app faz
 
-- **Vanzeiro:** viagens (confirmações, lista de espera, ida e volta, histórico), passageiros e convites, dinheiro (cobranças, recibos), gastos, relatórios (lucro por van e linha, ocupação, combustível) com **exportação para planilha (CSV) e PDF**, **tamanho da letra ajustável**, **navegação com Waze ou Google Maps**, alertas (CNH, atrasos, prazo de confirmação).
+- **Vanzeiro:** viagens (confirmações, lista de espera, ida e volta, histórico), passageiros e convites, dinheiro (cobranças, recibos), gastos, relatórios (lucro por van e linha, ocupação, combustível) com **exportação para planilha (CSV) e PDF**, **tamanho da letra ajustável**, **navegação com Waze ou Google Maps**, **tela "Como usar"**, alertas (CNH, atrasos, prazo de confirmação).
 - **Passageiro:** confirma presença, vê horário e parada, pagamentos e recibos, avisos.
 - **Primeiro acesso:** a conta nova começa **vazia**, com boas-vindas (nome, celular, cidade), um guia de primeiros passos e, para quem já tem um backup, a opção de restaurar. Quem já usava o app com dados continua como estava.
 - **Celular:** instala como aplicativo (Android e iPhone), abre em tela cheia, funciona offline e avisa quando há versão nova.

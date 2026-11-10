@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:03 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:55 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:03 UTC.
 | 4 — Viagem de ponta a ponta | concluida | 24/24 | OK |
 | 5 — Dinheiro e relatórios | concluida | 18/18 | OK |
 | 6 — Alertas e prazos | concluida | 19/19 | OK |
-| 7 — Área do passageiro completa | concluida | 22/24 | DIVERGENTE (declarada concluída, mas falha) |
+| 7 — Área do passageiro completa | concluida | 24/24 | OK |
 | 8 — PWA lapidado | concluida | 21/21 | OK |
 | 9 — Qualidade final e congelamento do mock | concluida | 21/21 | OK |
 | 10 — Extra: backup e restauração dos dados | concluida | 30/30 | OK |
@@ -20,9 +20,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:03 UTC.
 | 13 — Extra: tamanho da letra | concluida | 12/12 | OK |
 | 14 — Extra: revisão de clareza das telas | concluida | 7/7 | OK |
 | 15 — Extra: navegar com Waze ou Google Maps | concluida | 10/10 | OK |
-
-## O que falta
-
-**Etapa 7 — Área do passageiro completa**
-- Avisos em pagamentos
-- Avisos em minhas viagens
+| 16 — Extra: acabamento final (telas pequenas, textos, ajuda e segurança) | concluida | 13/13 | OK |

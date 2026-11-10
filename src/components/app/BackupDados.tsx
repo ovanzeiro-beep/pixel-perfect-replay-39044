@@ -145,8 +145,10 @@ export function BackupDados({ soRestaurar = false }: { soRestaurar?: boolean } =
               : "Você ainda não fez backup."}
             {meta.alteracoes > 0 && (
               <span className="block text-sm font-normal text-muted-foreground">
-                {meta.alteracoes} {meta.alteracoes === 1 ? "alteração" : "alterações"}{" "}
-                {meta.ultimoBackup ? "desde então" : "feitas só neste aparelho"}
+                {meta.alteracoes}{" "}
+                {meta.ultimoBackup
+                  ? `${meta.alteracoes === 1 ? "alteração" : "alterações"} desde então`
+                  : `${meta.alteracoes === 1 ? "alteração feita" : "alterações feitas"} só neste aparelho`}
               </span>
             )}
           </p>

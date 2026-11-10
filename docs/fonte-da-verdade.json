@@ -951,16 +951,16 @@
           "regex": "<AvisosPassageiro />"
         },
         {
-          "d": "Avisos em pagamentos",
+          "d": "Avisos de pagamento atrasado na tela de pagamentos",
           "tipo": "contem",
           "arquivo": "src/routes/passageiro.pagamentos.tsx",
-          "regex": "<AvisosPassageiro />"
+          "regex": "<AvisosPassageiro so=\"pagamento\" />"
         },
         {
-          "d": "Avisos em minhas viagens",
+          "d": "Minhas viagens mostra o prazo em cada cartão (sem repetir os avisos do início)",
           "tipo": "contem",
           "arquivo": "src/routes/passageiro.viagens.tsx",
-          "regex": "<AvisosPassageiro />"
+          "regex": "prazoViagem\\(v\\.data"
         },
         {
           "d": "Minhas viagens mostra o prazo",
@@ -2164,6 +2164,107 @@
           "d": "Teste na tela da viagem",
           "tipo": "arquivo",
           "arquivo": "src/test/navegar-fluxo.test.tsx"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "titulo": "Extra: acabamento final (telas pequenas, textos, ajuda e segurança)",
+      "status": "concluida",
+      "objetivo": "Fechar o app antes do teste em aparelho: nenhuma tela estoura em 320 px com letra grande, textos corrigidos, tela 'Como usar' para motorista e passageiro e passada de segurança.",
+      "checks": [
+        {
+          "d": "Ajuda: textos do motorista e do passageiro",
+          "tipo": "arquivo",
+          "arquivo": "src/data/ajuda.ts"
+        },
+        {
+          "d": "Ajuda: componente dos tópicos",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/AjudaApp.tsx"
+        },
+        {
+          "d": "Ajuda do motorista (rota)",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/vanzeiro.ajuda.tsx"
+        },
+        {
+          "d": "Ajuda do passageiro (rota)",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/passageiro.ajuda.tsx"
+        },
+        {
+          "d": "Ajuda no menu Mais",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "/vanzeiro/ajuda"
+        },
+        {
+          "d": "Ajuda no perfil do passageiro",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.perfil.tsx",
+          "regex": "/passageiro/ajuda"
+        },
+        {
+          "d": "Teste: a ajuda só cita botões que existem",
+          "tipo": "contem",
+          "arquivo": "src/data/ajuda.test.ts",
+          "regex": "existem nas telas"
+        },
+        {
+          "d": "Teste do fluxo da ajuda",
+          "tipo": "arquivo",
+          "arquivo": "src/test/ajuda-fluxo.test.tsx"
+        },
+        {
+          "d": "Telas pequenas: cartão da van não estoura",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.vans.tsx",
+          "regex": "min-w-0 flex-1"
+        },
+        {
+          "d": "Telas pequenas: financeiro não estoura",
+          "tipo": "contem",
+          "arquivo": "src/components/app/Financeiro.tsx",
+          "regex": "minmax\\(0,1fr\\)"
+        },
+        {
+          "d": "Texto: contagem de passageiros no singular e plural",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "\"1 passageiro\""
+        },
+        {
+          "d": "Texto: alteração no singular e plural",
+          "tipo": "contem",
+          "arquivo": "src/components/app/BackupDados.tsx",
+          "regex": "alteração feita"
+        },
+        {
+          "d": "Segurança: arquivos .env fora do repositório",
+          "tipo": "contem",
+          "arquivo": ".gitignore",
+          "regex": "\\n\\.env\\n"
         },
         {
           "d": "Lint limpo (sem erros nem avisos)",

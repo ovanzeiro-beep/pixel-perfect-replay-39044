@@ -202,8 +202,8 @@ export function gerarAlertas({
         titulo: "Faça um backup dos seus dados",
         detalhe:
           dias === null
-            ? `Você já fez ${backup.alteracoes} alterações e nunca salvou um backup. Se os dados do app forem apagados, não dá para recuperar.`
-            : `O último backup foi há ${dias} ${dias === 1 ? "dia" : "dias"}; desde então foram ${backup.alteracoes} alterações.`,
+            ? `Você já fez ${backup.alteracoes} ${backup.alteracoes === 1 ? "alteração" : "alterações"} e nunca salvou um backup. Se os dados do app forem apagados, não dá para recuperar.`
+            : `O último backup foi há ${dias} ${dias === 1 ? "dia" : "dias"}; desde então ${backup.alteracoes === 1 ? "foi 1 alteração" : `foram ${backup.alteracoes} alterações`}.`,
         destino: { to: "/vanzeiro/perfil" },
       });
     }

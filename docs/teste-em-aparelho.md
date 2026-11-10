@@ -62,6 +62,11 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] "Rota completa no Google Maps" abre com todas as paradas; o texto explica que o Waze vai uma parada por vez.
 - [ ] Depois de embarcar todos, "Seguir para o destino" → "Navegar até o destino" mostra os dois botões.
 
+## Como usar (ajuda dentro do app)
+
+- [ ] Motorista: Mais → **Como usar o app**. Os assuntos abrem e fecham ao tocar. Siga "Fazer uma viagem" com uma viagem de verdade e veja se cada passo bate com o que a tela mostra.
+- [ ] Passageiro: Meu perfil → **Como usar o app**. Peça a uma pessoa que nunca usou para tentar responder uma viagem **só lendo a ajuda**. Anote onde ela travou.
+
 ## Tamanho da letra
 
 - [ ] Perfil → **Tamanho da letra** → "Muito grande": a letra de todo o app aumenta na hora. Navegue por Viagens, Passageiros, Dinheiro, Gastos, Relatórios e Histórico: **nada corta nem aparece rolagem para o lado**.

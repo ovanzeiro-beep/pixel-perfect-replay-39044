@@ -223,7 +223,9 @@ function Passageiros() {
         </div>
       </div>
 
-      <p className="mt-3 text-base text-muted-foreground">{lista.length} passageiro(s)</p>
+      <p className="mt-3 text-base text-muted-foreground">
+        {lista.length === 1 ? "1 passageiro" : `${lista.length} passageiros`}
+      </p>
       <ul className="mt-2 space-y-3">
         {lista.map((p) => (
           <li key={p.id}>

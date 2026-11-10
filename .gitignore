@@ -33,3 +33,8 @@ dist-ssr
 
 # Carimbo de build do service worker (gerado em cada build)
 public/build-id.js
+
+# Segredos: nunca no repositório (o Lovable guarda em Secrets)
+.env
+.env.*
+!.env.example

@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { TamanhoDaLetra } from "@/components/app/TamanhoDaLetra";
 import { useState } from "react";
-import { Check, Edit3, MessageCircle, Phone } from "lucide-react";
+import { Check, ChevronRight, CircleHelp, Edit3, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { encerrarSessao, usePassageiroId } from "@/data/sessao";
@@ -161,6 +161,17 @@ function MeuPerfil() {
       </section>
 
       <TamanhoDaLetra />
+
+      <Link
+        to="/passageiro/ajuda"
+        className="flex min-h-16 items-center gap-4 rounded-3xl bg-card px-5 shadow-sm"
+      >
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <CircleHelp className="h-6 w-6" />
+        </span>
+        <span className="flex-1 text-lg font-bold">Como usar o app</span>
+        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+      </Link>
 
       <section>
         <button
