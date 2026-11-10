@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 00:50 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 01:03 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -19,6 +19,7 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 00:50 UTC.
 | 12 — Extra: exportar relatórios (planilha e PDF) | concluida | 20/20 | OK |
 | 13 — Extra: tamanho da letra | concluida | 12/12 | OK |
 | 14 — Extra: revisão de clareza das telas | concluida | 7/7 | OK |
+| 15 — Extra: navegar com Waze ou Google Maps | concluida | 10/10 | OK |
 
 ## O que falta
 
