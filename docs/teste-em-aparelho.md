@@ -56,6 +56,14 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Pagar na hora da viagem
+
+- [ ] Passageiros → abra um que paga **Por viagem** → editar: ligue **Paga na hora da viagem** e salve. Na lista, aparece "· paga na hora".
+- [ ] Inicie uma viagem com ele: ao tocar em **Embarcou**, o app pergunta **Pagou em dinheiro / Pagou no Pix / Paga depois**.
+- [ ] Escolha uma forma de pagamento: aparece "embarcou · pagou R$ … (recibo nº …)". Em Dinheiro → recibos o recibo está lá e **nada fica em aberto** para ele.
+- [ ] **Desfazer última marcação**: o recibo e a cobrança somem junto.
+- [ ] No fim, o **Resumo da viagem** mostra "Recebido na hora".
+
 ## Avisar que a van está chegando
 
 - [ ] Na ida, na próxima parada, toque em **Avisar: chegando**: abre o WhatsApp do passageiro com a mensagem pronta (com o horário combinado, sem "uns 5 minutos").

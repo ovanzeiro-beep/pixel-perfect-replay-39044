@@ -11,7 +11,13 @@ export type Ajuste = {
   extras: string[]; // só nesta viagem
   ida?: Ida;
 };
-export type Marca = { pid: string; r: "embarcou" | "faltou" | "ficou"; cobrou: number };
+export type Marca = {
+  pid: string;
+  r: "embarcou" | "faltou" | "ficou";
+  cobrou: number;
+  /** Pagou na hora do embarque: como e qual o número do recibo gerado. */
+  pagou?: { forma: "dinheiro" | "pix"; numero: number };
+};
 export type Ficou = { pid: string; motivo: string; hora: string };
 export type ParadaFeita = { inicio: number; minutos: number; local: string; ficaram: Ficou[] };
 export type ParadaAtiva = {

@@ -311,7 +311,7 @@ function Passageiros() {
             />
             <Item
               rotulo="Pagamento"
-              valor={`${nomeForma(aberto.formaPagamento)} · ${brl(aberto.valor)}`}
+              valor={`${nomeForma(aberto.formaPagamento)} · ${brl(aberto.valor)}${aberto.pagaNaHora ? " · paga na hora" : ""}`}
             />
             <Item rotulo="Vencimento" valor={vencTexto(aberto)} />
             <Item
@@ -462,6 +462,7 @@ function FormPassageiro({
     formaPagamento: pas?.formaPagamento ?? ("por_viagem" as FormaPagamento),
     valor: pas ? String(pas.valor) : "",
     vencimento: pas?.vencimento ?? "",
+    pagaNaHora: pas?.pagaNaHora ?? false,
     emergenciaNome: pas?.emergenciaNome ?? "",
     emergenciaTelefone: pas?.emergenciaTelefone ?? "",
     observacoes: pas?.observacoes ?? "",
@@ -485,6 +486,7 @@ function FormPassageiro({
       formaPagamento: fp,
       valor: s ? String(s) : f.valor,
       vencimento: fp === f.formaPagamento ? f.vencimento : "",
+      pagaNaHora: fp === "por_viagem" ? f.pagaNaHora : false,
     });
   };
 
@@ -627,6 +629,30 @@ function FormPassageiro({
             </Campo>
           )}
         </div>
+
+        {f.formaPagamento === "por_viagem" && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={f.pagaNaHora}
+            onClick={() => setF({ ...f, pagaNaHora: !f.pagaNaHora })}
+            className={`flex min-h-16 w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-left ${f.pagaNaHora ? "border-success bg-success/10" : "bg-card"}`}
+          >
+            <span className="min-w-0 flex-1">
+              <b className="block text-lg">Paga na hora da viagem</b>
+              <span className="text-sm text-muted-foreground">
+                Ao tocar em "Embarcou", o app pergunta como ele pagou (dinheiro ou Pix) e já gera o
+                recibo.
+              </span>
+            </span>
+            <span
+              aria-hidden
+              className={`flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition ${f.pagaNaHora ? "justify-end bg-success" : "justify-start bg-muted-foreground/40"}`}
+            >
+              <span className="h-5 w-5 rounded-full bg-white shadow" />
+            </span>
+          </button>
+        )}
 
         <p className="pt-2 text-lg font-extrabold text-primary">Contato de emergência (opcional)</p>
         <Campo label="Nome">

@@ -32,6 +32,7 @@ export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Pass
       return f === "semanal" || f === "mensal";
     }),
   ).size;
+  const recebidoNaHora = ida.marcas.filter((m) => m.pagou).reduce((t, m) => t + m.cobrou, 0);
   const L = ({ r, v }: { r: string; v: React.ReactNode }) => (
     <div className="flex justify-between gap-3 py-2">
       <span className="text-muted-foreground">{r}</span>
@@ -47,6 +48,7 @@ export function ResumoViagem({ ida, passageiros }: { ida: Ida; passageiros: Pass
         <L r="Embarcaram" v={embarcaram} />
         <L r="Entregues" v={entregues} />
         <L r="Total da viagem" v={brl(total)} />
+        {recebidoNaHora > 0 && <L r="Recebido na hora" v={brl(recebidoNaHora)} />}
       </div>
       {planos > 0 && (
         <p className="text-muted-foreground">

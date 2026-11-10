@@ -141,13 +141,17 @@ export interface EscritaDoMock {
 
   // O vanzeiro: a ida
   iniciarIda(viagemId: string, ordem: string[]): boolean;
-  /** Marca embarcou / não apareceu. Quem paga por viagem e embarcou recebe a cobrança NA MESMA operação. */
+  /**
+   * Marca embarcou / não apareceu. Quem paga por viagem e embarcou recebe a cobrança NA MESMA operação.
+   * Com `pagou` ("dinheiro" ou "pix"), quem pagou na hora também já tem a cobrança quitada e o recibo, tudo junto.
+   */
   marcarEmbarque(
     viagemId: string,
     passageiroId: string,
     resposta: "embarcou" | "faltou",
-  ): { ok: boolean; cobrou: number };
-  /** Desfaz a última marcação e a cobrança dela, NA MESMA operação. `cobrancaAchada: false` avisa que não havia cobrança a tirar. */
+    pagou?: Forma,
+  ): { ok: boolean; cobrou: number; recibo?: Recibo };
+  /** Desfaz a última marcação, a cobrança dela e (se pagou na hora) o pagamento e o recibo, NA MESMA operação. `cobrancaAchada: false` avisa que não havia cobrança a tirar. */
   desfazerUltimaMarcacaoDaIda(viagemId: string): { ok: boolean; cobrancaAchada: boolean };
   reordenarFaltamNaIda(viagemId: string, faltam: string[]): boolean;
   mudarFaseDaIda(viagemId: string, fase: "paradas" | "a_caminho" | "chegou"): boolean;

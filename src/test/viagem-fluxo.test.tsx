@@ -306,3 +306,76 @@ describe("avisos pelo WhatsApp durante a ida", () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe("passageiro que paga na hora", () => {
+  const porViagem = (v: import("@/data/viagens").Viagem, e: import("@/data/tipos").Estado) =>
+    v.vao.length >= 2 &&
+    v.vao.every((id) => e.passageiros.find((p) => p.id === id)?.formaPagamento === "por_viagem");
+
+  it("ao embarcar pergunta como pagou; 'Pagou no Pix' já gera o recibo; desfazer devolve tudo", async () => {
+    const { viagem, store, ajuste } = await abrirIda(2, porViagem);
+    await act(async () => {
+      for (const id of viagem.vao) store.atualizarPassageiro(id, { pagaNaHora: true });
+    });
+    const recibosAntes = store.obterEstado().recibos.length;
+
+    await clicar(/^Embarcou$/);
+    expect(await screen.findByText(/pagou a viagem\?/)).toBeInTheDocument();
+    expect(ajuste().ida!.marcas).toHaveLength(0); // ainda não marcou: espera a resposta
+    await clicar(/Pagou no Pix/);
+    await waitFor(() => expect(ajuste().ida!.marcas).toHaveLength(1));
+    const marca = ajuste().ida!.marcas[0]!;
+    expect(marca.pagou).toMatchObject({ forma: "pix" });
+    expect(store.obterEstado().recibos).toHaveLength(recibosAntes + 1);
+
+    await clicar(/Desfazer última marcação/);
+    await waitFor(() => expect(ajuste().ida!.marcas).toHaveLength(0));
+    expect(store.obterEstado().recibos).toHaveLength(recibosAntes);
+  });
+
+  it("'Paga depois' embarca só com a cobrança; 'Voltar' não marca nada", async () => {
+    const { viagem, store, ajuste } = await abrirIda(2, porViagem);
+    await act(async () => {
+      for (const id of viagem.vao) store.atualizarPassageiro(id, { pagaNaHora: true });
+    });
+    const recibosAntes = store.obterEstado().recibos.length;
+    await clicar(/^Embarcou$/);
+    await clicar(/^Voltar$/);
+    expect(ajuste().ida!.marcas).toHaveLength(0);
+
+    await clicar(/^Embarcou$/);
+    await clicar(/Paga depois/);
+    await waitFor(() => expect(ajuste().ida!.marcas).toHaveLength(1));
+    expect(ajuste().ida!.marcas[0]!.pagou).toBeUndefined();
+    expect(ajuste().ida!.marcas[0]!.cobrou).toBeGreaterThan(0);
+    expect(store.obterEstado().recibos).toHaveLength(recibosAntes);
+  });
+
+  it("o resumo da viagem mostra quanto foi recebido na hora", async () => {
+    const { viagem, store, ajuste } = await abrirIda(2, porViagem);
+    const n = viagem.vao.length;
+    await act(async () => {
+      for (const id of viagem.vao) store.atualizarPassageiro(id, { pagaNaHora: true });
+    });
+    for (let i = 0; i < n; i++) {
+      await clicar(/^Embarcou$/);
+      await clicar(/Pagou em dinheiro/);
+      await waitFor(() => expect(ajuste().ida!.marcas).toHaveLength(i + 1));
+    }
+    await ateAVolta(0, ajuste).catch(() => {});
+    await clicar(/Seguir para o destino/);
+    await clicar(/Cheguei ao destino/);
+    await clicar(/Iniciar volta/);
+    await screen.findByText("Chamada da volta");
+    for (let i = 0; i < n; i++) await clicar(/Aguardando/);
+    await clicar(/Seguir viagem/);
+    for (let i = 0; i < n; i++) await clicar(/^Entregue$/);
+    await clicar(/Encerrar viagem/);
+    await screen.findByText("Viagem concluída");
+    const resumo = screen.getByText("Resumo da viagem").closest("section")!;
+    expect(within(resumo).getByText("Recebido na hora")).toBeInTheDocument();
+    const recebido = ajuste().ida!.marcas.reduce((t, m) => t + (m.pagou ? m.cobrou : 0), 0);
+    expect(recebido).toBeGreaterThan(0);
+    expect(resumo.textContent).toMatch(/Recebido na hora\s*R\$/);
+  });
+});
