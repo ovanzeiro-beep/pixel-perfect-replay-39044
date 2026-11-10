@@ -57,7 +57,7 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 - **Pagar na hora:** o passageiro tem a opção `pagaNaHora` (só para quem paga por viagem). `marcarEmbarque(..., pagou)` com "dinheiro" ou "pix" cria a cobrança, quita, gera o recibo (número sequencial) e guarda em `marca.pagou` — tudo numa transação. Desfazer remove os quatro.
 - Operações com dinheiro dentro da viagem (`marcarEmbarque`, `desfazerUltimaMarcacaoDaIda`, `adicionarExtraNaVolta`) são **atômicas**: viagem e cobrança mudam juntas ou nenhuma muda (com banco, uma transação).
 - Operações de viagem que marcam várias pessoas (`marcarPresencasNaParada`, `marcarStatusNaVolta`) **somam** ao que já existe, nunca substituem; assim a resposta do passageiro e a marcação do vanzeiro não se apagam.
-- Prazo de confirmação: `responderViagemApp` (o passageiro) devolve `false` e **não grava** depois do prazo (20h da véspera, `PRAZO` em `src/data/alertas.ts`). O vanzeiro continua ajustando a resposta dele pela própria viagem (`ajustarViagem`). Com banco, a regra deve valer **no servidor**, não só na tela.
+- Prazo de confirmação: `responderViagemApp` (o passageiro) devolve `false` e **não grava** depois do prazo (20h da véspera, `PRAZO` em `src/data/alertas.ts`). O vanzeiro continua ajustando a resposta do passageiro pela própria viagem (`definirRespostaDoPassageiro`). Com banco, a regra deve valer **no servidor**, não só na tela.
 
 ## O que mudar ao trocar (e cuidados)
 
@@ -78,7 +78,7 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 
 ## Entidades (o que virar tabela)
 
-Fonte: tipos em `src/data/store.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.ts`.
+Fonte: tipos em `src/data/tipos.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.ts`.
 
 | Entidade | Campos principais |
 | --- | --- |
@@ -87,7 +87,7 @@ Fonte: tipos em `src/data/store.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.
 | **motoristas** | nome, telefone, categoria e validade da CNH, é o próprio vanzeiro, van |
 | **linhas** | nome, tipo, frequência (semanal/única), dias da semana ou data, saída, volta, destino, van, motorista, valor por viagem e mensal, ativa, observações |
 | **linha_paradas** | linha, posição, cidade (o trajeto, em ordem) |
-| **passageiros** | nome, telefone, endereço (rua, número, bairro, cidade, referência), forma de pagamento (por viagem/semanal/mensal), valor, vencimento (dia da semana ou do mês), contato de emergência, observações, estado do convite (não enviado/enviado/no app), ativo |
+| **passageiros** | nome, telefone, endereço (rua, número, bairro, cidade, referência), forma de pagamento (por viagem/semanal/mensal), valor, vencimento (dia da semana ou do mês), contato de emergência, observações, estado do convite (não enviado/enviado/no app), ativo, paga na hora (só por viagem). **Atenção:** o telefone **não** é único (irmãos podem dividir o telefone do responsável); a importação por planilha só recusa quem tem o mesmo nome **e** o mesmo telefone |
 | **passageiro_linhas** | passageiro × linha (um passageiro pode estar em várias linhas) |
 | **cobrancas** | passageiro, tipo (viagem/semana/mês), referência, vencimento, valor, cancelada (motivo), linha |
 | **pagamentos** | cobrança, valor, data, forma (dinheiro/pix), recibo |
@@ -95,8 +95,9 @@ Fonte: tipos em `src/data/store.ts`, `cobrancas.ts`, `financeiro.ts` e `viagens.
 | **gastos** | valor, data, categoria, van, linha, descrição, litros, km, repete todo mês |
 | **viagem_ajustes** | (linha, data), van e motorista da viagem, cancelada, lista de espera, extras |
 | **viagem_respostas** | viagem, passageiro, resposta (vai/não/sem/espera), ordem de confirmação |
-| **viagem_ida / viagem_volta** | marcações de embarque, paradas, chamada e entregas. Podem ser tabelas próprias ou um `jsonb` por viagem (é o formato de `Ida` e `Volta` em `viagens.ts`) |
+| **viagem_ida / viagem_volta** | marcações de embarque (inclui como pagou na hora, `marca.pagou`), paradas, chamada e entregas. Podem ser tabelas próprias ou um `jsonb` por viagem (é o formato de `Ida` e `Volta` em `viagens.ts`) |
 | **alertas_dispensados** | alerta, assinatura |
+| **config_cobranca** | vanzeiro (uma por vanzeiro), dias de aviso (1 a 7), texto da mensagem de cobrança, "paga na hora" como padrão |
 | **pausas** | vanzeiro, de, até, linha (vazio: todas), motivo, suspender planos (sim/não). Dia dentro de uma pausa **não tem viagem** (exceto viagem que já aconteceu); com banco a regra vale no servidor (resposta do passageiro em dia pausado é recusada). |
 
 ## Ver a van ao vivo e notificações

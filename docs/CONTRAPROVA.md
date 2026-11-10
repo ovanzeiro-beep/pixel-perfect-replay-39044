@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 13:57 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 16:59 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -35,3 +35,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 13:57 UTC.
 | 28 — Extra: férias e feriados (pausar linhas) | concluida | 14/14 | OK |
 | 29 — Extra: importar passageiros por planilha | concluida | 9/9 | OK |
 | 30 — Extra: exportar passageiros para planilha | concluida | 4/4 | OK |
+| 31 — Segunda varredura antes do banco | concluida | 6/6 | OK |

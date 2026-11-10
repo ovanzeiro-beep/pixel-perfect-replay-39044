@@ -3532,6 +3532,70 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 31,
+      "titulo": "Segunda varredura antes do banco",
+      "status": "concluida",
+      "objetivo": "Rever tudo depois das etapas 23 a 30: corrigir o que o banco quebraria e listar o que falta.",
+      "checks": [
+        {
+          "d": "Backup confere as pausas",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "pausas \\(férias e feriados\\) do backup"
+        },
+        {
+          "d": "Backup confere a configuração de cobrança",
+          "tipo": "contem",
+          "arquivo": "src/data/backup.ts",
+          "regex": "configuração de cobrança do backup"
+        },
+        {
+          "d": "Estado salvo recusa pausas estragadas",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "Array.isArray\\(e\\[\"pausas\"\\]\\)"
+        },
+        {
+          "d": "Excluir linha leva as pausas dela",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "Pausa só daquela linha perde o sentido"
+        },
+        {
+          "d": "Importação: irmãos com o mesmo telefone",
+          "tipo": "contem",
+          "arquivo": "src/data/importacao.ts",
+          "regex": "Mesmo telefone de"
+        },
+        {
+          "d": "Relatório da segunda varredura",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "Segunda varredura \\(etapas 23 a 30\\)"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

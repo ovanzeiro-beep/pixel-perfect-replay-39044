@@ -151,6 +151,34 @@ export function erroNosDados(d: unknown): string | null {
     )
       return "Os dados do vanzeiro no backup estão inválidos.";
   }
+  if (d["pausas"] !== undefined) {
+    const ehDia = (x: unknown) => ehTexto(x) && /^\d{4}-\d{2}-\d{2}$/.test(x);
+    const z = d["pausas"];
+    if (
+      !Array.isArray(z) ||
+      !z.every(
+        (x) =>
+          ehObjeto(x) &&
+          ehTexto(x["id"]) &&
+          ehDia(x["de"]) &&
+          ehDia(x["ate"]) &&
+          (x["ate"] as string) >= (x["de"] as string) &&
+          ehTexto(x["motivo"]) &&
+          (x["linhaId"] === undefined || ehTexto(x["linhaId"])),
+      )
+    )
+      return "As pausas (férias e feriados) do backup estão inválidas.";
+  }
+  if (d["configCobranca"] !== undefined) {
+    const c = d["configCobranca"];
+    if (
+      !ehObjeto(c) ||
+      !ehNumero(c["diasDeAviso"]) ||
+      !ehTexto(c["textoCobranca"]) ||
+      typeof c["pagaNaHoraPadrao"] !== "boolean"
+    )
+      return "A configuração de cobrança do backup está inválida.";
+  }
   if (!ehObjeto(d["ajustes"])) return "Faltam dados no backup (viagens ajustadas).";
   if (!ehTexto(d["chavePix"])) return "Faltam dados no backup (chave Pix).";
   if (d["alertasDispensados"] !== undefined && !ehObjeto(d["alertasDispensados"]))

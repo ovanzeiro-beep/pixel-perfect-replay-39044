@@ -222,7 +222,11 @@ export function analisarImportacao(tabela: Tabela, ctx: Contexto) {
   const linhasDeDados = colunas.temCabecalho ? tabela.slice(1) : tabela;
   const inicio = colunas.temCabecalho ? 2 : 1;
   const jaVistos = new Map<string, number>();
-  const existentes = new Map(ctx.existentes.map((e) => [digitos(e.telefone), e.nome]));
+  // Repetido = mesmo telefone E mesmo nome. Irmãos podem dividir o telefone do responsável: esses entram, com aviso.
+  const chaveDe = (telefone: string, nome: string) => `${digitos(telefone)}|${normalizar(nome)}`;
+  const existentes = new Map(ctx.existentes.map((e) => [chaveDe(e.telefone, e.nome), e.nome]));
+  const donosDoTelefone = new Map<string, string>();
+  for (const e of ctx.existentes) donosDoTelefone.set(digitos(e.telefone), e.nome);
 
   const itens = linhasDeDados.map((cels, i): ItemImportacao => {
     const v = (c: Campo) => {
@@ -306,14 +310,19 @@ export function analisarImportacao(tabela: Tabela, ctx: Contexto) {
     // Duplicados: já cadastrado ou repetido na própria planilha
     let situacao: SituacaoDaLinha = problemas.length ? "erro" : "novo";
     if (tel && !problemas.length) {
-      const chave = digitos(tel);
+      const chave = chaveDe(tel, nome);
       if (existentes.has(chave)) {
         situacao = "duplicado";
-        avisos.unshift(`Já cadastrado como ${existentes.get(chave)} (mesmo telefone).`);
+        avisos.unshift(`Já cadastrado como ${existentes.get(chave)} (mesmo nome e telefone).`);
       } else if (jaVistos.has(chave)) {
         situacao = "duplicado";
         avisos.unshift(`Repetido na planilha (linha ${jaVistos.get(chave)}).`);
-      } else jaVistos.set(chave, inicio + i);
+      } else {
+        jaVistos.set(chave, inicio + i);
+        const outro = donosDoTelefone.get(digitos(tel));
+        if (outro) avisos.unshift(`Mesmo telefone de ${outro}: confira se não é a mesma pessoa.`);
+        donosDoTelefone.set(digitos(tel), nome);
+      }
     }
 
     const dados: Omit<Passageiro, "id"> | null =
