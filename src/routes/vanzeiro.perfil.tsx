@@ -14,6 +14,7 @@ import {
 } from "@/data/repositorio";
 import { BackupDados } from "@/components/app/BackupDados";
 import { DadosDoVanzeiro } from "@/components/app/DadosDoVanzeiro";
+import { ChavePix } from "@/components/app/ChavePix";
 import { TamanhoDaLetra } from "@/components/app/TamanhoDaLetra";
 import { guardarCopiaDeSeguranca, zerarAlteracoes } from "@/data/backup";
 import { definirModoDemo, useModoDemo } from "@/lib/modoDemo";
@@ -33,10 +34,8 @@ export const Route = createFileRoute("/vanzeiro/perfil")({
 function PerfilVanzeiro() {
   const vanzeiro = useVanzeiro();
   const { chavePix } = useFrota();
-  const [pix, setPix] = useState(chavePix);
   const [acao, setAcao] = useState<null | "exemplo" | "zero">(null);
   const modoDemo = useModoDemo();
-  useEffect(() => setPix(chavePix), [chavePix]);
   return (
     <PerfilTela
       nome={vanzeiro.nome}
@@ -45,25 +44,7 @@ function PerfilVanzeiro() {
     >
       <Toaster position="top-center" />
       <DadosDoVanzeiro />
-      <div className="mt-6 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
-        <Campo label="Chave Pix">
-          <input
-            className={campoClasse}
-            placeholder="CPF, telefone, e-mail ou chave aleatória"
-            value={pix}
-            onChange={(e) => setPix(e.target.value)}
-          />
-        </Campo>
-        <p className="text-sm text-muted-foreground">Vai junto nas mensagens de cobrança.</p>
-        <BotaoGrande
-          onClick={() => {
-            salvarChavePix(pix);
-            toast.success(pix.trim() ? "Chave Pix salva" : "Chave Pix removida");
-          }}
-        >
-          Salvar chave Pix
-        </BotaoGrande>
-      </div>
+      <ChavePix atual={chavePix} />
       <TamanhoDaLetra />
       <BackupDados />
       <div className="mt-4 space-y-3 rounded-3xl bg-card p-5 shadow-sm">
@@ -99,7 +80,6 @@ function PerfilVanzeiro() {
                 guardarCopiaDeSeguranca(obterEstado(), "restauração dos dados de exemplo");
                 restaurarExemplo();
                 zerarAlteracoes();
-                setPix("");
                 setAcao(null);
                 toast.success("Dados de exemplo restaurados");
               }}

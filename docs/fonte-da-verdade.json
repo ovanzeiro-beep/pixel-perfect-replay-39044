@@ -3000,6 +3000,109 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 25,
+      "titulo": "Extra: Pix com valor e avisos de vencimento",
+      "status": "concluida",
+      "objetivo": "Pix copia e cola com o valor já preenchido, chave Pix reconhecida pelo tipo, e avisos de que o pagamento vai vencer para o passageiro e o vanzeiro.",
+      "checks": [
+        {
+          "d": "Gerador do Pix copia e cola",
+          "tipo": "arquivo",
+          "arquivo": "src/lib/pix.ts"
+        },
+        {
+          "d": "CRC16 do Pix",
+          "tipo": "contem",
+          "arquivo": "src/lib/pix.ts",
+          "regex": "export function crc16"
+        },
+        {
+          "d": "Reconhece o tipo da chave",
+          "tipo": "contem",
+          "arquivo": "src/lib/pix.ts",
+          "regex": "export function interpretarChavePix"
+        },
+        {
+          "d": "Ambíguo nunca vira código sem perguntar",
+          "tipo": "contem",
+          "arquivo": "src/lib/pix.ts",
+          "regex": "c\\.tipo === \"ambigua\""
+        },
+        {
+          "d": "Configuração da chave Pix",
+          "tipo": "arquivo",
+          "arquivo": "src/components/app/ChavePix.tsx"
+        },
+        {
+          "d": "Perfil usa a configuração",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.perfil.tsx",
+          "regex": "<ChavePix"
+        },
+        {
+          "d": "Cobrar leva o código",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "pixComValor"
+        },
+        {
+          "d": "Passageiro: copiar Pix com o valor",
+          "tipo": "contem",
+          "arquivo": "src/routes/passageiro.pagamentos.tsx",
+          "regex": "Copiar Pix com o valor"
+        },
+        {
+          "d": "Aviso: pagamento vence (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "Seu pagamento vence hoje"
+        },
+        {
+          "d": "Alerta: cobranças vencem (vanzeiro)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "vencem nos próximos 2 dias"
+        },
+        {
+          "d": "Teste: CRC bate com o manual do Banco Central",
+          "tipo": "contem",
+          "arquivo": "src/lib/pix.test.ts",
+          "regex": "exemplo do manual do Banco Central"
+        },
+        {
+          "d": "Testes de tela do Pix",
+          "tipo": "arquivo",
+          "arquivo": "src/test/pix-fluxo.test.tsx"
+        },
+        {
+          "d": "Teste: avisos de vencimento",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.test.ts",
+          "regex": "cobranças que vão vencer"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }

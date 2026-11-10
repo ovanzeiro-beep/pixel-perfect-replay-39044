@@ -26,6 +26,17 @@ const c = (id: string, venc: string, valor: number): Cobranca => ({
   pagamentos: [],
 });
 
+describe("mensagem de cobrança com Pix copia e cola", () => {
+  it("sem código, a mensagem é a de sempre; com código, ele vai no fim, sozinho numa linha para copiar", () => {
+    const sem = mensagemCobrar("Ana", 90, ["Semana 02 a 08/11"], "chave@pix");
+    expect(sem).not.toContain("copia e cola");
+    const com = mensagemCobrar("Ana", 90, ["Semana 02 a 08/11"], "chave@pix", "000201...6304ABCD");
+    expect(com.startsWith(sem)).toBe(true);
+    expect(com).toContain("Pix copia e cola (já com o valor):\n000201...6304ABCD");
+    expect(mensagemCobrar("Ana", 90, ["x"], "k", null)).not.toContain("copia e cola");
+  });
+});
+
 describe("cobranças", () => {
   it("referências no formato pedido", () => {
     expect(refViagem("2026-11-13")).toBe("Viagem 13/11");

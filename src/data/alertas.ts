@@ -161,6 +161,40 @@ export function gerarAlertas({
     });
   }
 
+  const vencem = cobrancas.filter(
+    (c) =>
+      c.tipo !== "viagem" &&
+      !c.cancelada &&
+      aberto(c) > 0 &&
+      diasEntre(hoje, c.vencimento) >= 0 &&
+      diasEntre(hoje, c.vencimento) <= 2,
+  );
+  if (vencem.length) {
+    const total = Math.round(vencem.reduce((s, c) => s + aberto(c), 0) * 100) / 100;
+    const primeiroAVencer = [...vencem].sort((a, b) =>
+      a.vencimento.localeCompare(b.vencimento),
+    )[0]!;
+    const quando =
+      primeiroAVencer.vencimento === hoje
+        ? "hoje"
+        : diasEntre(hoje, primeiroAVencer.vencimento) === 1
+          ? "amanhã"
+          : "em 2 dias";
+    out.push({
+      id: "vencem",
+      tipo: "cobranca",
+      nivel: "info",
+      assinatura: `${vencem.length}:${total}`,
+      acao: "Ver cobranças",
+      titulo:
+        vencem.length === 1
+          ? "1 cobrança vence nos próximos 2 dias"
+          : `${vencem.length} cobranças vencem nos próximos 2 dias`,
+      detalhe: `${brl(total)} a receber. A primeira é de ${primeiro(nomePas(primeiroAVencer.pid))}, ${quando}.`,
+      destino: { to: "/vanzeiro/dinheiro" },
+    });
+  }
+
   for (const v of viagens) {
     if (v.passada || v.ajuste.cancelada || v.ajuste.ida || v.sem.length === 0) continue;
     const inicio = inicioDaViagem(v.data, v.saida);
@@ -279,6 +313,30 @@ export function gerarAvisosPassageiro({
       acao: "Ver pagamentos",
       titulo: `Pagamento atrasado há ${dias} ${dias === 1 ? "dia" : "dias"}`,
       detalhe: `Você deve ${brl(total)}. Pague pelo Pix e avise o vanzeiro.`,
+    });
+  }
+
+  const aVencer = cobrancas.filter(
+    (c) =>
+      c.pid === pid &&
+      c.tipo !== "viagem" &&
+      !c.cancelada &&
+      aberto(c) > 0 &&
+      diasEntre(hoje, c.vencimento) >= 0 &&
+      diasEntre(hoje, c.vencimento) <= 1,
+  );
+  if (aVencer.length) {
+    const total = Math.round(aVencer.reduce((s, c) => s + aberto(c), 0) * 100) / 100;
+    const venceHoje = aVencer.some((c) => c.vencimento === hoje);
+    out.push({
+      id: "vence",
+      nivel: "atencao",
+      destino: "/passageiro/pagamentos",
+      acao: "Ver pagamentos",
+      titulo: venceHoje
+        ? `Seu pagamento vence hoje: ${brl(total)}`
+        : `Seu pagamento vence amanhã: ${brl(total)}`,
+      detalhe: "Pague pelo Pix e avise o vanzeiro. Você pode copiar o Pix já com o valor.",
     });
   }
 

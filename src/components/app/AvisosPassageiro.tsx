@@ -15,7 +15,7 @@ export function AvisosPassageiro({ so }: { so?: "pagamento" }) {
   const pid = usePassageiroId();
   const { cobrancas, viagens } = usePassageiroVisao(pid);
   const avisos = gerarAvisosPassageiro({ pid, cobrancas, viagens, agora: new Date() }).filter(
-    (a) => so !== "pagamento" || a.id === "atraso",
+    (a) => so !== "pagamento" || a.id === "atraso" || a.id === "vence",
   );
   if (avisos.length === 0) return null;
   return (

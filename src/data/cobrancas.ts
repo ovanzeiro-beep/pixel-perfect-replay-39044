@@ -229,8 +229,16 @@ export const totalEmAberto = (cobs: Cobranca[]) => cobs.reduce((s, c) => s + abe
 
 export const juntarRefs = (refs: string[]) =>
   refs.length <= 1 ? (refs[0] ?? "") : `${refs.slice(0, -1).join(", ")} e ${refs[refs.length - 1]}`;
-export const mensagemCobrar = (nome: string, valor: number, refs: string[], pix: string) =>
-  `Olá, ${nome}! Tudo bem? Passando pra lembrar do valor em aberto da van: ${brl(valor)}, referente a ${juntarRefs(refs)}. Pix: ${pix}. Obrigado!`;
+export const mensagemCobrar = (
+  nome: string,
+  valor: number,
+  refs: string[],
+  pix: string,
+  /** Pix copia e cola com o valor já preenchido (opcional). */
+  codigoPix?: string | null,
+) =>
+  `Olá, ${nome}! Tudo bem? Passando pra lembrar do valor em aberto da van: ${brl(valor)}, referente a ${juntarRefs(refs)}. Pix: ${pix}. Obrigado!` +
+  (codigoPix ? `\n\nPix copia e cola (já com o valor):\n${codigoPix}` : "");
 export const textoRecibo = (r: Recibo, vanzeiro: string, passageiro: string) =>
   [
     `RECIBO Nº ${String(r.numero).padStart(4, "0")}`,
