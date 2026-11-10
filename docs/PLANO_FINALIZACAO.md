@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) e regra do prazo (17) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) e preparação da publicação (18) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -32,6 +32,7 @@
 | 15 | Extra: navegar com Waze ou Maps | Na viagem, o motorista escolhe Google Maps ou Waze | **Concluída** |
 | 16 | Extra: acabamento final | Telas pequenas, textos, tela "Como usar" e segurança, antes do teste em aparelho | **Concluída** |
 | 17 | Extra: regra do prazo | Depois do prazo o passageiro não muda a resposta; o vanzeiro ajusta | **Concluída** |
+| 18 | Extra: preparação da publicação | Build de produção conferida e guia para publicar e instalar no celular | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -192,3 +193,7 @@ Na tela da viagem (ida e volta) há dois botões, **Google Maps** e **Waze**, pa
 - A regra vale também **na gravação dos dados**: `responderViagemApp` devolve `false` e não grava. Não basta esconder o botão.
 - O **vanzeiro continua ajustando** a resposta de qualquer passageiro (abre a viagem, toca no nome e escolhe Vai, Não vai ou Sem resposta), inclusive depois do prazo.
 - Isso substitui o ponto de atenção da etapa 16 (os botões funcionavam depois do prazo).
+
+## Extra: preparação da publicação
+
+Veja [`PUBLICACAO.md`](PUBLICACAO.md): como publicar no Lovable, o que conferir no celular depois e o que ainda falta para uso real (banco e login).

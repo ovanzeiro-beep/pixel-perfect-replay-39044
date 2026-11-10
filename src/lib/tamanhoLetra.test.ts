@@ -69,3 +69,12 @@ describe("tamanho da letra", () => {
     expect(raiz()).toBe("");
   });
 });
+
+describe("casco da página", () => {
+  it("o <html> aceita o ajuste de letra feito antes da hidratação (suppressHydrationWarning)", async () => {
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync("src/routes/__root.tsx", "utf8")).toMatch(
+      /<html lang="pt-BR" suppressHydrationWarning>/,
+    );
+  });
+});
