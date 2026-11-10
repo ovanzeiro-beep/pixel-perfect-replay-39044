@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { AlertTriangle, BellRing, Info } from "lucide-react";
 import { gerarAvisosPassageiro, type Nivel } from "@/data/alertas";
 import { usePassageiroId } from "@/data/sessao";
-import { useFrota, useViagens } from "@/data/repositorio";
+import { usePassageiroVisao } from "@/data/repositorio";
 
 const COR: Record<Nivel, string> = {
   urgente: "border-destructive/40 bg-destructive/10",
@@ -12,9 +12,8 @@ const COR: Record<Nivel, string> = {
 
 /** Avisos do passageiro (pagamento atrasado, prazo para responder, viagem cancelada). Some quando está tudo em dia. */
 export function AvisosPassageiro({ so }: { so?: "pagamento" }) {
-  const { cobrancas } = useFrota();
-  const viagens = useViagens();
   const pid = usePassageiroId();
+  const { cobrancas, viagens } = usePassageiroVisao(pid);
   const avisos = gerarAvisosPassageiro({ pid, cobrancas, viagens, agora: new Date() }).filter(
     (a) => so !== "pagamento" || a.id === "atraso",
   );

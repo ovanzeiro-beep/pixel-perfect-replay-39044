@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { LogoIcon } from "./Logo";
-import { useDadosProntos, useFrota } from "@/data/repositorio";
+import { useDadosProntos, usePassageiroVisao, useVanzeiro } from "@/data/repositorio";
 import { destinoSeNegado, encerrarSessao, useSessao, type Papel } from "@/data/sessao";
 
 function Carregando() {
@@ -28,13 +28,11 @@ export function ProtegeArea({
 }) {
   const sessao = useSessao();
   const prontos = useDadosProntos();
-  const { passageiros, perfil } = useFrota();
+  const perfil = useVanzeiro();
+  const { eu } = usePassageiroVisao(sessao?.papel === "passageiro" ? sessao.passageiroId : "");
   const navigate = useNavigate();
   const negado = destinoSeNegado(papel, sessao);
-  const passageiroSumiu =
-    prontos &&
-    sessao?.papel === "passageiro" &&
-    !passageiros.some((p) => p.id === sessao.passageiroId && p.ativo);
+  const passageiroSumiu = prontos && sessao?.papel === "passageiro" && !(eu && eu.ativo);
 
   const precisaConfigurar =
     prontos && !negado && papel === "vanzeiro" && modoPerfil === "exigido" && !perfil.configurado;

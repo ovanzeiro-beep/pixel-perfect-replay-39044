@@ -1,6 +1,35 @@
 // Guarda todos os dados do app. Ficam salvos no aparelho (localStorage) e "Restaurar exemplo" volta ao início.
 import { useMemo, useSyncExternalStore } from "react";
 import { prazoViagem } from "./alertas";
+import {
+  opCancelarViagem,
+  opChamadaNaParada,
+  opDefinirResposta,
+  opDesfazerEntrega,
+  opDesfazerMarcacao,
+  opEncerrarParada,
+  opEncerrarViagem,
+  opEntregar,
+  opExtraNaViagem,
+  opExtraNaVolta,
+  opIniciarEntregas,
+  opIniciarIda,
+  opIniciarParada,
+  opIniciarVolta,
+  opMarcarEmbarque,
+  opMudarFase,
+  opPresencasNaParada,
+  opReordenarEntregas,
+  opReordenarFaltam,
+  opStatusNaVolta,
+  opTrocarVanOuMotorista,
+} from "./operacoesViagem";
+import {
+  previaDoConvite,
+  visaoDoPassageiro,
+  type ConvitePreview,
+  type VisaoPassageiro,
+} from "./visaoPassageiro";
 import { novoId } from "./ids";
 import { CHAVE, armazenamentoLocal, gravar, ler, limpar } from "./persistencia";
 import { registrarAlteracao, salvarMeta } from "./backup";
@@ -37,11 +66,15 @@ import {
   type Recibo,
 } from "./cobrancas";
 import {
-  definirResposta,
+  cobrancaSoVolta,
+  datasDaLinha,
+  novaVolta,
   semearAjustes,
   montarViagens,
   semPassageiro,
   type Ajuste,
+  type Resposta,
+  type StatusVolta,
 } from "./viagens";
 import { semearHistorico } from "./historico";
 
@@ -330,6 +363,17 @@ export const useFrota = () =>
     () => estadoServidor,
   );
 export const obterEstado = () => estado;
+
+/** Só o que o passageiro `pid` pode ver (ele, as linhas e viagens dele, as cobranças e recibos dele). */
+export function usePassageiroVisao(pid: string): VisaoPassageiro {
+  const e = useFrota();
+  return useMemo(() => visaoDoPassageiro(e, pid, new Date()), [e, pid]);
+}
+/** Prévia do convite, sem dados pessoais: existe, está válido e se o passageiro já entrou no app. */
+export function useConvite(pid: string): ConvitePreview {
+  const e = useFrota();
+  return useMemo(() => previaDoConvite(e, pid), [e, pid]);
+}
 
 // Fica true depois que os dados salvos no aparelho foram carregados (ou se não há como carregar).
 let dadosProntos = false;
@@ -626,11 +670,15 @@ export function ajustarViagem(id: string, aj: Ajuste) {
  * Ao tirar: remove a mais recente ainda sem pagamento; se já foi paga, cancela a cobrança (o recibo fica, pois o dinheiro entrou).
  * Devolve false se não achou cobrança para tirar.
  */
-export function lancarCobranca(passageiroId: string, valor: number, linhaId?: string): boolean {
+function cobrancasComViagem(
+  cobrancas: Cobranca[],
+  passageiroId: string,
+  valor: number,
+  linhaId?: string,
+): Cobranca[] | null {
   const hoje = isoDe(new Date());
-  let cobrancas = estado.cobrancas;
   if (valor > 0) {
-    cobrancas = [
+    return [
       ...cobrancas,
       {
         id: novoId(`${passageiroId}_viagem_`),
@@ -643,7 +691,8 @@ export function lancarCobranca(passageiroId: string, valor: number, linhaId?: st
         ...(linhaId ? { linhaId } : {}),
       },
     ];
-  } else if (valor < 0) {
+  }
+  if (valor < 0) {
     const iguais = [...cobrancas]
       .reverse()
       .filter(
@@ -651,11 +700,16 @@ export function lancarCobranca(passageiroId: string, valor: number, linhaId?: st
       );
     const livre = iguais.find((c) => c.pagamentos.length === 0);
     const alvo = livre ?? iguais[0];
-    if (!alvo) return false;
-    cobrancas = livre
+    if (!alvo) return null;
+    return livre
       ? cobrancas.filter((c) => c !== alvo)
       : cobrancas.map((c) => (c === alvo ? { ...c, cancelada: "Marcação da viagem desfeita" } : c));
   }
+  return cobrancas;
+}
+export function lancarCobranca(passageiroId: string, valor: number, linhaId?: string): boolean {
+  const cobrancas = cobrancasComViagem(estado.cobrancas, passageiroId, valor, linhaId);
+  if (!cobrancas) return false;
   set(comAberto({ ...estado, cobrancas }));
   return true;
 }
@@ -717,44 +771,197 @@ export function aceitarConvite(pid: string) {
     ),
   });
 }
+// ===== Operações pequenas sobre uma viagem =====
+// Cada uma mexe só no que é dela e é aplicada sobre o dado MAIS RECENTE (veja operacoesViagem.ts).
+// Quando mexe também no dinheiro (cobrança), tudo vai numa transição só: ou muda os dois, ou nenhum.
+type PedidoCobranca = { pid: string; valor: number; linhaId?: string | undefined };
+
+/**
+ * A viagem existe se a linha dela está ativa e roda naquele dia (os dados da viagem são criados na primeira escrita,
+ * por isso uma viagem futura ainda sem registro também conta).
+ */
+const viagemExiste = (viagemId: string) => {
+  const [linhaId, data] = viagemId.split("_");
+  const linha = estado.linhas.find((l) => l.id === linhaId);
+  return (
+    !!linha &&
+    !!data &&
+    (!!estado.ajustes[viagemId] || datasDaLinha(linha, new Date()).includes(data))
+  );
+};
+
+function mudarViagem(
+  viagemId: string,
+  f: (aj: Ajuste) => Ajuste | null,
+  cobranca?: PedidoCobranca,
+): boolean {
+  if (!viagemExiste(viagemId)) return false;
+  const novo = f(estado.ajustes[viagemId] ?? vaziaDaViagem());
+  if (!novo) return false;
+  let cobrancas = estado.cobrancas;
+  if (cobranca) {
+    cobrancas =
+      cobrancasComViagem(cobrancas, cobranca.pid, cobranca.valor, cobranca.linhaId) ?? cobrancas;
+  }
+  set(comAberto({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: novo }, cobrancas }));
+  return true;
+}
+const vaziaDaViagem = (): Ajuste => ({ respostas: {}, espera: [], extras: [] });
+const linhaIdDe = (viagemId: string) => viagemId.split("_")[0] ?? "";
+const passageiroPorId = (id: string) => estado.passageiros.find((p) => p.id === id);
+function lugaresDaViagem(viagemId: string, aj: Ajuste): number {
+  const linha = estado.linhas.find((l) => l.id === linhaIdDe(viagemId));
+  const vanId = aj.vanId ?? linha?.vanId ?? "";
+  return estado.vans.find((v) => v.id === vanId)?.lugares ?? 0;
+}
+
+// --- O passageiro (pelo app)
 /**
  * O passageiro responde "Vou" / "Não vou". Depois do prazo de confirmação ele não muda mais
  * (devolve `false`); o vanzeiro ainda ajusta a resposta dele na própria viagem.
  */
 export function responderViagemApp(pid: string, viagemId: string, vai: boolean): boolean {
-  const aj = estado.ajustes[viagemId];
-  if (!aj) return false;
   const data = viagemId.split("_")[1] ?? "";
   if (prazoViagem(data, new Date()).encerrado) return false;
-  const [linhaId] = viagemId.split("_");
-  const linha = estado.linhas.find((l) => l.id === linhaId);
-  const vanId = aj.vanId ?? linha?.vanId ?? "";
-  const lugares = estado.vans.find((v) => v.id === vanId)?.lugares ?? 0;
-  const { ajuste } = definirResposta(aj, pid, vai ? "vai" : "nao", lugares);
-  set({ ...estado, ajustes: { ...estado.ajustes, [viagemId]: ajuste } });
-  return true;
+  return mudarViagem(
+    viagemId,
+    (aj) => opDefinirResposta(aj, pid, vai ? "vai" : "nao", lugaresDaViagem(viagemId, aj)).ajuste,
+  );
 }
-export function confirmarParadaApp(pid: string, viagemId: string) {
-  const aj = estado.ajustes[viagemId];
-  if (!aj?.ida?.parada) return;
-  const parada = { ...aj.ida.parada, naVan: { ...aj.ida.parada.naVan, [pid]: "app" as const } };
-  set({
-    ...estado,
-    ajustes: { ...estado.ajustes, [viagemId]: { ...aj, ida: { ...aj.ida, parada } } },
+export function confirmarParadaApp(pid: string, viagemId: string): boolean {
+  return mudarViagem(viagemId, (aj) => opPresencasNaParada(aj, "ida", { [pid]: "app" }));
+}
+export function responderVoltaApp(
+  pid: string,
+  viagemId: string,
+  naVan: boolean,
+  motivo?: string,
+): boolean {
+  const status: StatusVolta = naVan
+    ? { r: "na_van", via: "app" }
+    : { r: "nao", motivo: motivo ?? "" };
+  return mudarViagem(viagemId, (aj) => opStatusNaVolta(aj, { [pid]: status }));
+}
+
+// --- O vanzeiro: a viagem em geral
+/** Marca a resposta de um passageiro (Vai / Não vai / Sem resposta) respeitando lotação e fila de espera. */
+export function definirRespostaDoPassageiro(
+  viagemId: string,
+  pid: string,
+  r: Exclude<Resposta, "espera">,
+): { foiParaEspera: boolean; subiu?: string } | null {
+  let resultado: { foiParaEspera: boolean; subiu?: string } | null = null;
+  const ok = mudarViagem(viagemId, (aj) => {
+    const res = opDefinirResposta(aj, pid, r, lugaresDaViagem(viagemId, aj));
+    resultado = { foiParaEspera: res.foiParaEspera, ...(res.subiu ? { subiu: res.subiu } : {}) };
+    return res.ajuste;
   });
+  return ok ? resultado : null;
 }
-export function responderVoltaApp(pid: string, viagemId: string, naVan: boolean, motivo?: string) {
+export const adicionarExtraNaViagem = (viagemId: string, pid: string) =>
+  mudarViagem(viagemId, (aj) => opExtraNaViagem(aj, pid));
+export const cancelarViagem = (viagemId: string) =>
+  mudarViagem(viagemId, (aj) => opCancelarViagem(aj));
+/** Troca o motorista da viagem e, se informada, a van (quem não cabe vai para a lista de espera). */
+export function trocarVanOuMotoristaDaViagem(
+  viagemId: string,
+  motoristaId: string,
+  vanId?: string,
+): boolean {
+  const lugares = vanId ? (estado.vans.find((v) => v.id === vanId)?.lugares ?? 0) : 0;
+  return mudarViagem(viagemId, (aj) => opTrocarVanOuMotorista(aj, motoristaId, vanId, lugares));
+}
+
+// --- O vanzeiro: a ida
+export const iniciarIda = (viagemId: string, ordem: string[]) =>
+  mudarViagem(viagemId, (aj) => opIniciarIda(aj, ordem, Date.now()));
+/** Marca embarcou / não apareceu. Quem paga por viagem e embarcou já recebe a cobrança, na mesma gravação. */
+export function marcarEmbarque(
+  viagemId: string,
+  pid: string,
+  r: "embarcou" | "faltou",
+): { ok: boolean; cobrou: number } {
+  const p = passageiroPorId(pid);
+  const cobrou = r === "embarcou" && p?.formaPagamento === "por_viagem" ? p.valor : 0;
+  const ok = mudarViagem(
+    viagemId,
+    (aj) => opMarcarEmbarque(aj, pid, r, cobrou),
+    cobrou ? { pid, valor: cobrou, linhaId: linhaIdDe(viagemId) } : undefined,
+  );
+  return { ok, cobrou: ok ? cobrou : 0 };
+}
+/** Desfaz a última marcação da ida e a cobrança dela, na mesma gravação. */
+export function desfazerUltimaMarcacaoDaIda(viagemId: string): {
+  ok: boolean;
+  cobrancaAchada: boolean;
+} {
   const aj = estado.ajustes[viagemId];
-  if (!aj?.ida?.volta) return;
-  const novoStatus = naVan
-    ? { r: "na_van" as const, via: "app" as const }
-    : { r: "nao" as const, motivo: motivo ?? "" };
-  const status = { ...aj.ida.volta.status, [pid]: novoStatus };
-  set({
-    ...estado,
-    ajustes: {
-      ...estado.ajustes,
-      [viagemId]: { ...aj, ida: { ...aj.ida, volta: { ...aj.ida.volta, status } } },
-    },
-  });
+  const desfeito = aj ? opDesfazerMarcacao(aj) : null;
+  if (!desfeito) return { ok: false, cobrancaAchada: true };
+  const { cobrou, pid } = desfeito.desfeita;
+  const cobrancaAchada = !cobrou || cobrancasComViagem(estado.cobrancas, pid, -cobrou) !== null;
+  const ok = mudarViagem(
+    viagemId,
+    (a) => opDesfazerMarcacao(a)?.ajuste ?? null,
+    cobrou ? { pid, valor: -cobrou } : undefined,
+  );
+  return { ok, cobrancaAchada };
 }
+export const reordenarFaltamNaIda = (viagemId: string, faltam: string[]) =>
+  mudarViagem(viagemId, (aj) => opReordenarFaltam(aj, faltam));
+export const mudarFaseDaIda = (viagemId: string, fase: "paradas" | "a_caminho" | "chegou") =>
+  mudarViagem(viagemId, (aj) => opMudarFase(aj, fase));
+export const iniciarVolta = (viagemId: string) =>
+  mudarViagem(viagemId, (aj) => opIniciarVolta(aj, novaVolta(Date.now())));
+export const encerrarViagem = (viagemId: string) =>
+  mudarViagem(viagemId, (aj) => opEncerrarViagem(aj, Date.now()));
+
+// --- O vanzeiro: parada no caminho (ida ou volta)
+export const iniciarParada = (
+  viagemId: string,
+  trecho: "ida" | "volta",
+  minutos: number,
+  local: string,
+) => mudarViagem(viagemId, (aj) => opIniciarParada(aj, trecho, minutos, local, Date.now()));
+export const marcarPresencasNaParada = (
+  viagemId: string,
+  trecho: "ida" | "volta",
+  mudancas: Record<string, "manual" | "app" | null>,
+) => mudarViagem(viagemId, (aj) => opPresencasNaParada(aj, trecho, mudancas));
+export const pedirChamadaNaParada = (viagemId: string, trecho: "ida" | "volta") =>
+  mudarViagem(viagemId, (aj) => opChamadaNaParada(aj, trecho));
+export const encerrarParada = (viagemId: string, trecho: "ida" | "volta", motivo: string) =>
+  mudarViagem(viagemId, (aj) => opEncerrarParada(aj, trecho, motivo, Date.now()));
+
+// --- O vanzeiro: a volta
+export const marcarStatusNaVolta = (
+  viagemId: string,
+  mudancas: Record<string, StatusVolta | null>,
+) => mudarViagem(viagemId, (aj) => opStatusNaVolta(aj, mudancas));
+export const iniciarEntregas = (viagemId: string, ordem: string[]) =>
+  mudarViagem(viagemId, (aj) => opIniciarEntregas(aj, ordem));
+/** Quem só volta entra na chamada; quem paga por viagem e ainda não foi cobrado recebe a cobrança, na mesma gravação. */
+export function adicionarExtraNaVolta(
+  viagemId: string,
+  pid: string,
+): { ok: boolean; cobrou: number } {
+  const p = passageiroPorId(pid);
+  const ida = estado.ajustes[viagemId]?.ida;
+  const cobrou = ida && p ? cobrancaSoVolta(ida, pid, p.formaPagamento, p.valor) : 0;
+  const ok = mudarViagem(
+    viagemId,
+    (aj) => opExtraNaVolta(aj, pid, cobrou),
+    cobrou ? { pid, valor: cobrou, linhaId: linhaIdDe(viagemId) } : undefined,
+  );
+  return { ok, cobrou: ok ? cobrou : 0 };
+}
+export const entregarNaVolta = (
+  viagemId: string,
+  pid: string,
+  r: "entregue" | "outro",
+  onde?: string,
+) => mudarViagem(viagemId, (aj) => opEntregar(aj, pid, r, onde));
+export const desfazerEntregaNaVolta = (viagemId: string) =>
+  mudarViagem(viagemId, (aj) => opDesfazerEntrega(aj));
+export const reordenarEntregasDaVolta = (viagemId: string, ainda: string[]) =>
+  mudarViagem(viagemId, (aj) => opReordenarEntregas(aj, ainda));

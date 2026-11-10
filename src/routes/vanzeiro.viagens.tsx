@@ -14,11 +14,17 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { prazoViagem } from "@/data/alertas";
-import { useFrota, useViagens, ajustarViagem, type Passageiro } from "@/data/repositorio";
 import {
-  definirResposta,
+  useFrota,
+  useViagens,
+  adicionarExtraNaViagem,
+  cancelarViagem,
+  definirRespostaDoPassageiro,
+  trocarVanOuMotoristaDaViagem,
+  type Passageiro,
+} from "@/data/repositorio";
+import {
   sobram,
-  aplicarNovaVan,
   rotuloDia,
   horaDe,
   diaSemana,
@@ -26,7 +32,6 @@ import {
   type Viagem,
   type Situacao,
   type Resposta,
-  type Ajuste,
 } from "@/data/viagens";
 import { linkWhatsApp } from "@/lib/validacao";
 import { ResumoViagem } from "@/components/app/ResumoViagem";
@@ -183,9 +188,12 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
   const editavel = !v.passada;
 
   const responder = (p: Passageiro, r: Exclude<Resposta, "espera">) => {
-    const res = definirResposta(v.ajuste, p.id, r, v.lugares);
-    ajustarViagem(v.id, res.ajuste);
+    const res = definirRespostaDoPassageiro(v.id, p.id, r);
     setTocado(null);
+    if (!res) {
+      toast.error("Não consegui salvar a resposta. Tente de novo.");
+      return;
+    }
     if (res.subiu)
       toast.success(
         `${primeiro(pas(res.subiu).nome)} entrou na viagem no lugar de ${primeiro(p.nome)}`,
@@ -409,7 +417,7 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
                 <li key={p.id}>
                   <button
                     onClick={() => {
-                      ajustarViagem(v.id, { ...v.ajuste, extras: [...v.ajuste.extras, p.id] });
+                      adicionarExtraNaViagem(v.id, p.id);
                       setAdicionar(false);
                       toast.success(`${primeiro(p.nome)} adicionado nesta viagem`);
                     }}
@@ -435,7 +443,7 @@ function FichaViagem({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
           texto={`A viagem de ${quando} será cancelada. ${v.vao.length} passageiros estão confirmados.`}
           onNao={() => setCancelar(false)}
           onSim={() => {
-            ajustarViagem(v.id, { ...v.ajuste, cancelada: true });
+            cancelarViagem(v.id);
             setCancelar(false);
             toast.success("Viagem cancelada");
             if (v.vao.length) setAvisarCancel(true);
@@ -491,9 +499,7 @@ function TrocarVan({ v, onFechar }: { v: Viagem; onFechar: () => void }) {
   const nova = vans.find((x) => x.id === vanId);
 
   const aplicar = () => {
-    let aj: Ajuste = { ...v.ajuste, motoristaId: motId };
-    if (vanId !== v.vanId) aj = aplicarNovaVan(aj, vanId, nova?.lugares ?? 0);
-    ajustarViagem(v.id, aj);
+    trocarVanOuMotoristaDaViagem(v.id, motId, vanId !== v.vanId ? vanId : undefined);
     toast.success("Viagem atualizada");
     onFechar();
   };

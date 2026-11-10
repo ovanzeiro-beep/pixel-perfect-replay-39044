@@ -35,18 +35,19 @@ import { Toaster } from "@/components/ui/sonner";
 import {
   useFrota,
   useViagens,
-  ajustarViagem,
-  lancarCobranca,
+  desfazerUltimaMarcacaoDaIda,
+  encerrarParada,
+  iniciarIda,
+  iniciarParada,
+  iniciarVolta,
+  marcarEmbarque,
+  marcarPresencasNaParada,
+  mudarFaseDaIda,
+  pedirChamadaNaParada,
+  reordenarFaltamNaIda,
   type Passageiro,
 } from "@/data/repositorio";
-import {
-  encerrarParada,
-  novaVolta,
-  ordenarParadas,
-  partesRota,
-  type Ida,
-  type Viagem,
-} from "@/data/viagens";
+import { ordenarParadas, partesRota, type Ida, type Viagem } from "@/data/viagens";
 import { enderecoCompleto, linkWhatsApp } from "@/lib/validacao";
 import { BotaoGrande } from "@/components/app/Formulario";
 import { IniciarParada, ParadaAtual } from "@/components/app/ParadaCaminho";
@@ -86,16 +87,8 @@ function TelaIda() {
   useEffect(() => {
     if (!v || v.ajuste.ida || v.ajuste.cancelada || !linha) return;
     const cidade = (id: string) => passageiros.find((p) => p.id === id)?.cidade ?? "";
-    ajustarViagem(v.id, {
-      ...v.ajuste,
-      ida: {
-        ordem: ordenarParadas(v.vao, cidade, linha.paradas),
-        marcas: [],
-        fase: "paradas",
-        inicio: Date.now(),
-      },
-    });
-    toast.success("Viagem iniciada");
+    if (iniciarIda(v.id, ordenarParadas(v.vao, cidade, linha.paradas)))
+      toast.success("Viagem iniciada");
   }, [v, linha, passageiros]);
 
   if (!v || !linha) {
@@ -149,12 +142,10 @@ function Conteudo({
   const naVan = ida.marcas.filter((m) => m.r === "embarcou").length;
   const prox = faltam[0] ? pas(faltam[0]) : undefined;
   const van = vans.find((x) => x.id === v.vanId);
-  const salvar = (nova: Ida) => ajustarViagem(v.id, { ...v.ajuste, ida: nova });
 
   const marcar = (p: Passageiro, r: "embarcou" | "faltou") => {
-    const cobrou = r === "embarcou" && p.formaPagamento === "por_viagem" ? p.valor : 0;
-    if (cobrou) lancarCobranca(p.id, cobrou, v.linhaId);
-    salvar({ ...ida, marcas: [...ida.marcas, { pid: p.id, r, cobrou }] });
+    const { ok, cobrou } = marcarEmbarque(v.id, p.id, r);
+    if (!ok) return;
     toast.success(
       r === "embarcou"
         ? `${primeiro(p.nome)} embarcou${cobrou ? " · cobrança da viagem lançada" : ""}`
@@ -162,11 +153,9 @@ function Conteudo({
     );
   };
   const desfazer = () => {
-    const ult = ida.marcas[ida.marcas.length - 1];
-    if (!ult) return;
-    if (ult.cobrou && !lancarCobranca(ult.pid, -ult.cobrou))
-      toast.warning("Não achei a cobrança dessa viagem. Confira em Dinheiro.");
-    salvar({ ...ida, marcas: ida.marcas.slice(0, -1), fase: "paradas" });
+    const { ok, cobrancaAchada } = desfazerUltimaMarcacaoDaIda(v.id);
+    if (!ok) return;
+    if (!cobrancaAchada) toast.warning("Não achei a cobrança dessa viagem. Confira em Dinheiro.");
     toast.success("Última marcação desfeita");
   };
   const aoArrastar = (e: DragEndEvent) => {
@@ -174,14 +163,13 @@ function Conteudo({
     const de = faltam.indexOf(String(e.active.id)),
       para = faltam.indexOf(String(e.over.id));
     const novaFaltam = arrayMove(faltam, de, para);
-    salvar({ ...ida, ordem: [...ida.marcas.map((m) => m.pid), ...novaFaltam] });
+    reordenarFaltamNaIda(v.id, novaFaltam);
   };
   if (ida.volta || ida.encerrada)
     return (
       <TelaVolta
         v={v}
         ida={ida}
-        salvar={salvar}
         nomeLinha={nomeLinha}
         vanNome={van?.apelido ?? "Sem van"}
         passageiros={passageiros}
@@ -226,8 +214,9 @@ function Conteudo({
             bordo={ida.marcas
               .filter((m) => m.r === "embarcou" && pas(m.pid))
               .map((m) => pas(m.pid)!)}
-            onMudar={(parada) => salvar({ ...ida, parada })}
-            onSeguir={(mot) => salvar(encerrarParada(ida, mot, Date.now()))}
+            onPresencas={(m) => marcarPresencasNaParada(v.id, "ida", m)}
+            onChamada={() => pedirChamadaNaParada(v.id, "ida")}
+            onSeguir={(mot) => encerrarParada(v.id, "ida", mot)}
           />
         </div>
       ) : (
@@ -307,7 +296,7 @@ function Conteudo({
             <BotaoGrande
               variante="destaque"
               onClick={() => {
-                salvar({ ...ida, fase: "a_caminho" });
+                mudarFaseDaIda(v.id, "a_caminho");
                 toast.success(`A caminho de ${destino}`);
               }}
             >
@@ -322,7 +311,7 @@ function Conteudo({
             <BotaoGrande
               variante="destaque"
               onClick={() => {
-                salvar({ ...ida, fase: "chegou" });
+                mudarFaseDaIda(v.id, "chegou");
                 toast.success("Chegada marcada");
               }}
             >
@@ -343,10 +332,7 @@ function Conteudo({
                   ))}
               </ul>
               <div className="mt-3">
-                <BotaoGrande
-                  variante="destaque"
-                  onClick={() => salvar({ ...ida, volta: novaVolta(Date.now()) })}
-                >
+                <BotaoGrande variante="destaque" onClick={() => iniciarVolta(v.id)}>
                   Iniciar volta
                 </BotaoGrande>
               </div>
@@ -425,10 +411,7 @@ function Conteudo({
         <IniciarParada
           onFechar={() => setNovaParada(false)}
           onIniciar={(minutos, local) => {
-            salvar({
-              ...ida,
-              parada: { inicio: Date.now(), minutos, local, chamada: false, naVan: {} },
-            });
+            iniciarParada(v.id, "ida", minutos, local);
             setNovaParada(false);
             toast.success(`Parada de ${minutos} minutos`);
           }}

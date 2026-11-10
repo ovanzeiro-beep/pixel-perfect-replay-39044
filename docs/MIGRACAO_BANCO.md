@@ -19,7 +19,7 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 ## O contrato (operações)
 
-**Leitura:** `useFrota`, `useViagens`, `useDadosProntos`, `useVanzeiro`, `obterEstado`.
+**Leitura:** `useFrota`, `useViagens`, `useDadosProntos`, `useVanzeiro`, `obterEstado` (vanzeiro) e `usePassageiroVisao`, `useConvite` (passageiro).
 
 **Ciclo de vida:** `iniciarPersistencia`, `restaurarExemplo`, `comecarDoZero`, `substituirTodosOsDados` (restaurar backup; com banco vira importação em lote).
 
@@ -31,7 +31,13 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 
 **Passageiros:** `salvarPassageiro`, `atualizarPassageiro`, `desativarPassageiro`, `excluirPassageiro`, `aceitarConvite`.
 
-**Viagens:** `ajustarViagem`, `responderViagemApp`, `confirmarParadaApp`, `responderVoltaApp`.
+**Viagens (operações pequenas):** ninguém grava a viagem inteira; cada operação mexe só no que é dela, sobre o dado mais recente, para passageiro e vanzeiro poderem mexer ao mesmo tempo sem apagar o trabalho um do outro.
+
+- *Passageiro (app):* `responderViagemApp`, `confirmarParadaApp`, `responderVoltaApp`.
+- *Viagem em geral:* `definirRespostaDoPassageiro`, `adicionarExtraNaViagem`, `cancelarViagem`, `trocarVanOuMotoristaDaViagem`.
+- *Ida:* `iniciarIda`, `marcarEmbarque` (já lança a cobrança), `desfazerUltimaMarcacaoDaIda` (já desfaz a cobrança), `reordenarFaltamNaIda`, `mudarFaseDaIda`, `iniciarVolta`, `encerrarViagem`.
+- *Parada no caminho:* `iniciarParada`, `marcarPresencasNaParada`, `pedirChamadaNaParada`, `encerrarParada`.
+- *Volta:* `marcarStatusNaVolta`, `iniciarEntregas`, `adicionarExtraNaVolta` (já lança a cobrança), `entregarNaVolta`, `desfazerEntregaNaVolta`, `reordenarEntregasDaVolta`.
 
 **Dinheiro:** `lancarCobranca`, `marcarPagamento`, `desfazerRecibo`, `cancelarCob`, `salvarChavePix`, `salvarGasto`, `excluirGasto`.
 
@@ -44,7 +50,10 @@ Regras de negócio que a implementação nova **precisa manter** (já cobertas p
 - O motorista `proprio` (o vanzeiro) não pode ser excluído.
 - `lancarCobranca` com valor negativo remove a cobrança ainda não paga; se já foi paga, **cancela** (o recibo fica); sem cobrança para tirar, devolve `false`.
 - `marcarPagamento` quita as cobranças **mais antigas primeiro**, devolve o recibo (número sequencial crescente) e `null` se nada estava em aberto.
+- Visão do passageiro: `usePassageiroVisao` entrega **só** o cadastro dele, as linhas e viagens dele (com as marcações dele, nunca as dos outros), as cobranças e os recibos dele. Com banco, é uma consulta própria protegida por regra de acesso (RLS). `useConvite` devolve só "existe / válido / já no app", sem dado pessoal, porque a tela abre antes do login.
 - Lotação: quem confirma além dos lugares da van vai para a lista de espera; quando abre vaga, o primeiro da espera sobe.
+- Operações com dinheiro dentro da viagem (`marcarEmbarque`, `desfazerUltimaMarcacaoDaIda`, `adicionarExtraNaVolta`) são **atômicas**: viagem e cobrança mudam juntas ou nenhuma muda (com banco, uma transação).
+- Operações de viagem que marcam várias pessoas (`marcarPresencasNaParada`, `marcarStatusNaVolta`) **somam** ao que já existe, nunca substituem; assim a resposta do passageiro e a marcação do vanzeiro não se apagam.
 - Prazo de confirmação: `responderViagemApp` (o passageiro) devolve `false` e **não grava** depois do prazo (20h da véspera, `PRAZO` em `src/data/alertas.ts`). O vanzeiro continua ajustando a resposta dele pela própria viagem (`ajustarViagem`). Com banco, a regra deve valer **no servidor**, não só na tela.
 
 ## O que mudar ao trocar (e cuidados)

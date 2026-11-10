@@ -35,7 +35,20 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { lancarCobranca, type Passageiro } from "@/data/repositorio";
+import {
+  adicionarExtraNaVolta,
+  desfazerEntregaNaVolta,
+  encerrarParada,
+  encerrarViagem,
+  entregarNaVolta,
+  iniciarEntregas,
+  iniciarParada,
+  marcarPresencasNaParada,
+  marcarStatusNaVolta,
+  pedirChamadaNaParada,
+  reordenarEntregasDaVolta,
+  type Passageiro,
+} from "@/data/repositorio";
 import { ResumoViagem } from "@/components/app/ResumoViagem";
 import { textoResumoViagem } from "@/data/manifesto";
 import { compartilharTexto } from "@/lib/compartilhar";
@@ -43,14 +56,13 @@ import { useModoDemo } from "@/lib/modoDemo";
 import {
   aindaNaVan,
   chamadaVolta,
-  cobrancaSoVolta,
-  encerrarParadaVolta,
   horaDe,
   partesRota,
   pendentesVolta,
   rotaVolta,
   textoFaltam,
   type Ida,
+  type StatusVolta,
   type Viagem,
   type Volta,
 } from "@/data/viagens";
@@ -97,14 +109,12 @@ function Contatos({ p, msg }: { p: Passageiro; msg: string }) {
 export function TelaVolta({
   v,
   ida,
-  salvar,
   nomeLinha,
   vanNome,
   passageiros,
 }: {
   v: Viagem;
   ida: Ida;
-  salvar: (i: Ida) => void;
   nomeLinha: string;
   vanNome: string;
   passageiros: Passageiro[];
@@ -112,7 +122,6 @@ export function TelaVolta({
   const pas = (id: string) => passageiros.find((p) => p.id === id);
   const volta = ida.volta;
   const ainda = volta ? aindaNaVan(volta).filter((id) => pas(id)) : [];
-  const setVolta = (nv: Volta) => salvar({ ...ida, volta: nv });
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-background pb-10">
@@ -153,21 +162,9 @@ export function TelaVolta({
         {ida.encerrada ? (
           <Encerrada v={v} ida={ida} nomeLinha={nomeLinha} passageiros={passageiros} />
         ) : volta?.fase === "chamada" ? (
-          <Chamada
-            ida={ida}
-            volta={volta}
-            setVolta={setVolta}
-            passageiros={passageiros}
-            linhaId={v.linhaId}
-          />
+          <Chamada viagemId={v.id} ida={ida} volta={volta} passageiros={passageiros} />
         ) : volta ? (
-          <EntregaVolta
-            ida={ida}
-            volta={volta}
-            setVolta={setVolta}
-            salvar={salvar}
-            passageiros={passageiros}
-          />
+          <EntregaVolta viagemId={v.id} ida={ida} volta={volta} passageiros={passageiros} />
         ) : null}
       </div>
     </div>
@@ -215,17 +212,15 @@ function Encerrada({
 }
 
 function Chamada({
+  viagemId,
   ida,
   volta,
-  setVolta,
   passageiros,
-  linhaId,
 }: {
+  viagemId: string;
   ida: Ida;
   volta: Volta;
-  setVolta: (v: Volta) => void;
   passageiros: Passageiro[];
-  linhaId: string;
 }) {
   const pas = (id: string) => passageiros.find((p) => p.id === id);
   const [naoVolta, setNaoVolta] = useState<Passageiro | null>(null);
@@ -248,18 +243,15 @@ function Chamada({
     .filter((p): p is Passageiro => !!p);
   const st = volta.status;
   const marcar = (id: string, s: Volta["status"][string] | null) => {
-    const n = { ...st };
-    if (s) n[id] = s;
-    else delete n[id];
-    setVolta({ ...volta, status: n });
+    marcarStatusNaVolta(viagemId, { [id]: s });
   };
   const tocar = (id: string) => marcar(id, st[id] ? null : { r: "na_van", via: "manual" });
   const simular = () => {
-    const n = { ...st };
+    const n: Record<string, StatusVolta> = {};
     pendentes.slice(0, Math.max(1, Math.ceil(pendentes.length / 2))).forEach((x) => {
       n[x.id] = { r: "na_van", via: "app" };
     });
-    setVolta({ ...volta, status: n });
+    marcarStatusNaVolta(viagemId, n);
     toast.success("Confirmações simuladas");
   };
   const seguir = () => {
@@ -267,7 +259,7 @@ function Chamada({
       toast.error(`${textoFaltam(pendentes.map((x) => primeiro(x.nome)))}`);
       return;
     }
-    setVolta({ ...volta, fase: "entrega", ordem: rotaVolta(ida, volta) });
+    iniciarEntregas(viagemId, rotaVolta(ida, volta));
     toast.success("Rota de volta montada");
   };
   const fora = new Set([...chamadaVolta(ida, volta), ...ficaram.map((x) => x.id)]);
@@ -275,9 +267,8 @@ function Chamada({
     (p) => p.ativo && !fora.has(p.id) && p.nome.toLowerCase().includes(busca.toLowerCase()),
   );
   const adicionarP = (p: Passageiro) => {
-    const cobrou = cobrancaSoVolta(ida, p.id, p.formaPagamento, p.valor);
-    if (cobrou) lancarCobranca(p.id, cobrou, linhaId);
-    setVolta({ ...volta, extras: [...volta.extras, { pid: p.id, cobrou }] });
+    const { ok, cobrou } = adicionarExtraNaVolta(viagemId, p.id);
+    if (!ok) return;
     setAdicionar(false);
     setBusca("");
     toast.success(
@@ -416,11 +407,11 @@ function Chamada({
           <BotaoGrande
             variante="destaque"
             onClick={() => {
-              const n = { ...st };
+              const n: Record<string, StatusVolta> = {};
               pendentes.forEach((x) => {
                 n[x.id] = { r: "na_van", via: "manual" };
               });
-              setVolta({ ...volta, status: n });
+              marcarStatusNaVolta(viagemId, n);
               setConferir(false);
             }}
           >
@@ -505,16 +496,14 @@ function Chamada({
 }
 
 function EntregaVolta({
+  viagemId,
   ida,
   volta,
-  setVolta,
-  salvar,
   passageiros,
 }: {
+  viagemId: string;
   ida: Ida;
   volta: Volta;
-  setVolta: (v: Volta) => void;
-  salvar: (i: Ida) => void;
   passageiros: Passageiro[];
 }) {
   const pas = (id: string) => passageiros.find((p) => p.id === id);
@@ -530,16 +519,13 @@ function EntregaVolta({
   const ainda = aindaNaVan(volta).filter((id) => pas(id));
   const prox = ainda[0] ? pas(ainda[0]) : undefined;
   const entregar = (p: Passageiro, r: "entregue" | "outro", lugar?: string) => {
-    setVolta({
-      ...volta,
-      entregas: [...volta.entregas, { pid: p.id, r, ...(lugar ? { onde: lugar } : {}) }],
-    });
+    entregarNaVolta(viagemId, p.id, r, lugar);
     toast.success(
       r === "entregue" ? `${primeiro(p.nome)} entregue` : `${primeiro(p.nome)} desceu em ${lugar}`,
     );
   };
   const desfazer = () => {
-    setVolta({ ...volta, entregas: volta.entregas.slice(0, -1) });
+    desfazerEntregaNaVolta(viagemId);
     toast.success("Última marcação desfeita");
   };
   const aoArrastar = (e: DragEndEvent) => {
@@ -549,20 +535,14 @@ function EntregaVolta({
       ainda.indexOf(String(e.active.id)),
       ainda.indexOf(String(e.over.id)),
     );
-    setVolta({
-      ...volta,
-      ordem: [
-        ...volta.entregas.map((x) => x.pid).filter((id) => volta.ordem.includes(id)),
-        ...nova,
-      ],
-    });
+    reordenarEntregasDaVolta(viagemId, nova);
   };
   const encerrar = () => {
     if (ainda.length) {
       setFaltaMarcar(ainda);
       return;
     }
-    salvar({ ...ida, encerrada: Date.now() });
+    encerrarViagem(viagemId);
     toast.success("Viagem encerrada");
   };
 
@@ -571,8 +551,9 @@ function EntregaVolta({
       <ParadaAtual
         parada={volta.parada}
         bordo={ainda.map((id) => pas(id)!)}
-        onMudar={(parada) => setVolta({ ...volta, parada })}
-        onSeguir={(mot) => setVolta(encerrarParadaVolta(volta, mot, Date.now()))}
+        onPresencas={(m) => marcarPresencasNaParada(viagemId, "volta", m)}
+        onChamada={() => pedirChamadaNaParada(viagemId, "volta")}
+        onSeguir={(mot) => encerrarParada(viagemId, "volta", mot)}
       />
     );
   }
@@ -719,10 +700,7 @@ function EntregaVolta({
         <IniciarParada
           onFechar={() => setNovaParada(false)}
           onIniciar={(minutos, local) => {
-            setVolta({
-              ...volta,
-              parada: { inicio: Date.now(), minutos, local, chamada: false, naVan: {} },
-            });
+            iniciarParada(viagemId, "volta", minutos, local);
             setNovaParada(false);
             toast.success(`Parada de ${minutos} minutos`);
           }}
