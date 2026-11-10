@@ -10,6 +10,7 @@
  *  - nenhuma tela importa `./store` direto.
  */
 import * as mock from "./store";
+import { escrever } from "./gravacao";
 import type { Estado, Linha, Motorista, Passageiro, PerfilVanzeiro, Van } from "./store";
 import type { Forma, Recibo } from "./cobrancas";
 import type { Gasto } from "./financeiro";
@@ -57,10 +58,12 @@ export interface Leitura {
 }
 
 /**
- * Escrita. No mock tudo é síncrono. Com banco, cada operação vira assíncrona (Promise): as que devolvem valor
- * (`salvarPassageiro` → id, `marcarPagamento` → recibo, `lancarCobranca` → boolean) passam a devolver Promise do mesmo valor.
+ * As operações de escrita, descritas como o mock as faz (imediatas). O CONTRATO que as telas usam é `Escrita`,
+ * logo abaixo: as MESMAS operações, todas devolvendo `Promise` do mesmo valor (`salvarPassageiro` → Promise do id,
+ * `marcarPagamento` → Promise do recibo, `responderViagemApp` → Promise de sim/não...). Uma operação que falha
+ * rejeita com `FalhaDeGravacao`. Só `iniciarPersistencia` continua imediata (devolve a função que para de salvar).
  */
-export interface Escrita {
+export interface EscritaDoMock {
   // --- Ciclo de vida
   /** Carrega os dados salvos e passa a salvar a cada mudança. Devolve a função que para de salvar. */
   iniciarPersistencia(): () => void;
@@ -191,6 +194,14 @@ export interface Escrita {
   restaurarAlertas(): void;
 }
 
+/** A mesma operação, devolvendo Promise do mesmo valor. */
+type Assincrono<T> = {
+  [K in keyof T]: T[K] extends (...a: infer A) => infer R ? (...a: A) => Promise<Awaited<R>> : T[K];
+};
+/** O contrato de escrita: tudo devolve Promise, menos o ciclo de vida do salvamento no aparelho. */
+export type Escrita = Pick<EscritaDoMock, "iniciarPersistencia"> &
+  Assincrono<Omit<EscritaDoMock, "iniciarPersistencia">>;
+
 export type Repositorio = Leitura & Escrita;
 
 /** A implementação em uso. Para trocar o mock pelo banco, é aqui que se muda. */
@@ -203,57 +214,57 @@ export const repositorio: Repositorio = {
   useConvite: mock.useConvite,
   obterEstado: mock.obterEstado,
   iniciarPersistencia: mock.iniciarPersistencia,
-  restaurarExemplo: mock.restaurarExemplo,
-  substituirTodosOsDados: mock.substituirTodosOsDados,
-  comecarDoZero: mock.comecarDoZero,
-  salvarPerfil: mock.salvarPerfil,
-  salvarVan: mock.salvarVan,
-  excluirVan: mock.excluirVan,
-  salvarMotorista: mock.salvarMotorista,
-  excluirMotorista: mock.excluirMotorista,
-  salvarLinha: mock.salvarLinha,
-  alternarLinha: mock.alternarLinha,
-  excluirLinha: mock.excluirLinha,
-  colocarNaLinha: mock.colocarNaLinha,
-  tirarDaLinha: mock.tirarDaLinha,
-  salvarPassageiro: mock.salvarPassageiro,
-  atualizarPassageiro: mock.atualizarPassageiro,
-  desativarPassageiro: mock.desativarPassageiro,
-  excluirPassageiro: mock.excluirPassageiro,
-  aceitarConvite: mock.aceitarConvite,
-  responderViagemApp: mock.responderViagemApp,
-  definirRespostaDoPassageiro: mock.definirRespostaDoPassageiro,
-  adicionarExtraNaViagem: mock.adicionarExtraNaViagem,
-  cancelarViagem: mock.cancelarViagem,
-  trocarVanOuMotoristaDaViagem: mock.trocarVanOuMotoristaDaViagem,
-  iniciarIda: mock.iniciarIda,
-  marcarEmbarque: mock.marcarEmbarque,
-  desfazerUltimaMarcacaoDaIda: mock.desfazerUltimaMarcacaoDaIda,
-  reordenarFaltamNaIda: mock.reordenarFaltamNaIda,
-  mudarFaseDaIda: mock.mudarFaseDaIda,
-  iniciarVolta: mock.iniciarVolta,
-  encerrarViagem: mock.encerrarViagem,
-  iniciarParada: mock.iniciarParada,
-  marcarPresencasNaParada: mock.marcarPresencasNaParada,
-  pedirChamadaNaParada: mock.pedirChamadaNaParada,
-  encerrarParada: mock.encerrarParada,
-  marcarStatusNaVolta: mock.marcarStatusNaVolta,
-  iniciarEntregas: mock.iniciarEntregas,
-  adicionarExtraNaVolta: mock.adicionarExtraNaVolta,
-  entregarNaVolta: mock.entregarNaVolta,
-  desfazerEntregaNaVolta: mock.desfazerEntregaNaVolta,
-  reordenarEntregasDaVolta: mock.reordenarEntregasDaVolta,
-  confirmarParadaApp: mock.confirmarParadaApp,
-  responderVoltaApp: mock.responderVoltaApp,
-  lancarCobranca: mock.lancarCobranca,
-  marcarPagamento: mock.marcarPagamento,
-  desfazerRecibo: mock.desfazerRecibo,
-  cancelarCob: mock.cancelarCob,
-  salvarChavePix: mock.salvarChavePix,
-  salvarGasto: mock.salvarGasto,
-  excluirGasto: mock.excluirGasto,
-  dispensarAlerta: mock.dispensarAlerta,
-  restaurarAlertas: mock.restaurarAlertas,
+  restaurarExemplo: escrever(mock.restaurarExemplo),
+  substituirTodosOsDados: escrever(mock.substituirTodosOsDados),
+  comecarDoZero: escrever(mock.comecarDoZero),
+  salvarPerfil: escrever(mock.salvarPerfil),
+  salvarVan: escrever(mock.salvarVan),
+  excluirVan: escrever(mock.excluirVan),
+  salvarMotorista: escrever(mock.salvarMotorista),
+  excluirMotorista: escrever(mock.excluirMotorista),
+  salvarLinha: escrever(mock.salvarLinha),
+  alternarLinha: escrever(mock.alternarLinha),
+  excluirLinha: escrever(mock.excluirLinha),
+  colocarNaLinha: escrever(mock.colocarNaLinha),
+  tirarDaLinha: escrever(mock.tirarDaLinha),
+  salvarPassageiro: escrever(mock.salvarPassageiro),
+  atualizarPassageiro: escrever(mock.atualizarPassageiro),
+  desativarPassageiro: escrever(mock.desativarPassageiro),
+  excluirPassageiro: escrever(mock.excluirPassageiro),
+  aceitarConvite: escrever(mock.aceitarConvite),
+  responderViagemApp: escrever(mock.responderViagemApp),
+  definirRespostaDoPassageiro: escrever(mock.definirRespostaDoPassageiro),
+  adicionarExtraNaViagem: escrever(mock.adicionarExtraNaViagem),
+  cancelarViagem: escrever(mock.cancelarViagem),
+  trocarVanOuMotoristaDaViagem: escrever(mock.trocarVanOuMotoristaDaViagem),
+  iniciarIda: escrever(mock.iniciarIda),
+  marcarEmbarque: escrever(mock.marcarEmbarque),
+  desfazerUltimaMarcacaoDaIda: escrever(mock.desfazerUltimaMarcacaoDaIda),
+  reordenarFaltamNaIda: escrever(mock.reordenarFaltamNaIda),
+  mudarFaseDaIda: escrever(mock.mudarFaseDaIda),
+  iniciarVolta: escrever(mock.iniciarVolta),
+  encerrarViagem: escrever(mock.encerrarViagem),
+  iniciarParada: escrever(mock.iniciarParada),
+  marcarPresencasNaParada: escrever(mock.marcarPresencasNaParada),
+  pedirChamadaNaParada: escrever(mock.pedirChamadaNaParada),
+  encerrarParada: escrever(mock.encerrarParada),
+  marcarStatusNaVolta: escrever(mock.marcarStatusNaVolta),
+  iniciarEntregas: escrever(mock.iniciarEntregas),
+  adicionarExtraNaVolta: escrever(mock.adicionarExtraNaVolta),
+  entregarNaVolta: escrever(mock.entregarNaVolta),
+  desfazerEntregaNaVolta: escrever(mock.desfazerEntregaNaVolta),
+  reordenarEntregasDaVolta: escrever(mock.reordenarEntregasDaVolta),
+  confirmarParadaApp: escrever(mock.confirmarParadaApp),
+  responderVoltaApp: escrever(mock.responderVoltaApp),
+  lancarCobranca: escrever(mock.lancarCobranca),
+  marcarPagamento: escrever(mock.marcarPagamento),
+  desfazerRecibo: escrever(mock.desfazerRecibo),
+  cancelarCob: escrever(mock.cancelarCob),
+  salvarChavePix: escrever(mock.salvarChavePix),
+  salvarGasto: escrever(mock.salvarGasto),
+  excluirGasto: escrever(mock.excluirGasto),
+  dispensarAlerta: escrever(mock.dispensarAlerta),
+  restaurarAlertas: escrever(mock.restaurarAlertas),
 };
 
 // As telas usam estas funções diretamente (import nomeado), todas vindas do `repositorio` acima.

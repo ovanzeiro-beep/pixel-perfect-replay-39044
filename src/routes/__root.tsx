@@ -1,3 +1,6 @@
+import { toast } from "sonner";
+import { FalhaDeGravacao, registrarFalhaDeGravacao } from "@/data/gravacao";
+import { IndicadorSalvando } from "@/components/app/IndicadorSalvando";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -128,7 +131,20 @@ function RootComponent() {
     iniciarTamanhoLetra();
     capturarInstalacao();
     registrarServiceWorker();
-    return iniciarPersistencia();
+    const pararDeSalvar = iniciarPersistencia();
+    // Gravação que falha (sem internet, servidor fora): avisa a pessoa e não deixa o erro "solto" no console.
+    const tirarAviso = registrarFalhaDeGravacao(() =>
+      toast.error("Não foi possível salvar. Confira a internet e tente de novo."),
+    );
+    const aoRejeitar = (e: PromiseRejectionEvent) => {
+      if (e.reason instanceof FalhaDeGravacao) e.preventDefault();
+    };
+    window.addEventListener("unhandledrejection", aoRejeitar);
+    return () => {
+      pararDeSalvar();
+      tirarAviso();
+      window.removeEventListener("unhandledrejection", aoRejeitar);
+    };
   }, []);
 
   return (
@@ -139,6 +155,7 @@ function RootComponent() {
         <div className="pointer-events-auto space-y-2">
           <AtualizacaoApp />
           <SemConexao />
+          <IndicadorSalvando />
         </div>
       </div>
     </QueryClientProvider>

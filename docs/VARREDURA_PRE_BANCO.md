@@ -71,7 +71,7 @@ Feita em 10/11/2026 sobre a `main` (etapa 18, `08215df`). Objetivo: achar erros,
 - [x] P0-1 Leituras próprias do passageiro e telas do passageiro usando só elas. *(feito, etapa 20)*
 - [x] P0-2 Operações pequenas de viagem no contrato, no mock e nas telas. *(feito, etapa 20)*
 - [x] P0-4 Operação única "embarque + cobrança" (e a equivalente da volta). *(feito, etapa 20)*
-- [ ] P0-3 Contrato assíncrono, com estados de salvando e erro nas telas.
+- [x] P0-3 Contrato assíncrono, com estados de salvando e erro nas telas. *(feito, etapa 21)*
 - [ ] P1-6 Tipos em `tipos.ts`.
 - [ ] P1-7 Testes de tela da viagem (ida, volta, resumo), do financeiro e dos cadastros.
 - [ ] P1-8 Aviso quando não conseguir gravar e sincronia entre janelas (modo demonstração).
@@ -127,3 +127,4 @@ Os passos 1 a 3 e 6 são os de maior risco e os que mais valem fazer **antes** d
 - **Etapa 20 (feita):** passos 1, 2 e 3 do plano. O passageiro só lê a visão dele (`usePassageiroVisao`, `useConvite`); `ajustarViagem` saiu do contrato e foi trocada por 21 operações pequenas; embarque, desfazer e extra da volta mudam viagem e cobrança numa operação só.
 - **Bug achado e corrigido no caminho:** em conta nova (sem os dados de exemplo), uma viagem sem registro gravado **não aceitava a resposta do passageiro** (a gravação era descartada). Agora a viagem é reconhecida pela linha e pelo dia, e o registro nasce na primeira escrita (há teste).
 - **Falta:** passo 6 (contrato assíncrono), passos 4, 5, 7 e 8 (tipos neutros, testes de tela, falha ao gravar, contraprova final) e a tela "Qual é o seu nome?" (P0-5, com o login real).
+- **Etapa 21 (feita):** passo 6. Todas as escritas do contrato devolvem `Promise`; as telas esperam o resultado; falha vira aviso ("Não foi possível salvar") e há indicador "Salvando…"; formulários de dinheiro e de passageiro não deixam clicar duas vezes. Uma regra de lint (`no-misused-promises`) impede esquecer o `await` numa condição.

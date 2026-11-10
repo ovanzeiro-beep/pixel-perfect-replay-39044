@@ -58,11 +58,13 @@ export function BotaoGrande({
   onClick,
   variante = "primario",
   type = "button",
+  disabled = false,
 }: {
   children: ReactNode;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
   variante?: "primario" | "contorno" | "perigo" | "destaque";
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   const v = {
     primario: "bg-primary text-primary-foreground",
@@ -74,7 +76,8 @@ export function BotaoGrande({
     <button
       type={type}
       onClick={onClick}
-      className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl text-lg font-bold ${v}`}
+      disabled={disabled}
+      className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl text-lg font-bold disabled:opacity-60 ${v}`}
     >
       {children}
     </button>

@@ -41,5 +41,16 @@ export default tseslint.config(
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: { "react-refresh/only-export-components": "off" },
   },
+  {
+    // Escritas devolvem Promise: `if (!responderViagemApp(...))` sem `await` seria sempre falso. Esta regra pega esse erro.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["**/*.test.{ts,tsx}", "src/test/**", "src/routeTree.gen.ts"],
+    languageOptions: {
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    },
+    rules: {
+      "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: false }],
+    },
+  },
   eslintPluginPrettier,
 );

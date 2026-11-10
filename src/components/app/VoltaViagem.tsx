@@ -266,8 +266,8 @@ function Chamada({
   const candidatos = passageiros.filter(
     (p) => p.ativo && !fora.has(p.id) && p.nome.toLowerCase().includes(busca.toLowerCase()),
   );
-  const adicionarP = (p: Passageiro) => {
-    const { ok, cobrou } = adicionarExtraNaVolta(viagemId, p.id);
+  const adicionarP = async (p: Passageiro) => {
+    const { ok, cobrou } = await adicionarExtraNaVolta(viagemId, p.id);
     if (!ok) return;
     setAdicionar(false);
     setBusca("");

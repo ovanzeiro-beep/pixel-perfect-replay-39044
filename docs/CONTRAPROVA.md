@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 03:06 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 03:31 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -25,3 +25,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 03:06 UTC.
 | 18 — Extra: preparação da publicação | concluida | 7/7 | OK |
 | 19 — Extra: varredura antes do banco | concluida | 7/7 | OK |
 | 20 — Preparação do banco: passos 1 a 3 (visão do passageiro, operações pequenas, dinheiro atômico) | concluida | 13/13 | OK |
+| 21 — Contrato assíncrono (passo 6 do plano do banco) | concluida | 12/12 | OK |

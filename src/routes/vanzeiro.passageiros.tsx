@@ -467,6 +467,7 @@ function FormPassageiro({
     observacoes: pas?.observacoes ?? "",
   });
   const [erros, setErros] = useState<ReturnType<typeof validarPassageiro>>({});
+  const [enviando, setEnviando] = useState(false);
   const muda = (k: keyof typeof f) => (e: { target: { value: string } }) =>
     setF({ ...f, [k]: e.target.value });
   const linhaDe = (id: string | undefined) => linhas.find((l) => l.id === id);
@@ -487,21 +488,30 @@ function FormPassageiro({
     });
   };
 
-  const salvar = (e: React.FormEvent) => {
+  const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (enviando) return;
     const er = validarPassageiro(f);
     setErros(er);
     if (Object.keys(er).length) return;
-    const id = salvarPassageiro({
-      ...f,
-      id: pas?.id,
-      nome: f.nome.trim(),
-      valor: Number(f.valor.replace(",", ".")) || 0,
-      emAberto: pas?.emAberto ?? 0,
-      ativo: f.linhaIds.length > 0 || (pas?.ativo ?? true),
-      convite: pas?.convite ?? "nao_enviado",
-      ultimoPagamento: pas?.ultimoPagamento ?? "",
-    });
+    setEnviando(true);
+    let id: string;
+    try {
+      id = await salvarPassageiro({
+        ...f,
+        id: pas?.id,
+        nome: f.nome.trim(),
+        valor: Number(f.valor.replace(",", ".")) || 0,
+        emAberto: pas?.emAberto ?? 0,
+        ativo: f.linhaIds.length > 0 || (pas?.ativo ?? true),
+        convite: pas?.convite ?? "nao_enviado",
+        ultimoPagamento: pas?.ultimoPagamento ?? "",
+      });
+    } catch {
+      setEnviando(false);
+      return;
+    }
+    setEnviando(false);
     toast.success("Passageiro salvo");
     onSalvo(id, !pas);
   };
@@ -641,7 +651,9 @@ function FormPassageiro({
             onChange={muda("observacoes")}
           />
         </Campo>
-        <BotaoGrande type="submit">Salvar passageiro</BotaoGrande>
+        <BotaoGrande type="submit" disabled={enviando}>
+          Salvar passageiro
+        </BotaoGrande>
       </form>
     </Painel>
   );
