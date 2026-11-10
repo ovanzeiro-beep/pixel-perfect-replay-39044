@@ -15,7 +15,7 @@ Telas e componentes  →  src/data/repositorio.ts  →  implementação
 - Telas importam dados **só** de `@/data/repositorio` (um teste garante: `src/data/repositorio.test.ts`).
 - O contrato `Repositorio` = `Leitura` (hooks que devolvem o dado atual) + `Escrita` (operações que mudam algo).
 - Para trocar: criar a implementação com banco que cumpra `Repositorio` e apontar `repositorio` para ela. As telas continuam iguais.
-- A **suíte de contrato** (`describe.each(IMPLEMENTACOES)` no mesmo teste) só usa a interface. Basta incluir a implementação nova na lista para conferir todo o comportamento combinado contra ela.
+- A **suíte de contrato** (`describe.each(IMPLEMENTACOES)` no mesmo teste) só usa a interface. Basta incluir a implementação nova na lista para conferir todo o comportamento combinado contra ela. Ela chama **todas** as operações de escrita do contrato (um teste garante: operação nova sem teste de contrato falha a suíte).
 
 ## O contrato (operações)
 
