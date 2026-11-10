@@ -129,7 +129,6 @@ function Conteudo({
 }) {
   const { vans } = useFrota();
   const [faltou, setFaltou] = useState<Passageiro | null>(null);
-  const [construcao, setConstrucao] = useState<string | null>(null);
   const [novaParada, setNovaParada] = useState(false);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -435,16 +434,6 @@ function Conteudo({
             >
               Seguir viagem
             </BotaoGrande>
-          </div>
-        </div>
-      )}
-
-      {construcao && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">
-          <div className="w-full max-w-md space-y-3 rounded-3xl bg-card p-6 text-center">
-            <p className="text-xl font-extrabold">Em construção</p>
-            <p className="text-lg text-muted-foreground">{construcao}</p>
-            <BotaoGrande onClick={() => setConstrucao(null)}>Entendi</BotaoGrande>
           </div>
         </div>
       )}

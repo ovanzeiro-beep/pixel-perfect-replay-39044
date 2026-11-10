@@ -1576,7 +1576,7 @@
         {
           "d": "Perfil do vanzeiro faz parte dos dados",
           "tipo": "contem",
-          "arquivo": "src/data/store.ts",
+          "arquivo": "src/data/tipos.ts",
           "regex": "export type PerfilVanzeiro"
         },
         {
@@ -2685,6 +2685,114 @@
           "tipo": "contem",
           "arquivo": "docs/MIGRACAO_BANCO.md",
           "regex": "Já é assíncrono no contrato"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "titulo": "Pronto para o banco: tipos neutros, testes de tela e falha ao gravar (passos 4, 5, 7 e 8)",
+      "status": "concluida",
+      "objetivo": "Fechar a preparação do banco: tipos fora do mock, telas da viagem e cadastros com teste, aviso quando o aparelho não guarda e janelas que se acompanham.",
+      "checks": [
+        {
+          "d": "Tipos e regras de domínio neutros",
+          "tipo": "arquivo",
+          "arquivo": "src/data/tipos.ts"
+        },
+        {
+          "d": "Tipos: Estado mora em tipos.ts",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "export type Estado = \\{"
+        },
+        {
+          "d": "Teste: módulos de dados não importam o store",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "nenhum módulo de src/data"
+        },
+        {
+          "d": "Teste: telas não dependem dos dados de exemplo",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "telas e componentes não dependem dos dados de exemplo"
+        },
+        {
+          "d": "Teste da viagem completa (ida, parada, volta, resumo)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/viagem-fluxo.test.tsx"
+        },
+        {
+          "d": "Teste dos cadastros e do dinheiro",
+          "tipo": "arquivo",
+          "arquivo": "src/test/cadastros-fluxo.test.tsx"
+        },
+        {
+          "d": "Teste: quem fica na parada",
+          "tipo": "contem",
+          "arquivo": "src/test/viagem-fluxo.test.tsx",
+          "regex": "quem não voltou para a van fica"
+        },
+        {
+          "d": "Teste: resumo com dinheiro",
+          "tipo": "contem",
+          "arquivo": "src/test/viagem-fluxo.test.tsx",
+          "regex": "resumo com dinheiro"
+        },
+        {
+          "d": "Aviso: dados não estão sendo salvos",
+          "tipo": "contem",
+          "arquivo": "src/components/app/AvisoNaoSalvou.tsx",
+          "regex": "Seus dados não estão sendo salvos"
+        },
+        {
+          "d": "Aviso ligado no app",
+          "tipo": "contem",
+          "arquivo": "src/routes/__root.tsx",
+          "regex": "<AvisoNaoSalvou />"
+        },
+        {
+          "d": "Janelas acompanham uma à outra",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "addEventListener\\(\"storage\""
+        },
+        {
+          "d": "Janela parada não sobrescreve a outra",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "if \\(!sujo\\) return"
+        },
+        {
+          "d": "Testes de falha ao guardar e de duas janelas",
+          "tipo": "arquivo",
+          "arquivo": "src/data/persistenciaJanelas.test.tsx"
+        },
+        {
+          "d": "Sem avisos 'Em construção' mortos",
+          "tipo": "contem",
+          "arquivo": "src/routes/ida.$viagemId.tsx",
+          "regex": "Seguir viagem"
         },
         {
           "d": "Lint limpo (sem erros nem avisos)",

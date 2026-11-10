@@ -73,6 +73,11 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] Passageiro, **depois do prazo**: os botões somem, aparece "O prazo para responder acabou" e **Falar com o vanzeiro** abre o WhatsApp com a mensagem pronta.
 - [ ] Vanzeiro, **depois do prazo**: abra a viagem, toque no nome do passageiro e escolha Vai ou Não vai. Salva normalmente.
 
+## Dados no aparelho (duas janelas e falha ao salvar)
+
+- [ ] Abra o app instalado e o mesmo endereço no navegador ao mesmo tempo. Mude algo (ex.: chave Pix) em um: **o outro acompanha** sem precisar recarregar.
+- [ ] (Só se conseguir) Abra o app em **aba anônima** e faça uma mudança: deve aparecer o aviso "Seus dados não estão sendo salvos", com o atalho para backup.
+
 ## Tamanho da letra
 
 - [ ] Perfil → **Tamanho da letra** → "Muito grande": a letra de todo o app aumenta na hora. Navegue por Viagens, Passageiros, Dinheiro, Gastos, Relatórios e Histórico: **nada corta nem aparece rolagem para o lado**.

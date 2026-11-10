@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { textoManifesto, textoResumoViagem } from "./manifesto";
-import type { Linha, Motorista, Passageiro, Van } from "./store";
+import type { Linha, Motorista, Passageiro, Van } from "./tipos";
 import type { Ida, Viagem } from "./viagens";
 
 const P = (id: string, nome: string, cidade: string, extra: Partial<Passageiro> = {}) =>

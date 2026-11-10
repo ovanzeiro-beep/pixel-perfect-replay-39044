@@ -248,3 +248,35 @@ describe.each(IMPLEMENTACOES)("contrato do repositório: %s", (_nome, criar) => 
     expect(r.obterEstado().passageiros).toHaveLength(22);
   });
 });
+
+describe("tipos e regras de domínio moram num lugar neutro", () => {
+  const arquivos = (dir: string): string[] =>
+    readdirSync(dir).flatMap((n) => {
+      const p = join(dir, n);
+      return statSync(p).isDirectory() ? arquivos(p) : /\.tsx?$/.test(n) ? [p] : [];
+    });
+
+  it("nenhum módulo de src/data (fora o store, o repositório e os testes) importa o store: só tipos.ts", () => {
+    const achados = arquivos(join("src", "data"))
+      .filter((p) => !/\.test\./.test(p) && !/[\\/](store|repositorio)\.ts$/.test(p))
+      .filter((p) => /from "\.\/store"/.test(readFileSync(p, "utf8")));
+    expect(achados).toEqual([]);
+  });
+
+  it("telas e componentes não dependem dos dados de exemplo", () => {
+    const achados = [...arquivos(join("src", "routes")), ...arquivos(join("src", "components"))]
+      .filter((p) => !/\.test\./.test(p))
+      .filter((p) => /from "@\/data\/exemplo"/.test(readFileSync(p, "utf8")));
+    expect(achados).toEqual([]);
+  });
+
+  it("o store não declara tipos de domínio (eles vêm de tipos.ts)", () => {
+    const store = readFileSync(join("src", "data", "store.ts"), "utf8");
+    expect(store).not.toMatch(
+      /^export type (Linha|Passageiro|Van|Motorista|Estado|PerfilVanzeiro)\b/m,
+    );
+    expect(readFileSync(join("src", "data", "tipos.ts"), "utf8")).toMatch(
+      /export type Estado = \{/,
+    );
+  });
+});

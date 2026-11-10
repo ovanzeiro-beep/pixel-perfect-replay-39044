@@ -1,5 +1,5 @@
 // Guia "Primeiros passos" do Início: o que falta fazer para começar a usar o app de verdade.
-import type { Estado } from "./store";
+import type { Estado } from "./tipos";
 
 export const ID_GUIA = "primeiros-passos";
 

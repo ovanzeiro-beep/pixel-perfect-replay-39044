@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 import { FalhaDeGravacao, registrarFalhaDeGravacao } from "@/data/gravacao";
+import { AvisoNaoSalvou } from "@/components/app/AvisoNaoSalvou";
 import { IndicadorSalvando } from "@/components/app/IndicadorSalvando";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -156,6 +157,7 @@ function RootComponent() {
           <AtualizacaoApp />
           <SemConexao />
           <IndicadorSalvando />
+          <AvisoNaoSalvou />
         </div>
       </div>
     </QueryClientProvider>

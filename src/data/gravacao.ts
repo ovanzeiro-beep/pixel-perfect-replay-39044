@@ -54,6 +54,23 @@ export const escrever =
   (...a: A): Promise<Awaited<R>> =>
     gravando(() => f(...a)) as Promise<Awaited<R>>;
 
+// ===== Salvar neste aparelho =====
+// Os dados ficam no armazenamento do navegador. Se ele estiver cheio, bloqueado (aba privada) ou indisponível,
+// a pessoa precisa saber: senão acha que está tudo salvo e perde o que fez ao fechar o app.
+let naoSalvou = false;
+/** O app marca aqui se a última tentativa de guardar no aparelho falhou (`true`) ou deu certo (`false`). */
+export function marcarNaoSalvou(falhou: boolean) {
+  if (naoSalvou === falhou) return;
+  naoSalvou = falhou;
+  avisar();
+}
+export const useNaoSalvou = () =>
+  useSyncExternalStore(
+    assinar,
+    () => naoSalvou,
+    () => false,
+  );
+
 /** Verdadeiro enquanto há alguma gravação em andamento. */
 export const useSalvando = () =>
   useSyncExternalStore(

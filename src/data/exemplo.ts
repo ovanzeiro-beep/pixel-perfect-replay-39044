@@ -1,12 +1,12 @@
 // Todos os dados de exemplo do app ficam aqui. Depois trocamos por banco de dados sem mexer nas telas.
 
 import { deslocarMeses, deslocarSemanas, somarDias } from "./datasRelativas";
+import type { DetalhePassageiro, FormaPagamento } from "./tipos";
 
 // As datas escritas aqui usam "hoje" = 09/11/2026 como referência; no fim do arquivo elas são
 // empurradas para perto do dia real (semanas ou meses inteiros), então os exemplos nunca ficam velhos.
 const HOJE = new Date();
 
-export type FormaPagamento = "por_viagem" | "semanal" | "mensal";
 export type SituacaoPagamento = "em_dia" | "atrasado_1_semana" | "pago_na_hora";
 
 export const vanzeiro = {
@@ -399,17 +399,6 @@ export const gastosMes = gastosMesBase.map((g) => ({
 }));
 
 // ===== Etapa 5: detalhes dos passageiros =====
-export type DetalhePassageiro = {
-  numero: string;
-  bairro: string;
-  referencia: string;
-  vencimento: string; // "sexta" (semanal) ou "10" (mensal)
-  emergenciaNome: string;
-  emergenciaTelefone: string;
-  observacoes: string;
-  convite: "nao_enviado" | "enviado" | "no_app";
-  ultimoPagamento: string;
-};
 const detalhesBase: Record<string, DetalhePassageiro> = {
   p1: {
     numero: "412",

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Estado } from "./store";
+import type { Estado } from "./tipos";
 
 type Modulos = {
   backup: typeof import("./backup");
