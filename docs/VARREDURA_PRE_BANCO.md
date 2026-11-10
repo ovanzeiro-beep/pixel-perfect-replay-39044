@@ -162,7 +162,7 @@ Cada correção tem teste (`backup.test.ts`, `store.test.ts`, `importacao.test.t
 
 Nada bloqueia. Estes itens deixam a troca mais segura, e podem ser feitos antes ou junto com o banco:
 
-1. **Testes das telas com menos cobertura.** Cobertura geral: **84% das linhas, 76% dos ramos** (734 testes). As telas mais fracas são `vanzeiro.viagens` (23%), `vanzeiro.linhas` (27%), `vanzeiro.index` (42%) e `passageiro.perfil`/`perfil` (cerca de 50%). Foram conferidas em navegador, mas um teste de tela protege a troca da camada de dados.
+1. ~~Testes das telas com menos cobertura.~~ **Feito (etapa 32):** 16 testes de tela cobrem o início, as viagens e as linhas do vanzeiro. Cobertura geral: **88% das linhas, 80% dos ramos** (750 testes). A tela inicial do vanzeiro foi de 42% para 94%, Linhas de 27% para 81% e Viagens de 23% para 78%. Ainda fracas: a tela inicial do passageiro (42%) e as telas de perfil (cerca de 50%).
 2. **Dependências sem auditoria automática.** O projeto usa `bun.lock`; o `npm audit` não roda sem `package-lock.json`. Antes de publicar para muita gente, vale rodar uma auditoria (o Lovable/GitHub podem fazer).
 3. **`store.ts` tem 1.026 linhas.** É o que o banco substitui, então não vale quebrar agora; as regras puras já estão em módulos separados (`cobrancas`, `viagens`, `operacoesViagem`, `pausas`).
 

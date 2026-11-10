@@ -3596,6 +3596,57 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 32,
+      "titulo": "Testes de tela: início, viagens e linhas",
+      "status": "concluida",
+      "objetivo": "Proteger a troca da camada de dados com testes das telas principais do vanzeiro.",
+      "checks": [
+        {
+          "d": "Testes de tela (início, viagens, linhas)",
+          "tipo": "arquivo",
+          "arquivo": "src/test/telas-principais.test.tsx"
+        },
+        {
+          "d": "Teste: cancelar viagem só após confirmar",
+          "tipo": "contem",
+          "arquivo": "src/test/telas-principais.test.tsx",
+          "regex": "só vale depois de confirmar"
+        },
+        {
+          "d": "Teste: trocar van com aviso de lotação",
+          "tipo": "contem",
+          "arquivo": "src/test/telas-principais.test.tsx",
+          "regex": "Vai faltar lugar"
+        },
+        {
+          "d": "Teste: excluir linha leva viagens e pausas",
+          "tipo": "contem",
+          "arquivo": "src/test/telas-principais.test.tsx",
+          "regex": "leva as viagens e pausas dela"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
