@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) e configuração de cobrança (26) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) configuração de cobrança (26) e legibilidade e telas vazias (27) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -41,6 +41,7 @@
 | 24 | Extra: pagar na hora da viagem | Passageiro que paga na hora: ao embarcar o app pergunta como pagou e já gera o recibo; desfazer tira tudo junto | **Concluída** |
 | 25 | Extra: Pix com valor e avisos de vencimento | Pix copia e cola com o valor, chave reconhecida (CPF, celular, e-mail), aviso "vence amanhã" para o passageiro e o vanzeiro | **Concluída** |
 | 26 | Extra: configurar cobrança e cobrar todos os atrasados | Dias de aviso, texto da mensagem, "paga na hora" como padrão e cobrança em sequência | **Concluída** |
+| 27 | Extra: legibilidade e telas vazias | Cores com contraste de leitura, telas vazias com orientação e vocabulário único do convite | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -231,3 +232,10 @@ Veja [`PUBLICACAO.md`](PUBLICACAO.md): como publicar no Lovable, o que conferir 
 - **Cobrar todos os atrasados (Dinheiro):** lista os atrasados do mais antigo ao mais recente; o WhatsApp abre uma conversa por vez e a lista mostra quem já foi avisado ("2 de 5 avisados"). Sem chave Pix cadastrada, não abre e não marca ninguém.
 - **Padrões:** quem nunca mexeu continua como antes (nada muda nos dados antigos).
 - **Ainda não faz:** envio automático de mensagens (o WhatsApp exige o toque do vanzeiro; automático depende de servidor e de um canal oficial).
+
+## Extra: legibilidade e telas vazias (da análise de facilidade de entendimento)
+
+- **Contraste das cores.** A ferramenta de acessibilidade apontava 168 trechos de texto com contraste abaixo do mínimo (4,5:1): o verde ("Em dia", valores recebidos), o vermelho ("Devendo", valores em aberto) e o laranja dos avisos. As três cores do tema foram escurecidas; depois da mudança, **nenhuma tela tem violação de contraste** (medido nas 18 telas). Um teste lê as cores do tema e falha se alguma voltar a ficar fraca.
+- **Telas vazias com orientação.** Viagens, Início, Passageiros, Dinheiro, Gastos, Linhas e Vans agora dizem **por que** estão vazias e **o que fazer** (ex.: "As viagens aparecem quando você cria uma linha", com o botão "Criar minha primeira linha"). Quando é um **filtro ou busca** que escondeu tudo, a mensagem é outra e há "Limpar filtros".
+- **Convite com um vocabulário só.** Etiquetas: **No app**, **Convite enviado**, **Sem convite**. Filtros: **No app** e **Ainda não entrou** (antes eram cinco nomes para três situações).
+- **Mantido de propósito:** "Cobranças" (do lado do vanzeiro) e "Pagamentos" (do lado do passageiro) ficam como estão: cada um fala do próprio ponto de vista.

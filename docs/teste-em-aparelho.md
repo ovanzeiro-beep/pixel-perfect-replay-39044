@@ -56,6 +56,12 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] O total da planilha de recebimentos e o de gastos batem com os números do relatório na tela.
 - [ ] **Imprimir ou salvar em PDF**: no celular escolha "Salvar como PDF" (ou impressora). O PDF tem o cabeçalho "O Vanzeiro — Relatório", seu nome, a cidade e o período, **sem** menu, botões nem avisos.
 
+## Leitura e telas vazias
+
+- [ ] **Com sol forte** (ou o brilho no máximo, ao ar livre): as palavras "Em dia", "Devendo", os valores em verde e vermelho e os avisos laranja **dão para ler sem esforço**.
+- [ ] Faça uma **conta nova** (Meu perfil → Começar do zero) e passe por Viagens, Passageiros, Dinheiro, Gastos, Linhas e Vans: cada tela vazia **explica o que fazer** e, quando dá, tem o botão do próximo passo.
+- [ ] Em Passageiros, digite uma busca que não existe: aparece "Nenhum passageiro com esse filtro ou busca" e **Limpar filtros** traz a lista de volta.
+
 ## Configurar cobrança e cobrar todos os atrasados
 
 - [ ] Mais → **Configurar cobrança**: mude para **5 dias**, edite o texto (use os botões `{nome}`, `{valor}`...) e veja o **exemplo** mudar. Salve.
