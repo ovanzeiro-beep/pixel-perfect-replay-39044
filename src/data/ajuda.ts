@@ -51,7 +51,9 @@ export const AJUDA_VANZEIRO: TopicoAjuda[] = [
     passos: [
       "Em Dinheiro → Cobranças você vê quanto cada passageiro deve.",
       "Quando receber, toque em Marcar pagamento. O app quita primeiro as cobranças mais antigas e gera o recibo.",
+      "Com vários atrasados, toque em Cobrar todos os atrasados: o app mostra a lista e você cobra um depois do outro, vendo quem já foi avisado.",
       "O recibo pode ser compartilhado com o passageiro pelo WhatsApp.",
+      "Em Mais → Configurar cobrança você escolhe quantos dias antes de vencer o app avisa, muda o texto da mensagem de Cobrar e define se passageiro novo já paga na hora.",
       "Quem paga na hora da viagem: no cadastro do passageiro (Por viagem), ligue Paga na hora da viagem. Ao tocar em Embarcou, o app pergunta Pagou em dinheiro, Pagou no Pix ou Paga depois, e já gera o recibo.",
       "Cadastre a sua chave Pix em Mais → Meu perfil: o app reconhece se é CPF, celular, e-mail ou chave aleatória. Na mensagem de Cobrar vai o Pix copia e cola já com o valor.",
     ],

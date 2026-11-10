@@ -58,6 +58,7 @@ describe("visão do passageiro: só o que é dele", () => {
       cobrancas: [],
       recibos: [],
       chavePix: "",
+      diasDeAviso: 2,
     });
   });
 

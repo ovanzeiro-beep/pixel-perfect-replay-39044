@@ -1,6 +1,6 @@
 # Contraprova
 
-Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:34 UTC.
+Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:51 UTC.
 
 | Etapa | Declarada | Checks da etapa | Resultado |
 | --- | --- | --- | --- |
@@ -30,3 +30,4 @@ Gerado por `node scripts/conferir.mjs --registrar` em 2026-11-10 11:34 UTC.
 | 23 — Extra: avisos de que a van está chegando (sem banco) | concluida | 10/10 | OK |
 | 24 — Extra: pagar na hora da viagem | concluida | 12/12 | OK |
 | 25 — Extra: Pix com valor e avisos de vencimento | concluida | 13/13 | OK |
+| 26 — Extra: configurar cobrança e cobrar todos os atrasados | concluida | 13/13 | OK |

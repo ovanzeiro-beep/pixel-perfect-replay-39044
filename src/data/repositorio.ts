@@ -12,6 +12,7 @@
 import * as mock from "./store";
 import { escrever } from "./gravacao";
 import type {
+  ConfigCobranca,
   Estado,
   FormaPagamento,
   Linha,
@@ -25,7 +26,16 @@ import type { Gasto } from "./financeiro";
 import type { StatusVolta, Viagem } from "./viagens";
 import type { ConvitePreview, VisaoPassageiro } from "./visaoPassageiro";
 
-export type { Estado, FormaPagamento, Linha, Motorista, Passageiro, PerfilVanzeiro, Van };
+export type {
+  ConfigCobranca,
+  Estado,
+  FormaPagamento,
+  Linha,
+  Motorista,
+  Passageiro,
+  PerfilVanzeiro,
+  Van,
+};
 export type {
   ConvitePreview,
   MinhaIda,
@@ -34,7 +44,7 @@ export type {
   VisaoPassageiro,
 } from "./visaoPassageiro";
 // Regras e listas de domínio (não são acesso a dados): continuam saindo do mesmo lugar para as telas.
-export { TIPOS_LINHA, DIAS, estaDevendo } from "./tipos";
+export { TIPOS_LINHA, DIAS, estaDevendo, configDaCobranca, CONFIG_COBRANCA_PADRAO } from "./tipos";
 
 /** Novo cadastro (sem `id`) ou edição (com `id`). */
 type Salvar<T, Fora extends PropertyKey = never> = Omit<T, Fora | "id"> & {
@@ -198,6 +208,8 @@ export interface EscritaDoMock {
   desfazerRecibo(numero: number): void;
   cancelarCob(cobrancaId: string, motivo: string): void;
   salvarChavePix(chave: string): void;
+  /** Configuração de cobrança: dias de aviso antes de vencer, texto da mensagem de cobrança e "paga na hora" como padrão. */
+  salvarConfigCobranca(config: Partial<ConfigCobranca>): void;
   salvarGasto(gasto: Salvar<Gasto>): void;
   excluirGasto(id: string): void;
 
@@ -273,6 +285,7 @@ export const repositorio: Repositorio = {
   desfazerRecibo: escrever(mock.desfazerRecibo),
   cancelarCob: escrever(mock.cancelarCob),
   salvarChavePix: escrever(mock.salvarChavePix),
+  salvarConfigCobranca: escrever(mock.salvarConfigCobranca),
   salvarGasto: escrever(mock.salvarGasto),
   excluirGasto: escrever(mock.excluirGasto),
   dispensarAlerta: escrever(mock.dispensarAlerta),
@@ -337,6 +350,7 @@ export const {
   desfazerRecibo,
   cancelarCob,
   salvarChavePix,
+  salvarConfigCobranca,
   salvarGasto,
   excluirGasto,
   dispensarAlerta,

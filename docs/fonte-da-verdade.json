@@ -3063,7 +3063,7 @@
           "d": "Alerta: cobranças vencem (vanzeiro)",
           "tipo": "contem",
           "arquivo": "src/data/alertas.ts",
-          "regex": "vencem nos próximos 2 dias"
+          "regex": "nos próximos \\$\\{diasDeAviso\\} dias"
         },
         {
           "d": "Teste: CRC bate com o manual do Banco Central",
@@ -3081,6 +3081,111 @@
           "tipo": "contem",
           "arquivo": "src/data/alertas.test.ts",
           "regex": "cobranças que vão vencer"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "titulo": "Extra: configurar cobrança e cobrar todos os atrasados",
+      "status": "concluida",
+      "objetivo": "O vanzeiro escolhe os dias de aviso, o texto da mensagem de cobrança e o padrão de pagar na hora; e cobra vários atrasados em sequência.",
+      "checks": [
+        {
+          "d": "Tipo da configuração de cobrança",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "export type ConfigCobranca"
+        },
+        {
+          "d": "Padrões da configuração",
+          "tipo": "contem",
+          "arquivo": "src/data/tipos.ts",
+          "regex": "CONFIG_COBRANCA_PADRAO"
+        },
+        {
+          "d": "Dados: salvar configuração",
+          "tipo": "contem",
+          "arquivo": "src/data/store.ts",
+          "regex": "export function salvarConfigCobranca"
+        },
+        {
+          "d": "Contrato: salvar configuração",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.ts",
+          "regex": "salvarConfigCobranca\\(config"
+        },
+        {
+          "d": "Mensagem com texto do vanzeiro",
+          "tipo": "contem",
+          "arquivo": "src/data/cobrancas.ts",
+          "regex": "preencherTextoCobranca"
+        },
+        {
+          "d": "Dias de aviso configuráveis (passageiro)",
+          "tipo": "contem",
+          "arquivo": "src/data/alertas.ts",
+          "regex": "diasDeAviso = 2"
+        },
+        {
+          "d": "Passageiro recebe os dias de aviso",
+          "tipo": "contem",
+          "arquivo": "src/data/visaoPassageiro.ts",
+          "regex": "diasDeAviso"
+        },
+        {
+          "d": "Tela Configurar cobrança",
+          "tipo": "arquivo",
+          "arquivo": "src/routes/vanzeiro.cobranca.tsx"
+        },
+        {
+          "d": "Menu: Configurar cobrança",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.mais.tsx",
+          "regex": "Configurar cobrança"
+        },
+        {
+          "d": "Cobrar todos os atrasados",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.dinheiro.tsx",
+          "regex": "Cobrar todos os atrasados"
+        },
+        {
+          "d": "Teste: configuração (dados)",
+          "tipo": "contem",
+          "arquivo": "src/data/configCobranca.test.ts",
+          "regex": "configuração de cobrança"
+        },
+        {
+          "d": "Teste: tela e efeitos da configuração",
+          "tipo": "contem",
+          "arquivo": "src/test/cobranca-fluxo.test.tsx",
+          "regex": "a configuração vale de verdade"
+        },
+        {
+          "d": "Teste: cobrar todos os atrasados",
+          "tipo": "contem",
+          "arquivo": "src/test/cobranca-fluxo.test.tsx",
+          "regex": "Cobrar todos os atrasados"
         },
         {
           "d": "Lint limpo (sem erros nem avisos)",

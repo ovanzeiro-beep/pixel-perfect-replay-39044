@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) e Pix com valor e avisos de vencimento (25) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) e configuração de cobrança (26) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -40,6 +40,7 @@
 | 23 | Extra: avisos de que a van está chegando | WhatsApp pronto (chegando e grupo), paradas que faltam para o passageiro; mapa ao vivo e push em [`VAN_AO_VIVO.md`](VAN_AO_VIVO.md) | **Concluída** |
 | 24 | Extra: pagar na hora da viagem | Passageiro que paga na hora: ao embarcar o app pergunta como pagou e já gera o recibo; desfazer tira tudo junto | **Concluída** |
 | 25 | Extra: Pix com valor e avisos de vencimento | Pix copia e cola com o valor, chave reconhecida (CPF, celular, e-mail), aviso "vence amanhã" para o passageiro e o vanzeiro | **Concluída** |
+| 26 | Extra: configurar cobrança e cobrar todos os atrasados | Dias de aviso, texto da mensagem, "paga na hora" como padrão e cobrança em sequência | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 
@@ -220,3 +221,13 @@ Veja [`PUBLICACAO.md`](PUBLICACAO.md): como publicar no Lovable, o que conferir 
 - **Onde aparece.** Mensagem de **Cobrar** do vanzeiro (código no fim) e botão **Copiar Pix com o valor** para o passageiro (Pagamentos e tela inicial).
 - **Avisos de vencimento.** Passageiro: "Seu pagamento vence hoje/amanhã: R$ …" (cobranças semanais e mensais). Vanzeiro: "N cobranças vencem nos próximos 2 dias". Cobrança de viagem avulsa não gera esse aviso.
 - **Ainda não faz:** o app não sabe sozinho que o Pix caiu (confirmação automática depende de banco e de um provedor de pagamento) e o aviso só aparece se o app for aberto.
+
+## Extra: configurar cobrança e cobrar todos os atrasados
+
+- **Mais → Configurar cobrança:**
+  - **Avisar antes de vencer:** 1, 2, 3, 5 ou 7 dias (padrão 2). Vale para o aviso na tela do passageiro e para o alerta do vanzeiro.
+  - **Mensagem de cobrança:** texto próprio com `{nome}`, `{valor}`, `{referencia}` e `{pix}`, com exemplo ao vivo e "voltar ao texto padrão". O Pix copia e cola continua indo no fim. Avisa se faltar o `{valor}`.
+  - **Passageiro novo já paga na hora:** a opção já vem ligada para quem paga por viagem.
+- **Cobrar todos os atrasados (Dinheiro):** lista os atrasados do mais antigo ao mais recente; o WhatsApp abre uma conversa por vez e a lista mostra quem já foi avisado ("2 de 5 avisados"). Sem chave Pix cadastrada, não abre e não marca ninguém.
+- **Padrões:** quem nunca mexeu continua como antes (nada muda nos dados antigos).
+- **Ainda não faz:** envio automático de mensagens (o WhatsApp exige o toque do vanzeiro; automático depende de servidor e de um canal oficial).

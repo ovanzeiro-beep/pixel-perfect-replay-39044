@@ -12,6 +12,7 @@ import {
   cancelarCob,
   type Passageiro,
   useVanzeiro,
+  configDaCobranca,
 } from "@/data/repositorio";
 import {
   aberto,
@@ -90,24 +91,27 @@ function Dinheiro() {
 }
 
 function useCobrar() {
-  const { chavePix, cobrancas } = useFrota();
+  const { chavePix, cobrancas, configCobranca } = useFrota();
   const vanzeiro = useVanzeiro();
+  const modelo = configDaCobranca({ configCobranca }).textoCobranca;
   const [semPix, setSemPix] = useState(false);
   const hoje = isoDe(new Date());
-  const cobrar = (p: Passageiro) => {
+  /** Abre o WhatsApp com a cobrança. Devolve `true` se abriu (e não faltou chave Pix ou valor em aberto). */
+  const cobrar = (p: Passageiro): boolean => {
     if (!chavePix) {
       setSemPix(true);
-      return;
+      return false;
     }
     const r = resumoPassageiro(cobrancas, p.id, hoje);
     if (r.total <= 0) {
       toast("Nada em aberto para cobrar");
-      return;
+      return false;
     }
     window.open(
-      `${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(mensagemCobrar(primeiro(p.nome), r.total, r.refs, chavePix, pixComValor(chavePix, r.total, vanzeiro)))}`,
+      `${linkWhatsApp(p.telefone)}?text=${encodeURIComponent(mensagemCobrar(primeiro(p.nome), r.total, r.refs, chavePix, pixComValor(chavePix, r.total, vanzeiro), modelo))}`,
       "_blank",
     );
+    return true;
   };
   const aviso = semPix ? (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-foreground/50 p-4 sm:items-center">
@@ -146,6 +150,17 @@ function Cobrancas() {
   } | null>(null);
   const [recibo, setRecibo] = useState<Recibo | null>(null);
   const { cobrar, aviso } = useCobrar();
+  const [cobrandoTodos, setCobrandoTodos] = useState(false);
+
+  // Quem está com pagamento atrasado, do mais antigo para o mais recente.
+  const atrasados = useMemo(
+    () =>
+      passageiros
+        .map((p) => ({ p, r: resumoPassageiro(cobrancas, p.id, hoje) }))
+        .filter(({ r }) => r.total > 0 && r.diasAtraso > 0)
+        .sort((a, b) => b.r.diasAtraso - a.r.diasAtraso || b.r.total - a.r.total),
+    [passageiros, cobrancas, hoje],
+  );
 
   const lista = useMemo(
     () =>
@@ -210,6 +225,11 @@ function Cobrancas() {
         </div>
       </div>
 
+      {atrasados.length >= 2 && (
+        <BotaoGrande variante="destaque" onClick={() => setCobrandoTodos(true)}>
+          <MessageCircle className="h-5 w-5" /> Cobrar todos os atrasados ({atrasados.length})
+        </BotaoGrande>
+      )}
       <BotaoGrande variante="contorno" onClick={copiarPix}>
         <Copy className="h-5 w-5" /> Copiar chave Pix
       </BotaoGrande>
@@ -323,9 +343,72 @@ function Cobrancas() {
           }}
         />
       )}
+      {cobrandoTodos && (
+        <CobrarTodos
+          itens={atrasados.map(({ p, r }) => ({ p, total: r.total, dias: r.diasAtraso }))}
+          cobrar={cobrar}
+          onFechar={() => setCobrandoTodos(false)}
+        />
+      )}
       {recibo && <JanelaRecibo r={recibo} onFechar={() => setRecibo(null)} />}
       {aviso}
     </div>
+  );
+}
+
+/** Cobra um atrasado depois do outro: o WhatsApp abre uma conversa por vez, e aqui fica a conta de quem já foi avisado. */
+function CobrarTodos({
+  itens,
+  cobrar,
+  onFechar,
+}: {
+  itens: { p: Passageiro; total: number; dias: number }[];
+  cobrar: (p: Passageiro) => boolean;
+  onFechar: () => void;
+}) {
+  const [avisados, setAvisados] = useState<Set<string>>(new Set());
+  const proximo = itens.find((i) => !avisados.has(i.p.id));
+  return (
+    <Painel titulo="Cobrar todos os atrasados" onFechar={onFechar}>
+      <p className="text-lg font-bold">
+        {avisados.size} de {itens.length} avisados
+      </p>
+      <p className="text-sm text-muted-foreground">
+        O WhatsApp abre uma conversa por vez: toque em Cobrar, envie a mensagem e volte aqui para o
+        próximo.
+      </p>
+      <ul className="space-y-2">
+        {itens.map(({ p, total, dias }) => {
+          const feito = avisados.has(p.id);
+          return (
+            <li
+              key={p.id}
+              className={`flex items-center gap-3 rounded-2xl p-3 ${proximo?.p.id === p.id ? "border-2 border-accent bg-accent/10" : "bg-card"}`}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="break-words font-extrabold">{p.nome}</p>
+                <p className="text-sm text-muted-foreground">
+                  {brl(total)} · atrasado há {dias} {dias === 1 ? "dia" : "dias"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (cobrar(p)) setAvisados((s) => new Set(s).add(p.id));
+                }}
+                aria-label={feito ? `Cobrar ${p.nome} de novo` : `Cobrar ${p.nome}`}
+                className={`flex min-h-12 shrink-0 items-center gap-1 rounded-xl px-4 font-bold ${feito ? "border-2 border-success text-success" : "bg-success text-success-foreground"}`}
+              >
+                {feito ? "Avisado ✓" : "Cobrar"}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {!proximo && (
+        <p className="text-center text-lg font-extrabold text-success">Todos avisados!</p>
+      )}
+    </Painel>
   );
 }
 
