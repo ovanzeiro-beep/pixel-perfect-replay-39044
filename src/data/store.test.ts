@@ -311,3 +311,35 @@ describe("prazo de confirmação do passageiro", () => {
     expect(s.responderViagemApp("p1", "l1_2099-01-01", true)).toBe(false);
   });
 });
+
+describe("importarPassageiros", () => {
+  it("grava a lista de uma vez, com ids novos e únicos", async () => {
+    const store = await import("./store");
+    const antes = store.obterEstado().passageiros.length;
+    const base = {
+      endereco: "",
+      numero: "",
+      bairro: "",
+      cidade: "X",
+      referencia: "",
+      linhaIds: [],
+      formaPagamento: "mensal" as const,
+      valor: 100,
+      vencimento: "5",
+      emergenciaNome: "",
+      emergenciaTelefone: "",
+      observacoes: "",
+      convite: "nao_enviado" as const,
+      ativo: true,
+      emAberto: 0,
+      ultimoPagamento: "",
+    };
+    const ids = store.importarPassageiros([
+      { ...base, nome: "Imp A", telefone: "(43) 90000-0001" },
+      { ...base, nome: "Imp B", telefone: "(43) 90000-0002" },
+    ]);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+    expect(store.obterEstado().passageiros).toHaveLength(antes + 2);
+  });
+});

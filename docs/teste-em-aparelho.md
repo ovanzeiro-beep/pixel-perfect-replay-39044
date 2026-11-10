@@ -64,6 +64,13 @@ O iPhone **não oferece** o botão de instalar e **não esconde tudo** como o An
 - [ ] Ligue "Não cobrar o plano semanal e mensal" numa pausa: quem tem vencimento dentro do período **não recebe cobrança**.
 - [ ] **Excluir** a pausa: as viagens voltam. Uma viagem que **já aconteceu** nunca some por causa de pausa.
 
+## Importar passageiros por planilha
+
+- [ ] Passageiros → **Importar de planilha** → **Baixar planilha de exemplo**. Abra no Excel ou Planilhas Google: colunas separadas e acentos certos.
+- [ ] Troque os nomes e telefones por passageiros de teste, salve como **CSV** e escolha o arquivo no app (ou cole o texto copiado da planilha).
+- [ ] A conferência mostra **quantos estão prontos, quantos já cadastrados e quantos precisam de correção**, com o motivo de cada linha.
+- [ ] Toque em **Importar N passageiros**: eles aparecem na lista, sem convite enviado. Importar **o mesmo arquivo de novo** não duplica ninguém.
+
 ## Leitura e telas vazias
 
 - [ ] **Com sol forte** (ou o brilho no máximo, ao ar livre): as palavras "Em dia", "Devendo", os valores em verde e vermelho e os avisos laranja **dão para ler sem esforço**.

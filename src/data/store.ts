@@ -586,6 +586,12 @@ export function salvarPassageiro(p: Omit<Passageiro, "id"> & { id?: string | und
   });
   return pas.id;
 }
+/** Cadastra vários passageiros de uma vez (importação de planilha), numa gravação só. Devolve os ids novos. */
+export function importarPassageiros(lista: Omit<Passageiro, "id">[]): string[] {
+  const novos = lista.map((p) => ({ ...p, id: novoId("p") }) as Passageiro);
+  if (novos.length) set({ ...estado, passageiros: [...estado.passageiros, ...novos] });
+  return novos.map((p) => p.id);
+}
 export function atualizarPassageiro(id: string, mud: Partial<Passageiro>) {
   set({
     ...estado,

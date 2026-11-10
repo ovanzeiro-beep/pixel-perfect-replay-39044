@@ -16,12 +16,12 @@ export async function compartilharTexto(
 }
 
 /** Lê o conteúdo de um arquivo escolhido pelo usuário (FileReader funciona em todo navegador). */
-export function lerArquivoTexto(arquivo: Blob): Promise<string> {
+export function lerArquivoTexto(arquivo: Blob, codificacao?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const leitor = new FileReader();
     leitor.onload = () => resolve(String(leitor.result ?? ""));
     leitor.onerror = () => reject(leitor.error ?? new Error("Não deu para ler o arquivo."));
-    leitor.readAsText(arquivo);
+    leitor.readAsText(arquivo, codificacao);
   });
 }
 

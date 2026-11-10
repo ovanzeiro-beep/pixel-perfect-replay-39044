@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { EstadoVazio } from "@/components/app/EstadoVazio";
+import { ImportarPassageiros } from "@/components/app/ImportarPassageiros";
 import { useMemo, useState } from "react";
 import {
   CheckCircle2,
   Clock,
   Copy,
+  FileSpreadsheet,
   MapPin,
   MessageCircle,
   Pencil,
@@ -142,6 +144,7 @@ function Passageiros() {
   const [fConv, setFConv] = useState<"" | "aceito" | "pendente">("");
   const [abertoId, setAbertoId] = useState<string | null>(null);
   const [editando, setEditando] = useState<Passageiro | "novo" | null>(null);
+  const [importando, setImportando] = useState(false);
   const [excluindo, setExcluindo] = useState<Passageiro | null>(null);
   const [perguntarConvite, setPerguntarConvite] = useState<string | null>(null);
 
@@ -174,6 +177,13 @@ function Passageiros() {
         <BotaoGrande variante="destaque" onClick={() => setEditando("novo")}>
           <Plus className="h-6 w-6" /> Novo passageiro
         </BotaoGrande>
+        <button
+          type="button"
+          onClick={() => setImportando(true)}
+          className="mt-2 flex min-h-12 w-full items-center justify-center gap-2 text-base font-bold text-primary underline"
+        >
+          <FileSpreadsheet className="h-5 w-5" /> Importar de planilha
+        </button>
       </div>
 
       <div className="relative mt-4">
@@ -410,6 +420,8 @@ function Passageiros() {
           </BotaoGrande>
         </Painel>
       )}
+
+      {importando && <ImportarPassageiros onFechar={() => setImportando(false)} />}
 
       {editando && (
         <FormPassageiro
