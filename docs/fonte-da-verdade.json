@@ -2437,6 +2437,75 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 19,
+      "titulo": "Extra: varredura antes do banco",
+      "status": "concluida",
+      "objetivo": "Varredura ponta a ponta (erros, fluxos, código morto, lacunas) com checklist e plano de correção para a entrada do banco. Corrige só o que é seguro e pequeno.",
+      "checks": [
+        {
+          "d": "Relatório da varredura com checklist e plano",
+          "tipo": "arquivo",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md"
+        },
+        {
+          "d": "Relatório: achados que bloqueiam o banco (P0)",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "### P0"
+        },
+        {
+          "d": "Relatório: checklist",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "## Checklist"
+        },
+        {
+          "d": "Relatório: plano de correção em passos",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "## Plano de correção"
+        },
+        {
+          "d": "Relatório: decisões para o dia do banco",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "## Decisões suas"
+        },
+        {
+          "d": "Voltar com altura de toque confortável",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.historico.tsx",
+          "regex": "min-h-11"
+        },
+        {
+          "d": "Busca de passageiros com rótulo",
+          "tipo": "contem",
+          "arquivo": "src/routes/vanzeiro.passageiros.tsx",
+          "regex": "Buscar passageiro por nome"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
