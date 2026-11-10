@@ -1,6 +1,6 @@
 # Plano de finalização — O Vanzeiro (somente mock, sem banco de dados)
 
-> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) configuração de cobrança (26) legibilidade e telas vazias (27) férias e feriados (28) e importação de passageiros por planilha (29) exportação da lista de passageiros (30) e segunda varredura antes do banco (31) e testes das telas principais (32) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
+> **Status: todas as etapas (0 a 9) e os extras de backup (10), começar do zero (11) e exportação de relatórios (12) tamanho da letra (13) revisão de clareza (14) navegação com Waze/Maps (15) acabamento final (16) regra do prazo (17) preparação da publicação (18) varredura antes do banco (19) preparação do banco, passos 1 a 3 (20) contrato assíncrono (21) tipos neutros, testes de tela e falha ao gravar (22) avisos de que a van está chegando (23) pagar na hora da viagem (24) Pix com valor e avisos de vencimento (25) configuração de cobrança (26) legibilidade e telas vazias (27) férias e feriados (28) e importação de passageiros por planilha (29) exportação da lista de passageiros (30) e segunda varredura antes do banco (31) e testes das telas principais (32) e contrato 100% testado (33) concluídos e conferidos** (`npm run conferir`). O mock está congelado e pronto para a fase de banco de dados ([`MIGRACAO_BANCO.md`](MIGRACAO_BANCO.md)).
 
 **Meta:** o vanzeiro controla a viagem inteira pelo celular: quem vai, ida, paradas, volta, cobrança, gastos e lucro. Tudo com dados de exemplo; o banco entra numa fase futura sem refazer as telas.
 
@@ -47,6 +47,7 @@
 | 30 | Extra: exportar passageiros para planilha | Baixar ou compartilhar a lista de passageiros em CSV, com as mesmas colunas da importação | **Concluída** |
 | 31 | Segunda varredura antes do banco | Backup e estado salvo conferem pausas e cobrança; excluir linha leva as pausas; importação aceita irmãos com o mesmo telefone; documentação do banco atualizada | **Concluída** |
 | 32 | Testes de tela: início, viagens e linhas | 16 testes de tela das telas principais do vanzeiro (cobertura geral de 84% para 88%) | **Concluída** |
+| 33 | Contrato 100% testado | Todas as 55 operações do contrato têm teste na suíte que o banco vai ter de passar; operação nova sem teste falha a suíte | **Concluída** |
 
 Ordem sugerida: 1 → 2 → 3 (base sólida), depois 4 → 5 → 6 (valor para o vanzeiro), 7 (passageiro), 8 → 9 (acabamento).
 

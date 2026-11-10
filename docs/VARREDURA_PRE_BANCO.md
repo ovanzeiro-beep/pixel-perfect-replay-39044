@@ -179,3 +179,7 @@ Nada bloqueia. Estes itens deixam a troca mais segura, e podem ser feitos antes 
 
 8. **O telefone identifica o passageiro?** Hoje não é único (irmãos dividem o telefone). Se o login do passageiro for por telefone/WhatsApp, é preciso decidir como separar duas pessoas com o mesmo número.
 9. **Pausas e configuração de cobrança** valem por vanzeiro (uma configuração por conta). Se um dia houver mais de um responsável por conta, decidir quem pode alterá-las.
+
+## Cobertura do contrato (etapa 33)
+
+A conferência final achou que a **suíte de contrato** (o que um banco precisa passar) chamava diretamente só 22 das 55 operações do contrato; as outras só eram testadas pelas telas e por testes do mock. Agora **todas as 55** são chamadas pela suíte de contrato, com o comportamento combinado: o que devolvem, quando recusam (`false`/`null`) e o que não podem apagar. Um teste impede a volta do problema: **operação nova no contrato sem teste de contrato falha a suíte**. Para conferir, estraguei de propósito 7 regras do mock (pausar linha, desfazer entrega, repetir fase, prazo de confirmação, pedido de chamada, limite de dias de aviso, convite) e a suíte pegou todas.

@@ -3647,6 +3647,64 @@
           "cmd": "npx vite build"
         }
       ]
+    },
+    {
+      "id": 33,
+      "titulo": "Contrato 100% testado",
+      "status": "concluida",
+      "objetivo": "Toda operação do contrato tem teste na suíte que o banco vai ter de passar.",
+      "checks": [
+        {
+          "d": "Teste: toda operação de escrita é chamada pela suíte de contrato",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "chama de verdade cada operação de escrita"
+        },
+        {
+          "d": "Teste de contrato: entregas da volta",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "volta: entregar, desfazer e reordenar"
+        },
+        {
+          "d": "Teste de contrato: prazo de confirmação",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "responde antes do prazo e é recusado depois dele"
+        },
+        {
+          "d": "Teste de contrato: pausas",
+          "tipo": "contem",
+          "arquivo": "src/data/repositorio.test.ts",
+          "regex": "pausas: valem só com datas boas"
+        },
+        {
+          "d": "Relatório: cobertura do contrato",
+          "tipo": "contem",
+          "arquivo": "docs/VARREDURA_PRE_BANCO.md",
+          "regex": "Cobertura do contrato \\(etapa 33\\)"
+        },
+        {
+          "d": "Lint limpo (sem erros nem avisos)",
+          "tipo": "comando",
+          "cmd": "npx eslint . --max-warnings 0"
+        },
+        {
+          "d": "Tipos sem erro",
+          "tipo": "comando",
+          "cmd": "npx tsc --noEmit"
+        },
+        {
+          "d": "Testes passam",
+          "tipo": "comando",
+          "cmd": "npx vitest run"
+        },
+        {
+          "d": "Build passa",
+          "tipo": "comando",
+          "cmd": "npx vite build"
+        }
+      ]
     }
   ]
 }
